@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import React, { useState } from "react";
-import { setUsername as updateUsername } from "@/lib/profiles";
+import { setUsername as updateUsername, checkUsernameExists } from "@/lib/profiles";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 
@@ -37,6 +37,21 @@ function page() {
 
     if (!user) {
       setErrorMessage("You must be logged in to set a username");
+      setLoading(false);
+      return;
+    }
+    
+    // Check if username is already taken
+    const { exists, error: checkError } = await checkUsernameExists(username);
+
+    if (checkError) {
+      setErrorMessage("Failed to check username availability. Please try again.");
+      setLoading(false);
+      return;
+    }
+
+    if (exists) {
+      setErrorMessage("Username already taken");
       setLoading(false);
       return;
     }

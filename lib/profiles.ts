@@ -32,6 +32,19 @@ export const getProfile = async (user_id:string) => {
   return { profile, error: null };
 }
 
+export const checkUsernameExists = async (username: string) => {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase.from("profiles").select("username").eq("username", username);
+
+  if (error) {
+    console.log("checkUsernameExists() Failed:", error);
+    return { exists: false, error };
+  }
+
+  return { exists: data && data.length > 0, error: null };
+}
+
 export const setUsername = async (user_id:string, username:string) => {
   const supabase = await createClient();
 
