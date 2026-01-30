@@ -1,5 +1,6 @@
 "use client";
 import { createClient } from "./supabase/client";
+import { createProfile } from "./profiles";
 
 export const signUpWithEmailAndPassword = async (
   email: string,
@@ -17,6 +18,17 @@ export const signUpWithEmailAndPassword = async (
     return { user: null, error };
   }
 
+  if (!data.user) {
+    console.log("signUpWithEmailAndPassword() Failed: No user returned");
+    return { user: null, error: new Error("No user returned from sign up") };
+  }
+
+  const { profile, error: profileError } = await createProfile(data.user)
+  
+  if (profileError) {
+    console.log('createProfile() Failed:', profileError)
+  }
+  
   return { user: data.user, error: null };
 };
 

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 // The client you created from the Server-Side Auth instructions
 import { createClient } from '@/lib/supabase/server'
+import { createProfile } from '@/lib/profiles'
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
@@ -15,6 +16,15 @@ export async function GET(request: Request) {
   if (code) {
     const supabase = await createClient()
     const { error } = await supabase.auth.exchangeCodeForSession(code)
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (user) {
+      const { profile, error: profileError } = await createProfile(user)
+
+      if (profileError) {
+        console.log('createProfile() Failed:', profileError)
+      }
+    }
 
     if (!error) {
       const forwardedHost = request.headers.get('x-forwarded-host') // original origin before load balancer
