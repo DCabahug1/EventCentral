@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
+import { signInWithEmailAndPassword, continueWithGoogle } from "@/lib/auth";
+import { useRouter } from "next/navigation";
 
 export function LoginForm({
   className,
@@ -22,17 +24,44 @@ export function LoginForm({
   });
   const [message, setMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const router = useRouter();
+
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
+    setLoading(true);
+
     // Reset messages
     setMessage("");
     setErrorMessage("");
 
-    // TODO: Implement login logic
-    console.log(formState);
-    setMessage("Logged in successfully.");
+    // Validate form
+    if (!formState.email || !formState.password) {
+      setErrorMessage("Please fill in all fields");
+      setLoading(false);
+      return;
+    }
+
+    // Sign In
+    const { user, error } = await signInWithEmailAndPassword(
+      formState.email,
+      formState.password
+    );
+
+    if (error) {
+      setErrorMessage(error.message);
+      setLoading(false);
+      return;
+    }
+
+    if (user) {
+      setMessage("Logged in successfully.");
+      router.push("/");
+    }
+
+    setLoading(false);
   };
 
   return (
@@ -75,14 +104,16 @@ export function LoginForm({
                 />
               </Field>
               <Field>
-                <Button type="submit">Login</Button>
+                <Button type="submit" disabled={loading}>
+                  {loading ? "Logging in..." : "Login"}
+                </Button>
               </Field>
               {message && <p>{message}</p>}
               {errorMessage && <p className="text-red-500">{errorMessage}</p>}
               <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
                 Or
               </FieldSeparator>
-              <Button variant="outline">Login with Google</Button>
+              <Button variant="outline" type="button" onClick={continueWithGoogle}>Login with Google</Button>
               <FieldDescription className="text-center">
                 Don&apos;t have an account? <a href="/register">Sign up</a>
               </FieldDescription>

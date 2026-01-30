@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
+import { continueWithGoogle, signUpWithEmailAndPassword } from "@/lib/auth";
+import { useRouter } from "next/navigation";
 
 export function SignupForm({
   className,
@@ -23,23 +25,50 @@ export function SignupForm({
   });
   const [message, setMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const router = useRouter();
+
+  const onSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
-    
+
+    setLoading(true);
+
     // Reset messages
     setMessage("");
     setErrorMessage("");
 
     // Validate form
-    if (formState.password !== formState.confirmPassword) {
-      setErrorMessage("Passwords do not match.");
+    if (!formState.email || !formState.password || !formState.confirmPassword) {
+      setErrorMessage("Please fill in all fields");
       return;
     }
 
-    // TODO: Implement signup logic
-    console.log(formState);
-    setMessage("Account created successfully.");
+    if (formState.password.length < 8) {
+      setErrorMessage("Password must be at least 8 characters long");
+      return;
+    }
+
+    if (formState.password !== formState.confirmPassword) {
+      setErrorMessage("Passwords do not match");
+      return;
+    }
+
+    // Sign Up
+    const { user, error } = await signUpWithEmailAndPassword(
+      formState.email,
+      formState.password
+    );
+
+    if (error) {
+      setErrorMessage(error.message);
+      return;
+    }
+
+    if (user) {
+      setMessage("Account created successfully.");
+      router.push("/");
+    }
   };
 
   return (
@@ -66,31 +95,38 @@ export function SignupForm({
                     setFormState({ ...formState, email: e.target.value })
                   }
                 />
-                <FieldDescription>
-                  We&apos;ll use this to contact you. We will not share your
-                  email with anyone else.
-                </FieldDescription>
               </Field>
               <Field>
                 <Field className="grid grid-cols-2 gap-4">
-              <Field>
-                <FieldLabel htmlFor="password">Password</FieldLabel>
-                <Input
-                  id="password"
-                  type="password"
-                  required
-                  minLength={8}
-                  value={formState.password}
-                  onChange={(e) =>
-                    setFormState({ ...formState, password: e.target.value })
-                  }
-                />
-              </Field>
-              <Field>
-                <FieldLabel htmlFor="confirm-password">
-                  Confirm Password
-                </FieldLabel>
-                    <Input id="confirm-password" type="password" required value={formState.confirmPassword} onChange={(e) => setFormState({ ...formState, confirmPassword: e.target.value })} />
+                  <Field>
+                    <FieldLabel htmlFor="password">Password</FieldLabel>
+                    <Input
+                      id="password"
+                      type="password"
+                      required
+                      minLength={8}
+                      value={formState.password}
+                      onChange={(e) =>
+                        setFormState({ ...formState, password: e.target.value })
+                      }
+                    />
+                  </Field>
+                  <Field>
+                    <FieldLabel htmlFor="confirm-password">
+                      Confirm Password
+                    </FieldLabel>
+                    <Input
+                      id="confirm-password"
+                      type="password"
+                      required
+                      value={formState.confirmPassword}
+                      onChange={(e) =>
+                        setFormState({
+                          ...formState,
+                          confirmPassword: e.target.value,
+                        })
+                      }
+                    />
                   </Field>
                 </Field>
                 <FieldDescription>
@@ -98,14 +134,14 @@ export function SignupForm({
                 </FieldDescription>
               </Field>
               <Field>
-                <Button type="submit">Create Account</Button>
+                <Button type="submit" disabled={loading} >{loading ? 'Creating Account...' : 'Create Account'}</Button>
               </Field>
               {message && <p>{message}</p>}
               {errorMessage && <p className="text-red-500">{errorMessage}</p>}
               <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
                 Or
               </FieldSeparator>
-              <Button variant="outline">Sign up with Google</Button>
+              <Button variant="outline" type="button" onClick={continueWithGoogle}>Sign up with Google</Button>
               <FieldDescription className="text-center">
                 Already have an account? <a href="/login">Sign in</a>
               </FieldDescription>
@@ -121,5 +157,5 @@ export function SignupForm({
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
