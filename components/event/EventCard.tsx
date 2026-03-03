@@ -21,22 +21,41 @@ const formatDate = (date: string) => {
 };
 
 function EventCard({ event }: { event: Event }) {
-  // TODO: Implement the event card UI.
-  //
-  // Guide:
-  // - Use the `Card` component as the outer container.
-  // - Use the `Image` component to display the event image (`event.image_url`) with a nice aspect ratio.
-  // - Show the event title prominently.
-  // - Display the start date/time using the `formatDate` helper above.
-  // - Include the location and capacity information from the `event` object.
-  // - Use the `Clock`, `MapPin`, and `Users` icons next to the corresponding pieces of information.
-  // - Show a visual indication of how full the event is using the `Progress` component
-  //   (derivable from `event.current_attendees` and `event.max_capacity`).
-  // - Refer to the Shadcn-UI documentation for the `Card` and 'Progress' components.
-
   return (
-    <Card>
-      {/* Implement the layout and styling for the event card here. */}
+    <Card className="w-72 max-w-md p-4 gap-3 hover:opacity-80 hover:shadow-md transition-all duration-300 cursor-pointer">
+      {/* Event Image */}
+      <div className="w-full h-48 relative rounded-lg overflow-hidden">
+        <Image
+          src={event.image_url}
+          alt={event.title}
+          width={100}
+          height={100}
+          className="object-cover w-full h-full"
+        />
+      </div>
+      {/* Event Title */}
+      <h1 className="text-2xl font-bold">{event.title}</h1>
+      {/* Event Details */}
+      <div className="flex flex-col gap-2">
+        {/* Start Time & Date */}
+        <div className="flex items-center gap-2">
+          <Clock className="w-4 h-4" />
+          {/* Format time 12 hour format */}
+          <span>{formatDate(event.start_date)}</span>
+        </div>
+        {/* Location */}
+        <div className="flex items-center gap-2">
+          <MapPin className="w-4 h-4" />
+          <span>{event.location}</span>
+        </div>
+        {/* Capacity */}
+        <div className="flex items-center gap-2">
+          <Users className="w-4 h-4" />
+          <span>{event.current_attendees} / {event.capacity} Attendees</span>
+        </div>
+        {/* Attendees Progress Bar */}
+        <Progress value={event.current_attendees / event.capacity * 100} />
+      </div>
     </Card>
   );
 }

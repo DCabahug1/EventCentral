@@ -4,18 +4,22 @@ import { Event, getEvents } from "@/lib/events";
 import EventCard from "@/components/event/EventCard";
 
 function page() {
-  // TODO: Implement the events page.
-  //
-  // Hints for the candidate:
-  // - Use `useState<Event[]>` to hold the list of events.
-  // - Use an `async` function that calls `getEvents()` and updates state.
-  // - Trigger that fetch on mount using `useEffect`.
-  // - Render the list of events using the `EventCard` component.
-  // - Consider a simple layout using flexbox or grid for the cards.
+  const [events, setEvents] = useState<Event[]>([]);
+
+  const fetchEvents = async () => {
+    const newEvents = await getEvents();
+    setEvents(newEvents);
+  };
+
+  useEffect(() => {
+    fetchEvents();
+  }, []);
 
   return (
-    <div>
-      {/* Render the list of events here using `EventCard`. */}
+    <div className="flex  w-full flex-wrap p-4 gap-4">
+      {events.map((event) => (
+        <EventCard key={event.id} event={event} />
+      ))}
     </div>
   );
 }
