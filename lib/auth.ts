@@ -15,21 +15,22 @@ export const signUpWithEmailAndPassword = async (
 
   if (error) {
     console.log("signUpWithEmailAndPassword() Failed:", error);
-    return { user: null, error };
+    return error;
   }
 
   if (!data.user) {
     console.log("signUpWithEmailAndPassword() Failed: No user returned");
-    return { user: null, error: new Error("No user returned from sign up") };
+    return new Error("No user returned from sign up");
   }
 
   const { profile, error: profileError } = await createProfile(data.user)
   
   if (profileError) {
     console.log('createProfile() Failed:', profileError)
+    return profileError;
   }
   
-  return { user: data.user, error: null };
+  return data.user;
 };
 
 export const signInWithEmailAndPassword = async (
@@ -45,10 +46,10 @@ export const signInWithEmailAndPassword = async (
 
   if (error) {
     console.log("signInWithEmailAndPassword() Failed:", error);
-    return { user: null, error };
+    return error;
   }
 
-  return { user: data.user, error: null };
+  return data.user;
 };
 
 export const continueWithGoogle = async () => {
