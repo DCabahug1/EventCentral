@@ -77,8 +77,9 @@ function page() {
             src="/discover-page/Hero.jpg"
             alt="EventCentral"
             fill
-            className="object-cover object-[center_40%] brightness-50"
+            className="object-cover object-[center_40%] "
           />
+          <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent" />
         </motion.div>
 
         <motion.div

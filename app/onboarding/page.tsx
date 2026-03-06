@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { createProfile } from "@/lib/profiles";
-import { AuthError, PostgrestError } from "@supabase/supabase-js";
+import { AuthError } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
 
 function formatPhoneNumber(value: string): string {
@@ -42,12 +42,20 @@ function page() {
         formData.description,
       );
 
-      if (result instanceof AuthError || result instanceof PostgrestError) {
+      if (result instanceof AuthError) {
         setErrorMessage(result.message);
         return;
       }
 
-      console.log("Profile created successfully", result);
+      if (result && typeof result === "object" && "code" in result) {
+        const err = result as { code: string; message: string };
+        if (err.code === "23505") {
+          setErrorMessage("That username is already taken. Please choose a different one.");
+        } else {
+          setErrorMessage(err.message);
+        }
+        return;
+      }
 
       router.push("/");
     } catch (error) {
