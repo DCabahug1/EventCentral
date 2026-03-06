@@ -26,19 +26,13 @@ export const createProfile = async (username: string, phone_number: string, desc
   return profileData;
 }
 
-export const getProfile = async () => {
+export const getProfile = async (user_id: string) => {
   const supabase = await createClient();
-  const { data, error } = await supabase.auth.getUser();
-
-  if (error) {
-    // Handle as AuthError
-    return error;
-  }
 
   const { data: profileData, error: profileError } = await supabase
     .from('profiles')
     .select('*')
-    .eq('user_id', data.user.id)
+    .eq('user_id', user_id)
     .maybeSingle();
 
   if (profileError) {
