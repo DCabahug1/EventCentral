@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { getCurrentUser } from "@/lib/user";
 import { useState } from "react";
 import { useEffect } from "react";
+import Header from "@/components/header/Header";
 
 function page() {
   const [user, setUser] = useState<User | null>(null);
@@ -34,14 +35,17 @@ function page() {
 
     router.push("/auth/login");
   };
-  if (!user) {
-    return <div>Loading...</div>;
-  }
-  
+
   return (
-    <div>
-      <p>Welcome {user?.email}</p>
-      <Button onClick={handleSignOut}>Sign Out</Button>
+    <div className="flex flex-col w-full">
+      {user ? (
+        <>
+          <p>Welcome {user?.email}</p>
+          <Button onClick={handleSignOut}>Sign Out</Button>
+        </>
+      ) : (
+        <p>Loading...</p>
+      )}
     </div>
   );
 }

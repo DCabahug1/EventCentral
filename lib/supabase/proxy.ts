@@ -59,7 +59,7 @@ export async function updateSession(request: NextRequest) {
   let profile: Profile | null = null;
 
   try {
-    const result = await getProfile();
+    const result = await getProfile(user.sub);
     if (result instanceof PostgrestError) {
       console.error("Error getting profile:", result.message);
       return supabaseResponse;

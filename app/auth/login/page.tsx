@@ -11,6 +11,7 @@ import { Separator } from "@/components/ui/separator";
 import { signInWithEmailAndPassword, signInWithGoogle } from "@/lib/auth";
 import { AuthError } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
+import { motion } from "motion/react";
 
 function page() {
   const [showPassword, setShowPassword] = useState(false);
@@ -49,7 +50,13 @@ function page() {
   return (
     <div className="flex flex-col h-svh">
       <div className="flex-1 flex items-center justify-center p-4">
-        <Card className="grid grid-cols-1 sm:grid-cols-2 gap-0 p-0 overflow-hidden w-full max-w-2xl">
+        <motion.div
+          className="w-full max-w-2xl"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, ease: "easeOut" }}
+        >
+        <Card className="grid grid-cols-1 sm:grid-cols-2 gap-0 p-0 overflow-hidden w-full">
           <div className="flex flex-col justify-center px-4 py-8 gap-4">
             <div>
               <h1 className="text-2xl font-bold">Welcome back</h1>
@@ -119,6 +126,7 @@ function page() {
             className="hidden sm:block h-full object-cover"
           />
         </Card>
+        </motion.div>
       </div>
     </div>
   );
