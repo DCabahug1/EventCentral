@@ -8,7 +8,7 @@ import { Eye, EyeOff, Loader2 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { Separator } from "@/components/ui/separator";
-import { signUpWithEmailAndPassword } from "@/lib/auth";
+import { signUpWithEmailAndPassword, signInWithGoogle } from "@/lib/auth";
 import { AuthError } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
 
@@ -124,7 +124,7 @@ function page() {
               </Button>
             </form>
             <Separator />
-            <Button variant="outline" className="w-full" disabled={loading}>
+            <Button variant="outline" className="w-full" disabled={loading} onClick={signInWithGoogle}>
               {loading ? <Loader2 className="animate-spin" /> : "Continue with Google"}
             </Button>
             <p className="text-sm text-muted-foreground">
