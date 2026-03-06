@@ -11,17 +11,18 @@ import {
 } from "../ui/dropdown-menu";
 import Link from "next/link";
 import { Button } from "../ui/button";
-import { LogOut, User } from "lucide-react";
+import { ChevronDown, LogOut, Moon, Sun, User } from "lucide-react";
 import { signOut } from "@/lib/auth";
 import { AuthError } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useState } from "react";
+import { pastelColors } from "@/lib/avatarColors";
+import { useTheme } from "next-themes";
 
 function AvatarButton({ profile }: { profile: Profile }) {
-  useEffect(() => {
-    console.log(profile);
-  });
+  const [randomAvatarColor] = useState<string>(pastelColors[Math.floor(Math.random() * pastelColors.length)]);
   const router = useRouter();
+  const { theme, setTheme } = useTheme();
 
   const handleSignOut = async () => {
     const result = await signOut();
@@ -32,15 +33,19 @@ function AvatarButton({ profile }: { profile: Profile }) {
     router.push("/auth/login");
   };
 
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Avatar className="cursor-pointer">
-          <AvatarImage src={profile.avatar_url || ""} />
-          <AvatarFallback>
-            {profile.username?.charAt(0).toUpperCase() || "?"}
-          </AvatarFallback>
-        </Avatar>
+        <Button variant="ghost" className="cursor-pointer">
+          <Avatar className="">
+            <AvatarImage src={profile.avatar_url || ""} />
+            <AvatarFallback style={{ backgroundColor: randomAvatarColor }} className="text-primary-foreground">
+              {profile.username?.charAt(0).toUpperCase() || "?"}
+            </AvatarFallback>
+          </Avatar>
+          <ChevronDown className="size-4" />
+        </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuLabel>
@@ -53,6 +58,10 @@ function AvatarButton({ profile }: { profile: Profile }) {
             Profile
           </DropdownMenuItem>
         </Link>
+        <DropdownMenuItem onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
+          {theme === "dark" ? <Sun /> : <Moon />}
+          {theme === "dark" ? "Light mode" : "Dark mode"}
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleSignOut} variant="destructive">
           <LogOut />
