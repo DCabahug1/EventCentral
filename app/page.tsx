@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useRef } from "react";
 import { signOut } from "@/lib/auth";
 import { AuthError, PostgrestError, User } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ import { getProfile } from "@/lib/profiles";
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
-import { motion } from "motion/react";
+import { motion, useScroll, useTransform } from "motion/react";
 
 const CATEGORIES = [
   { label: "Music", emoji: "🎵" },
@@ -29,6 +29,10 @@ function page() {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const router = useRouter();
+
+  const heroRef = useRef<HTMLDivElement>(null);
+  const { scrollY } = useScroll();
+  const parallaxY = useTransform(scrollY, [0, 600], ["0%", "50%"]);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -65,10 +69,14 @@ function page() {
   return (
     <div className="flex flex-col w-full">
       {/* Hero */}
-      <div className="flex flex-col items-center justify-center md:h-[50svh] h-[60svh] p-4 gap-4 relative w-full">
+      <div
+        ref={heroRef}
+        className="flex flex-col items-center justify-center md:h-[50svh] h-[60svh] p-4 gap-4 relative w-full overflow-hidden"
+      >
         {/* Background image */}
         <motion.div
-          className="absolute inset-0 -z-10 h-full"
+          className="absolute inset-x-0 -top-[25%] -z-10 h-[150%]"
+          style={{ y: parallaxY }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1, ease: "easeOut" }}
@@ -77,10 +85,10 @@ function page() {
             src="/discover-page/Hero.jpg"
             alt="EventCentral"
             fill
-            className="object-cover object-[center_40%] "
+            className="object-cover object-[center_40%]"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent" />
         </motion.div>
+        <div className="absolute inset-0 -z-10 bg-gradient-to-t from-black/70 dark:from-background to-transparent" />
 
         <motion.div
           className="flex flex-col items-center gap-3 text-center"
@@ -131,6 +139,14 @@ function page() {
           ))}
         </motion.div>
       </div>
+      <div className="bg-red-500 w-[200px] h-[200px]">Filler Block</div>
+      <div className="bg-blue-500 w-[200px] h-[200px]">Filler Block</div>
+      <div className="bg-green-500 w-[200px] h-[200px]">Filler Block</div>
+      <div className="bg-yellow-500 w-[200px] h-[200px]">Filler Block</div>
+      <div className="bg-purple-500 w-[200px] h-[200px]">Filler Block</div>
+      <div className="bg-pink-500 w-[200px] h-[200px]">Filler Block</div>
+      <div className="bg-gray-500 w-[200px] h-[200px]">Filler Block</div>
+      <div className="bg-black w-[200px] h-[200px]">Filler Block</div>
     </div>
   );
 }
