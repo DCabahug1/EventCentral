@@ -3,18 +3,10 @@ import React, { useRef, useState } from "react";
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Search } from "lucide-react";
 import { motion, useScroll, useTransform } from "motion/react";
-
-const CATEGORIES = [
-  { label: "Music", emoji: "🎵" },
-  { label: "Parties", emoji: "🎉" },
-  { label: "Tech", emoji: "💻" },
-  { label: "Sports", emoji: "🏆" },
-  { label: "Food & Drink", emoji: "🍕" },
-  { label: "Art", emoji: "🎨" },
-  { label: "Outdoor", emoji: "🌿" },
-];
+import { CATEGORY_CONFIG } from "@/lib/categoryConfig";
 
 function Hero({
   onSearch,
@@ -38,7 +30,7 @@ function Hero({
   return (
     <div
       ref={heroRef}
-      className="flex flex-col items-center justify-center md:h-[50svh] h-[60svh] p-4 gap-4 relative w-full overflow-hidden"
+      className="flex flex-col items-center justify-center md:h-[60svh] h-[70svh] p-4 gap-4 relative w-full overflow-hidden"
     >
       {/* Parallax background image */}
       <motion.div
@@ -74,7 +66,7 @@ function Hero({
 
       {/* Search bar */}
       <motion.div
-        className="dark flex w-full max-w-lg items-center gap-2 rounded-full border border-white/20 bg-white/10 px-2 py-1.5 backdrop-blur-sm"
+        className="dark flex w-full max-w-2xl items-center gap-2 rounded-full border border-white/20 bg-white/10 px-2 py-1.5 backdrop-blur-sm"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut", delay: 0.15 }}
@@ -100,18 +92,21 @@ function Hero({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut", delay: 0.3 }}
       >
-        {CATEGORIES.map(({ label, emoji }) => (
-          <button
+        {CATEGORY_CONFIG.map(({ label, icon: Icon, colorClass }) => (
+          <Badge
             key={label}
-            onClick={() => onTagSelect(label)}
-            className={`inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium backdrop-blur-sm transition-colors ${
+            asChild
+            className={`cursor-pointer backdrop-blur-sm transition-colors px-3 py-1 text-xs ${
               activeTag === label
-                ? "border-primary bg-primary text-primary-foreground"
+                ? "border-primary bg-primary text-primary-foreground [&>svg]:text-primary-foreground"
                 : "border-white/20 bg-white/10 text-white/80 hover:bg-white/20"
             }`}
           >
-            {emoji} {label}
-          </button>
+            <button onClick={() => onTagSelect(label)}>
+              <Icon className={activeTag === label ? "" : colorClass} />
+              {label}
+            </button>
+          </Badge>
         ))}
       </motion.div>
     </div>

@@ -6,6 +6,8 @@ import Image from "next/image";
 import { MapPin, Calendar, Users } from "lucide-react";
 import { Progress } from "../ui/progress";
 import { motion } from "motion/react";
+import { Badge } from "../ui/badge";
+import { getCategoryConfig } from "@/lib/categoryConfig";
 import Link from "next/link";
 
 // Formats an ISO date string to a readable "Month Day, Year at HH:MM AM/PM" label
@@ -23,7 +25,6 @@ const formatDateTime = (date: string) => {
 const getProgressColor = (pct: number) => {
   if (pct >= 100) return "bg-red-500";
   if (pct >= 75) return "bg-orange-500";
-  if (pct >= 50) return "bg-yellow-500";
   return "bg-primary";
 };
 
@@ -66,13 +67,22 @@ function EventCard({ event }: { event: Event }) {
   const status = getEventStatus(event.start_time, event.end_time);
   const { label, className, dot } = statusConfig[status];
 
+  // For the hover effect
+  const [isHovered, setIsHovered] = useState(false);
+
   return (
     <motion.div className="w-full h-full">
       <Link href={`/events/${event.id}`}>
-        <Card className="w-full h-full p-0 gap-0 overflow-hidden cursor-pointer hover:scale-101 dark:brightness-90 dark:hover:brightness-100 transition-all duration-300">
+        <Card
+          className="w-full h-full p-0 gap-0 overflow-hidden cursor-pointer hover:scale-101 dark:brightness-90 dark:hover:brightness-100 transition-all duration-300"
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+        >
           {/* Image + overlays */}
           <div className="relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 dark:from-background to-transparent z-10" />
+            <div
+              className={`absolute inset-0 bg-gradient-to-t from-black/70 dark:from-background to-transparent z-10 ${isHovered ? "opacity-70" : "opacity-80"} transition-all duration-300`}
+            />
 
             {/* Status badge — positioned over the image in the top-left */}
             <div
@@ -104,8 +114,25 @@ function EventCard({ event }: { event: Event }) {
           </div>
 
           {/* Event details */}
-          <div className="flex flex-col gap-2 p-4">
-            <h1 className="text-2xl font-bold">{event.title}</h1>
+          <div className="flex flex-col gap-3 p-4">
+            {/* Heading */}
+            <div className="flex flex-col gap-1">
+              <h2 className="text-sm text-muted-foreground">Organization Placeholder</h2>
+              <h1 className="text-2xl font-bold">{event.title}</h1>
+            </div>
+            {/* Tags */}
+            <div className="flex flex-wrap gap-2">
+              {event.tags.map((tag) => {
+                const config = getCategoryConfig(tag);
+                const Icon = config?.icon;
+                return (
+                  <Badge key={tag} variant="outline">
+                    {Icon && <Icon className={config?.colorClass} />}
+                    {tag}
+                  </Badge>
+                );
+              })}
+            </div>
             <div className="flex gap-2">
               <MapPin className="w-4 h-4 text-muted-foreground" />
               <p className="text-sm text-muted-foreground">{event.location}</p>
