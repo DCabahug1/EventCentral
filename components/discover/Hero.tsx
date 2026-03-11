@@ -1,10 +1,10 @@
 "use client";
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { motion, useScroll, useTransform } from "motion/react";
 import { CATEGORY_CONFIG } from "@/lib/categoryConfig";
 
@@ -12,18 +12,24 @@ function Hero({
   onSearch,
   onTagSelect,
   activeTag,
+  query,
+  input,
+  onInputChange,
+  onClearSearch,
 }: {
   onSearch: (q: string) => void;
   onTagSelect: (tag: string) => void;
   activeTag: string;
+  query: string;
+  input: string;
+  onInputChange: (value: string) => void;
+  onClearSearch: () => void;
 }) {
   const heroRef = useRef<HTMLDivElement>(null);
-  const [input, setInput] = useState("");
   const { scrollY } = useScroll();
   const parallaxY = useTransform(scrollY, [0, 600], ["0%", "50%"]);
 
   const submit = () => {
-    setInput(""); // clear input after submitting so it doesn't linger
     onSearch(input.trim());
   };
 
@@ -74,11 +80,23 @@ function Hero({
         <Input
           type="text"
           value={input}
-          onChange={(e) => setInput(e.target.value)}
+          onChange={(e) => onInputChange(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && submit()}
           placeholder="Search for an event"
           className="flex-1 border-0 bg-transparent shadow-none focus-visible:ring-0 text-white placeholder:text-white/50"
         />
+        {/* Clear search button */}
+        {query && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onClearSearch}
+            className="shrink-0 rounded-full text-white/60 hover:text-white hover:bg-white/10!"
+            aria-label="Clear search"
+          >
+            <X className="w-4 h-4" />
+          </Button>
+        )}
         <Button size="sm" className="shrink-0 rounded-full" onClick={submit}>
           <Search />
           Search

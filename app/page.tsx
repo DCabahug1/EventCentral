@@ -9,6 +9,7 @@ function page() {
   const [events, setEvents] = useState<Event[]>([]);
   const [query, setQuery] = useState("");
   const [activeTag, setActiveTag] = useState("");
+  const [input, setInput] = useState("");
   const eventsListRef = useRef<HTMLDivElement>(null);
 
   const fetchEvents = async () => {
@@ -34,7 +35,13 @@ function page() {
     const next = activeTag === tag ? "" : tag;
     setActiveTag(next);
     setQuery("");
+    setInput("");
     scrollToEvents();
+  };
+
+  const handleClearSearch = () => {
+    setQuery("");
+    setInput("");
   };
 
   const filteredEvents = activeTag
@@ -51,7 +58,15 @@ function page() {
 
   return (
     <div className="flex flex-col w-full">
-      <Hero onSearch={handleSearch} onTagSelect={handleTagSelect} activeTag={activeTag} />
+      <Hero
+        onSearch={handleSearch}
+        onTagSelect={handleTagSelect}
+        activeTag={activeTag}
+        query={query}
+        input={input}
+        onInputChange={setInput}
+        onClearSearch={handleClearSearch}
+      />
       <div ref={eventsListRef}>
         <EventsList events={filteredEvents} query={query} activeTag={activeTag} />
       </div>

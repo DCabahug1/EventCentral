@@ -65,7 +65,7 @@ function EmptyState({ message }: { message: string }) {
     <motion.p
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="text-muted-foreground text-sm py-12"
+      className="text-muted-foreground text-sm py-12 text-center"
     >
       {message}
     </motion.p>

@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/header/Header";
 import { ThemeProvider } from "@/components/theme-provider";
+import Footer from "@/components/footer/Footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,7 +17,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "EventCentral",
-  description: "EventCentral is a platform for creating and managing events.",
+  description: "Discover what's happening around you.",
 };
 
 export default function RootLayout({
@@ -33,6 +34,7 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="dark">
           <Header />
           {children}
+          <Footer />
         </ThemeProvider>
       </body>
     </html>
