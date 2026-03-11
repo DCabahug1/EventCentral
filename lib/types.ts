@@ -18,4 +18,5 @@ export type Event = {
   location: string;
   max_capacity: number;
   image_url: string;
+  tags: string[];
 }

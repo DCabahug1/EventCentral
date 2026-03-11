@@ -11,6 +11,7 @@ const mockEvents: Event[] = [
     location: "Convention Center, San Francisco, CA",
     max_capacity: 500,
     image_url: "/mock-event-assets/mockImage.jpg",
+    tags: ["Tech"],
   },
   {
     id: 2,
@@ -22,6 +23,7 @@ const mockEvents: Event[] = [
     location: "Downtown Arts District, Austin, TX",
     max_capacity: 200,
     image_url: "/mock-event-assets/mockImage.jpg",
+    tags: ["Art"],
   },
   {
     id: 3,
@@ -33,6 +35,7 @@ const mockEvents: Event[] = [
     location: "WeWork Headquarters, New York, NY",
     max_capacity: 150,
     image_url: "/mock-event-assets/mockImage.jpg",
+    tags: ["Tech"],
   },
   {
     id: 4,
@@ -44,6 +47,7 @@ const mockEvents: Event[] = [
     location: "Riverside Park, Chicago, IL",
     max_capacity: 1000,
     image_url: "/mock-event-assets/mockImage.jpg",
+    tags: ["Sports", "Outdoor"],
   },
   {
     id: 5,
@@ -55,6 +59,7 @@ const mockEvents: Event[] = [
     location: "The Culinary Studio, Seattle, WA",
     max_capacity: 24,
     image_url: "/mock-event-assets/mockImage.jpg",
+    tags: ["Food & Drink"],
   },
   {
     id: 6,
@@ -66,6 +71,7 @@ const mockEvents: Event[] = [
     location: "Centennial Park, Nashville, TN",
     max_capacity: 800,
     image_url: "/mock-event-assets/mockImage.jpg",
+    tags: ["Music", "Outdoor"],
   },
   {
     id: 7,
@@ -77,6 +83,7 @@ const mockEvents: Event[] = [
     location: "The Photo Loft, Portland, OR",
     max_capacity: 30,
     image_url: "/mock-event-assets/mockImage.jpg",
+    tags: ["Art"],
   },
   {
     id: 8,
@@ -88,6 +95,7 @@ const mockEvents: Event[] = [
     location: "The Game Vault, Denver, CO",
     max_capacity: 120,
     image_url: "/mock-event-assets/mockImage.jpg",
+    tags: ["Parties"],
   },
   {
     id: 9,
@@ -99,6 +107,7 @@ const mockEvents: Event[] = [
     location: "Grand Hyatt, Boston, MA",
     max_capacity: 300,
     image_url: "/mock-event-assets/mockImage.jpg",
+    tags: ["Tech"],
   },
   {
     id: 10,
@@ -110,6 +119,7 @@ const mockEvents: Event[] = [
     location: "Blue Ridge Mountain Retreat, Asheville, NC",
     max_capacity: 60,
     image_url: "/mock-event-assets/mockImage.jpg",
+    tags: ["Outdoor"],
   },
   // Ongoing event
   {
@@ -122,6 +132,7 @@ const mockEvents: Event[] = [
     location: "Capitol Square, Madison, WI",
     max_capacity: 600,
     image_url: "/mock-event-assets/mockImage.jpg",
+    tags: ["Food & Drink", "Outdoor"],
   },
   // Past events
   {
@@ -134,6 +145,7 @@ const mockEvents: Event[] = [
     location: "MIT Media Lab, Cambridge, MA",
     max_capacity: 200,
     image_url: "/mock-event-assets/mockImage.jpg",
+    tags: ["Tech"],
   },
   {
     id: 12,
@@ -145,6 +157,7 @@ const mockEvents: Event[] = [
     location: "Union Square, San Francisco, CA",
     max_capacity: 2000,
     image_url: "/mock-event-assets/mockImage.jpg",
+    tags: ["Art", "Parties"],
   },
   {
     id: 13,
@@ -156,6 +169,7 @@ const mockEvents: Event[] = [
     location: "The Ritz-Carlton, Chicago, IL",
     max_capacity: 350,
     image_url: "/mock-event-assets/mockImage.jpg",
+    tags: ["Parties", "Music"],
   },
   {
     id: 14,
@@ -167,6 +181,7 @@ const mockEvents: Event[] = [
     location: "Alamo Drafthouse, Austin, TX",
     max_capacity: 180,
     image_url: "/mock-event-assets/mockImage.jpg",
+    tags: ["Art"],
   },
   {
     id: 15,
@@ -178,6 +193,7 @@ const mockEvents: Event[] = [
     location: "Green Thumb Community Center, Portland, OR",
     max_capacity: 40,
     image_url: "/mock-event-assets/mockImage.jpg",
+    tags: ["Outdoor"],
   },
   {
     id: 16,
@@ -189,6 +205,7 @@ const mockEvents: Event[] = [
     location: "The Taproom, Nashville, TN",
     max_capacity: 100,
     image_url: "/mock-event-assets/mockImage.jpg",
+    tags: ["Parties"],
   },
   {
     id: 17,
@@ -200,6 +217,7 @@ const mockEvents: Event[] = [
     location: "IDEO Studio, New York, NY",
     max_capacity: 50,
     image_url: "/mock-event-assets/mockImage.jpg",
+    tags: ["Tech", "Art"],
   },
   {
     id: 18,
@@ -211,6 +229,7 @@ const mockEvents: Event[] = [
     location: "The Velvet Lounge, Seattle, WA",
     max_capacity: 90,
     image_url: "/mock-event-assets/mockImage.jpg",
+    tags: ["Music"],
   },
   {
     id: 19,
@@ -222,6 +241,7 @@ const mockEvents: Event[] = [
     location: "Serenity Wellness Center, Denver, CO",
     max_capacity: 45,
     image_url: "/mock-event-assets/mockImage.jpg",
+    tags: ["Outdoor"],
   },
 ]
 

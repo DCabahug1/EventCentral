@@ -16,13 +16,24 @@ const CATEGORIES = [
   { label: "Outdoor", emoji: "🌿" },
 ];
 
-function Hero({ onSearch }: { onSearch: (q: string) => void }) {
+function Hero({
+  onSearch,
+  onTagSelect,
+  activeTag,
+}: {
+  onSearch: (q: string) => void;
+  onTagSelect: (tag: string) => void;
+  activeTag: string;
+}) {
   const heroRef = useRef<HTMLDivElement>(null);
   const [input, setInput] = useState("");
   const { scrollY } = useScroll();
   const parallaxY = useTransform(scrollY, [0, 600], ["0%", "50%"]);
 
-  const submit = () => onSearch(input.trim());
+  const submit = () => {
+    setInput(""); // clear input after submitting so it doesn't linger
+    onSearch(input.trim());
+  };
 
   return (
     <div
@@ -92,8 +103,12 @@ function Hero({ onSearch }: { onSearch: (q: string) => void }) {
         {CATEGORIES.map(({ label, emoji }) => (
           <button
             key={label}
-            onClick={() => { setInput(label); onSearch(label); }}
-            className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium text-white/80 backdrop-blur-sm transition-colors hover:bg-white/20"
+            onClick={() => onTagSelect(label)}
+            className={`inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium backdrop-blur-sm transition-colors ${
+              activeTag === label
+                ? "border-primary bg-primary text-primary-foreground"
+                : "border-white/20 bg-white/10 text-white/80 hover:bg-white/20"
+            }`}
           >
             {emoji} {label}
           </button>

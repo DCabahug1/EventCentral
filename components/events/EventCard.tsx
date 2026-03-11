@@ -6,6 +6,7 @@ import Image from "next/image";
 import { MapPin, Calendar, Users } from "lucide-react";
 import { Progress } from "../ui/progress";
 import { motion } from "motion/react";
+import Link from "next/link";
 
 // Formats an ISO date string to a readable "Month Day, Year at HH:MM AM/PM" label
 const formatDateTime = (date: string) => {
@@ -37,7 +38,10 @@ const getEventStatus = (start: string, end: string): EventStatus => {
 };
 
 // Visual config for each status — controls badge label, styles, and whether to show a pulse dot
-const statusConfig: Record<EventStatus, { label: string; className: string; dot?: boolean }> = {
+const statusConfig: Record<
+  EventStatus,
+  { label: string; className: string; dot?: boolean }
+> = {
   upcoming: {
     label: "Upcoming",
     className: "bg-black/50 text-white border border-white/20",
@@ -64,64 +68,66 @@ function EventCard({ event }: { event: Event }) {
 
   return (
     <motion.div className="w-full h-full">
-      <Card className="w-full h-full p-0 gap-0 overflow-hidden">
+      <Link href={`/events/${event.id}`}>
+        <Card className="w-full h-full p-0 gap-0 overflow-hidden cursor-pointer brightness-90 hover:brightness-100 transition-all duration-300">
+          {/* Image + overlays */}
+          <div className="relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 dark:from-background to-transparent z-10" />
 
-        {/* Image + overlays */}
-        <div className="relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 dark:from-background to-transparent z-10" />
+            {/* Status badge — positioned over the image in the top-left */}
+            <div
+              className={`absolute top-3 left-3 z-20 flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold backdrop-blur-sm ${className}`}
+            >
+              {dot && (
+                // Ping animation only shown for live events
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-white" />
+                </span>
+              )}
+              {label}
+            </div>
 
-          {/* Status badge — positioned over the image in the top-left */}
-          <div className={`absolute top-3 left-3 z-20 flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold backdrop-blur-sm ${className}`}>
-            {dot && (
-              // Ping animation only shown for live events
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-white" />
-              </span>
-            )}
-            {label}
+            {/* Image scales up slightly on hover */}
+            <motion.div
+              whileHover={{ scale: 1.04 }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+            >
+              <Image
+                src={event.image_url}
+                alt={event.title}
+                width={500}
+                height={500}
+                className="w-full h-48 object-cover"
+              />
+            </motion.div>
           </div>
 
-          {/* Image scales up slightly on hover */}
-          <motion.div
-            whileHover={{ scale: 1.04 }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
-          >
-            <Image
-              src={event.image_url}
-              alt={event.title}
-              width={500}
-              height={500}
-              className="w-full h-48 object-cover"
-            />
-          </motion.div>
-        </div>
+          {/* Event details */}
+          <div className="flex flex-col gap-2 p-4">
+            <h1 className="text-2xl font-bold">{event.title}</h1>
+            <div className="flex gap-2">
+              <MapPin className="w-4 h-4 text-muted-foreground" />
+              <p className="text-sm text-muted-foreground">{event.location}</p>
+            </div>
+            <div className="flex gap-2">
+              <Calendar className="w-4 h-4 text-muted-foreground" />
+              <p className="text-sm text-muted-foreground">
+                {formatDateTime(event.start_time)}
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Users className="w-4 h-4 text-muted-foreground" />
+              <p className="text-sm text-muted-foreground">
+                {attendees + " / " + event.max_capacity + " attendees"}
+              </p>
+            </div>
 
-        {/* Event details */}
-        <div className="flex flex-col gap-2 p-4">
-          <h1 className="text-2xl font-bold">{event.title}</h1>
-          <div className="flex gap-2">
-            <MapPin className="w-4 h-4 text-muted-foreground" />
-            <p className="text-sm text-muted-foreground">{event.location}</p>
+            {/* Capacity bar — color shifts as the event fills up */}
+            <Progress value={pct} indicatorClassName={getProgressColor(pct)} />
           </div>
-          <div className="flex gap-2">
-            <Calendar className="w-4 h-4 text-muted-foreground" />
-            <p className="text-sm text-muted-foreground">
-              {formatDateTime(event.start_time)}
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <Users className="w-4 h-4 text-muted-foreground" />
-            <p className="text-sm text-muted-foreground">
-              {attendees + " / " + event.max_capacity + " attendees"}
-            </p>
-          </div>
-
-          {/* Capacity bar — color shifts as the event fills up */}
-          <Progress value={pct} indicatorClassName={getProgressColor(pct)} />
-        </div>
-
-      </Card>
+        </Card>
+      </Link>
     </motion.div>
   );
 }

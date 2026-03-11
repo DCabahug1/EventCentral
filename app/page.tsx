@@ -8,6 +8,7 @@ import { Event } from "@/lib/types";
 function page() {
   const [events, setEvents] = useState<Event[]>([]);
   const [query, setQuery] = useState("");
+  const [activeTag, setActiveTag] = useState("");
   const eventsListRef = useRef<HTMLDivElement>(null);
 
   const fetchEvents = async () => {
@@ -19,12 +20,26 @@ function page() {
     fetchEvents();
   }, []);
 
+  const scrollToEvents = () =>
+    eventsListRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+
   const handleSearch = (q: string) => {
     setQuery(q);
-    eventsListRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    setActiveTag(""); // tag filter and keyword search are mutually exclusive
+    scrollToEvents();
   };
 
-  const filteredEvents = query
+  const handleTagSelect = (tag: string) => {
+    // Toggle off if already selected
+    const next = activeTag === tag ? "" : tag;
+    setActiveTag(next);
+    setQuery("");
+    scrollToEvents();
+  };
+
+  const filteredEvents = activeTag
+    ? events.filter((e) => e.tags.includes(activeTag))
+    : query
     ? events.filter((e) => {
         const q = query.toLowerCase();
         return (
@@ -36,9 +51,9 @@ function page() {
 
   return (
     <div className="flex flex-col w-full">
-      <Hero onSearch={handleSearch} />
+      <Hero onSearch={handleSearch} onTagSelect={handleTagSelect} activeTag={activeTag} />
       <div ref={eventsListRef}>
-        <EventsList events={filteredEvents} query={query} />
+        <EventsList events={filteredEvents} query={query} activeTag={activeTag} />
       </div>
     </div>
   );
