@@ -69,7 +69,7 @@ function EventCard({ event }: { event: Event }) {
   return (
     <motion.div className="w-full h-full">
       <Link href={`/events/${event.id}`}>
-        <Card className="w-full h-full p-0 gap-0 overflow-hidden cursor-pointer brightness-90 hover:brightness-100 transition-all duration-300">
+        <Card className="w-full h-full p-0 gap-0 overflow-hidden cursor-pointer hover:scale-101 dark:brightness-90 dark:hover:brightness-100 transition-all duration-300">
           {/* Image + overlays */}
           <div className="relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 dark:from-background to-transparent z-10" />
