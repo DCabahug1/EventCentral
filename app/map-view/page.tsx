@@ -1,5 +1,6 @@
 "use client";
 import Form from "@/components/map-view/Form";
+import MapView from "@/components/map-view/Map";
 import React, { useState, useEffect } from "react";
 import { Event } from "@/lib/types";
 import { todayDateString, daysFromNowDateString } from "@/lib/utils";
@@ -31,7 +32,9 @@ function page() {
         <Form fetchEvents={fetchEvents} />
       </div>
       {/* Map & Event List */}
-      <div className="flex-1 h-full"></div>
+      <div className="flex-1 h-full">
+        <MapView />
+      </div>
     </div>
   );
 }
