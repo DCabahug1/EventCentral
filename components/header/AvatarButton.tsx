@@ -38,7 +38,7 @@ function AvatarButton({ profile }: { profile: Profile }) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="cursor-pointer">
-          <Avatar className="">
+          <Avatar className="" size='sm'>
             <AvatarImage src={profile.avatar_url || ""} />
             <AvatarFallback style={{ backgroundColor: randomAvatarColor }} className="text-primary-foreground">
               {profile.username?.charAt(0).toUpperCase() || "?"}

@@ -14,8 +14,8 @@ export const createProfile = async (username: string, phone_number: string, desc
     user_id: data.user?.id,
     email: data.user?.email,
     username: username,
-    phone_number: phone_number,
-    description: description,
+    phone_number: phone_number || null,
+    description: description || null,
   });
 
   if (profileError) {

@@ -1,0 +1,20 @@
+import Link from "next/link";
+import React from "react";
+
+function Footer() {
+  return (
+    <div className="flex items-center justify-center w-full h-16 bg-background border-t gap-2">
+      <Link href="/">
+        <h1 className="text-xl font-bold">
+          Event<span className="text-primary ">Central</span>
+        </h1>
+      </Link>
+      <div className=" w-[2px] h-[20px] bg-border" />
+      <p className="text-muted-foreground">
+        Discover what's happening around you.
+      </p>
+    </div>
+  );
+}
+
+export default Footer;
