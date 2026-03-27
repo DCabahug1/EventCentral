@@ -51,7 +51,7 @@ function page() {
         const q = query.toLowerCase();
         return (
           e.title.toLowerCase().includes(q) ||
-          e.location.toLowerCase().includes(q)
+          e.address.toLowerCase().includes(q)
         );
       })
     : events;
