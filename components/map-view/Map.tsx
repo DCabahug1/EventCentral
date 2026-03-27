@@ -6,7 +6,6 @@ import {
   useMapsLibrary,
   AdvancedMarker,
 } from "@vis.gl/react-google-maps";
-import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { useTheme } from "next-themes";
 import { Event } from "@/lib/types";
@@ -69,7 +68,8 @@ function MapViewInner({
   //   typing) or if the geocode returns no results (unrecognized location).
   useEffect(() => {
     if (!map || !geocoder || coordinates) return;
-    if (!locationValid || !location) {
+    // rather than geocoding it (which would resolve to a single point and zoom in)
+    if (!locationValid || !location || location === "United States") {
       map.panTo(DEFAULT_CENTER);
       map.setZoom(DEFAULT_ZOOM);
       return;
@@ -77,9 +77,16 @@ function MapViewInner({
     const timer = setTimeout(() => {
       geocoder.geocode({ address: location }, (results, status) => {
         if (status === "OK" && results?.[0]) {
-          const pos = results[0].geometry.location;
-          map.panTo({ lat: pos.lat(), lng: pos.lng() });
-          map.setZoom(radiusToZoom(radius ?? 10));
+          const geo = results[0].geometry;
+          // Prefer fitBounds so the map properly frames regions of any size
+          // (countries, states, cities). Fall back to panTo+zoom when no bounds exist.
+          const boundsToFit = geo.bounds ?? geo.viewport;
+          if (boundsToFit) {
+            map.fitBounds(boundsToFit);
+          } else {
+            map.panTo({ lat: geo.location.lat(), lng: geo.location.lng() });
+            map.setZoom(radiusToZoom(radius ?? 10));
+          }
         } else {
           // Unrecognized location — reset to default view
           map.panTo(DEFAULT_CENTER);
@@ -97,11 +104,28 @@ function MapViewInner({
     map.setZoom(14);
   }, [map, selectedEvent]);
 
+  // Draw a semi-transparent circle showing the search radius around the user's location.
+  // Only active in geolocation mode (coordinates defined). Cleaned up on unmount or change.
+  useEffect(() => {
+    if (!map || !coordinates) return;
+    const circle = new google.maps.Circle({
+      center: coordinates,
+      radius: (radius ?? 10) * 1609.34, // miles → meters
+      strokeColor: "#3b82f6",
+      strokeOpacity: 0.6,
+      strokeWeight: 1.5,
+      fillColor: "#3b82f6",
+      fillOpacity: 0.08,
+      map,
+      clickable: false,
+    });
+    return () => circle.setMap(null);
+  }, [map, coordinates, radius]);
+
   return null;
 }
 
 export default function MapView({
-  eventCount,
   location,
   radius,
   coordinates,
@@ -111,7 +135,6 @@ export default function MapView({
   onEventSelect,
   onScrollToEvent,
 }: {
-  eventCount?: number;
   location?: string;
   radius?: number;
   coordinates?: { lat: number; lng: number };
@@ -268,12 +291,6 @@ export default function MapView({
         })}
       </Map>
 
-      {/* Event count badge — overlaid on the top-right corner of the map */}
-      {eventCount !== undefined && (
-        <div className="absolute top-4 right-4 z-10">
-          <Badge>{eventCount} events</Badge>
-        </div>
-      )}
     </div>
   );
 }

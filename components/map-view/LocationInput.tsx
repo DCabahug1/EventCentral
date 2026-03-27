@@ -10,7 +10,8 @@ type Suggestion = {
   description: string;
 };
 
-// Text input with Google Places city autocomplete.
+// Text input with Google Places region autocomplete.
+// Supports countries, states, cities, and neighborhoods.
 // Supports a read-only mode for when geolocation is active — clicking the input
 // in that state calls onActivate (which re-enables manual editing) instead of
 // opening the dropdown.
@@ -25,12 +26,16 @@ export default function LocationInput({
   // Called false when the user starts typing (unvalidated),
   // called true when the user selects a suggestion (validated city)
   onValidityChange,
+  // Called when the user selects a suggestion — passes the display text and
+  // place ID so the parent can geocode the selection to lat/lng coordinates
+  onPlaceSelect,
 }: {
   value: string;
   onChange: (value: string) => void;
   readOnly?: boolean;
   onActivate?: () => void;
   onValidityChange?: (valid: boolean) => void;
+  onPlaceSelect?: (description: string, placeId: string) => void;
 }) {
   // Lazily load the Places library — only fetched when this component mounts
   const placesLib = useMapsLibrary("places");
@@ -60,8 +65,9 @@ export default function LocationInput({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Fetches city suggestions from the Places Autocomplete API.
-  // Requires at least 2 characters to avoid noisy results.
+  // Fetches region suggestions (countries, states, cities, neighborhoods) from
+  // the Places Autocomplete API. Uses the "geocode" type to include geographic
+  // areas while excluding businesses. Requires at least 2 characters.
   const fetchSuggestions = (input: string) => {
     if (!autocompleteService || input.trim().length < 2) {
       setSuggestions([]);
@@ -69,7 +75,7 @@ export default function LocationInput({
       return;
     }
     autocompleteService.getPlacePredictions(
-      { input, types: ["(cities)"] },
+      { input, types: ["geocode"] },
       (predictions, status) => {
         if (
           status === google.maps.places.PlacesServiceStatus.OK &&
@@ -101,9 +107,10 @@ export default function LocationInput({
   };
 
   // Selecting a suggestion confirms it as a valid city
-  const handleSelect = (description: string) => {
+  const handleSelect = (description: string, placeId: string) => {
     onChange(description);
     onValidityChange?.(true);
+    onPlaceSelect?.(description, placeId);
     setSuggestions([]);
     setOpen(false);
     setActiveIndex(-1);
@@ -120,7 +127,7 @@ export default function LocationInput({
       setActiveIndex((i) => Math.max(i - 1, 0));
     } else if (e.key === "Enter" && activeIndex >= 0) {
       e.preventDefault();
-      handleSelect(suggestions[activeIndex].description);
+      handleSelect(suggestions[activeIndex].description, suggestions[activeIndex].placeId);
     } else if (e.key === "Escape") {
       setOpen(false);
     }
@@ -130,7 +137,7 @@ export default function LocationInput({
     <div ref={containerRef} className="relative">
       <MapPin className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground size-4 z-10 pointer-events-none" />
       <Input
-        placeholder="Location (e.g. Northridge, CA)"
+        placeholder="City, neighborhood, state, or country"
         className={cn("pr-10", readOnly && "cursor-pointer text-muted-foreground")}
         value={value}
         onChange={handleInputChange}
@@ -159,7 +166,7 @@ export default function LocationInput({
               onMouseDown={(e) => {
                 // Prevent blur from firing before the click registers
                 e.preventDefault();
-                handleSelect(s.description);
+                handleSelect(s.description, s.placeId);
               }}
               onMouseEnter={() => setActiveIndex(i)}
             >

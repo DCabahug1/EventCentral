@@ -1,22 +1,28 @@
 import React from "react";
 import { Event } from "@/lib/types";
 import EventItem from "./EventItem";
+import { Badge } from "../ui/badge";
 import { motion } from "motion/react";
 
 function EventList({
   events,
+  heading = "Events Across the US",
   selectedEventId,
   onEventSelect,
 }: {
   events: Event[];
+  heading?: string;
   selectedEventId?: number | null;
   onEventSelect?: (id: number) => void;
 }) {
   return (
     <div className="flex flex-col border-t">
-      {/* Header */}
-      <div className="p-4 sticky top-0 bg-background z-10 border-b">
-        <h2 className="text-2xl font-bold">Events Nearby</h2>
+      {/* Header — dynamic title reflects current location context + live event count */}
+      <div className="p-4 sticky top-0 bg-background z-10 border-b flex items-center gap-3">
+        <h2 className="text-2xl font-bold">{heading}</h2>
+        <Badge variant="default" className="shrink-0">
+          {events.length} {events.length === 1 ? "event" : "events"}
+        </Badge>
       </div>
       <div className="flex flex-col">
         {events.map((event) => (

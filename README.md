@@ -62,3 +62,17 @@ When starting new work, always branch off of `production/main`:
 2. Click **Current Branch → New Branch** and name it `feature/<name>` or `fix/<name>`.
 3. Do your work, commit with a clear message, and push to origin.
 4. Open a pull request on GitHub targeting `production/main`.
+
+## TODOs
+
+### Map View — Supabase Integration
+
+When the map view is connected to a Supabase table, move the following filters
+into the database query instead of filtering the client-side array in `lib/events.ts`:
+
+- **Date range** — use `.gte("start_time", startDate).lte("start_time", endDate)`
+- **Event type** — use `.contains("tags", [eventType])` (skip when `"all"`)
+
+**Distance (radius) filtering stays client-side** using `distanceBetweenLocations`
+in `lib/utils.ts`. A bounding-box pre-filter can optionally be added to the query
+to reduce the result set before the JS distance check.

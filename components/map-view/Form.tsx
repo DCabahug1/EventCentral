@@ -16,13 +16,20 @@ import {
   SelectValue,
 } from "../ui/select";
 import { CATEGORY_CONFIG } from "@/lib/categoryConfig";
-import { daysFromNowDateString, todayDateString } from "@/lib/utils";
+import { addOneYear, daysFromNowDateString, todayDateString } from "@/lib/utils";
+
+type RegionBounds = {
+  north: number;
+  south: number;
+  east: number;
+  west: number;
+};
 
 type FormData = {
   location: string;
   // True while the browser geolocation API is active as the location source
   useUserLocation: boolean;
-  // Raw lat/lng from geolocation — present only when useUserLocation is true
+  // Raw lat/lng — only present when useUserLocation is true (geolocation mode)
   coordinates?: { lat: number; lng: number };
   // True when the location was set via autocomplete selection or geolocation.
   // False while the user is typing freely. Gates form submission.
@@ -31,6 +38,10 @@ type FormData = {
   startDate: string;
   endDate: string;
   eventType: string;
+  // Bounding box of the selected region — set when a place is chosen from
+  // autocomplete. Used for region-boundary filtering (events inside the region).
+  // Not set in geolocation mode (which uses coordinates + radius instead).
+  regionBounds?: RegionBounds;
 };
 
 function Form({
@@ -50,13 +61,14 @@ function Form({
   formRef?: React.RefObject<HTMLFormElement>;
 }) {
   const [formData, setFormData] = useState<FormData>({
-    location: "Northridge, CA",
+    location: "United States",
     useUserLocation: false,
     locationValid: true,
     radius: 10,
     startDate: todayDateString(),
     endDate: daysFromNowDateString(30),
     eventType: "all",
+    // No regionBounds — the "United States" default shows all events (no location filter)
   });
 
   // Tracks whether the geolocation + reverse geocode request is in flight
@@ -77,9 +89,9 @@ function Form({
   }, [formData]);
 
   const handleUseMyLocation = () => {
-    // Toggle off: clear geolocation state and mark location as unvalidated
+    // Toggle off: clear geolocation and region state, mark location as unvalidated
     if (formData.useUserLocation) {
-      setFormData({ ...formData, useUserLocation: false, coordinates: undefined, locationValid: false });
+      setFormData({ ...formData, useUserLocation: false, coordinates: undefined, regionBounds: undefined, locationValid: false });
       return;
     }
     if (!navigator.geolocation) return;
@@ -131,6 +143,52 @@ function Form({
     );
   };
 
+  // Called when the user selects a place from the autocomplete dropdown.
+  // Geocodes the placeId to extract the region's bounding box, which is stored
+  // in regionBounds and used for region-boundary filtering on submit.
+  // Coordinates are cleared — region mode filters by bounds, not radius.
+  const handlePlaceSelect = (_description: string, placeId: string) => {
+    if (!geocoder) return;
+    geocoder.geocode({ placeId }, (results, status) => {
+      if (status === "OK" && results && results[0]) {
+        const geo = results[0].geometry;
+        // Prefer viewport (always a well-formed rectangle, no antimeridian wrapping).
+        // Fall back to bounds for types that may not carry a viewport.
+        const src = geo.viewport ?? geo.bounds;
+        if (src) {
+          setFormData((prev) => ({
+            ...prev,
+            coordinates: undefined, // region mode does not use center-point + radius
+            regionBounds: {
+              north: src.getNorthEast().lat(),
+              south: src.getSouthWest().lat(),
+              east:  src.getNorthEast().lng(),
+              west:  src.getSouthWest().lng(),
+            },
+          }));
+        }
+      }
+    });
+  };
+
+  // Updates startDate and clamps endDate to stay within the 1-year max window
+  const handleStartDateChange = (value: string) => {
+    const maxEnd = addOneYear(value);
+    setFormData((prev) => ({
+      ...prev,
+      startDate: value,
+      // If current endDate exceeds the new 1-year ceiling, clamp it down
+      endDate: prev.endDate > maxEnd ? maxEnd : prev.endDate < value ? value : prev.endDate,
+    }));
+  };
+
+  // Updates endDate, clamping it within [startDate, startDate + 1 year]
+  const handleEndDateChange = (value: string) => {
+    const maxEnd = addOneYear(formData.startDate);
+    const clamped = value > maxEnd ? maxEnd : value < formData.startDate ? formData.startDate : value;
+    setFormData((prev) => ({ ...prev, endDate: clamped }));
+  };
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     fetchEvents(formData);
@@ -161,8 +219,9 @@ function Form({
                 value={formData.location}
                 onChange={(value) => setFormData({ ...formData, location: value })}
                 readOnly={formData.useUserLocation}
-                onActivate={() => setFormData({ ...formData, useUserLocation: false, coordinates: undefined, locationValid: false })}
+                onActivate={() => setFormData({ ...formData, useUserLocation: false, coordinates: undefined, regionBounds: undefined, locationValid: false })}
                 onValidityChange={(valid) => setFormData((prev) => ({ ...prev, locationValid: valid }))}
+                onPlaceSelect={handlePlaceSelect}
               />
               {/* Geolocation toggle — shows a spinner while the browser resolves
                   the position and reverse geocodes it to a city name */}
@@ -186,36 +245,37 @@ function Form({
               </Button>
             </Field>
 
-            {/* Radius slider — 5 to 50 miles */}
-            <Field>
-              <div className="flex items-center justify-between">
-                <FieldLabel className={labelClass}>Radius</FieldLabel>
-                <p className="text-sm text-primary font-medium">{formData.radius} mi</p>
-              </div>
-              <Slider
-                defaultValue={[formData.radius]}
-                min={5}
-                max={50}
-                step={5}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, radius: value[0] })
-                }
-              />
-              <div className="flex justify-between">
-                <span className="text-xs text-muted-foreground">5 mi</span>
-                <span className="text-xs text-muted-foreground">50 mi</span>
-              </div>
-            </Field>
+            {/* Radius slider — only shown in geolocation mode.
+                Region searches use boundary matching instead of a distance radius. */}
+            {formData.useUserLocation && (
+              <Field>
+                <div className="flex items-center justify-between">
+                  <FieldLabel className={labelClass}>Radius</FieldLabel>
+                  <p className="text-sm text-primary font-medium">{formData.radius} mi</p>
+                </div>
+                <Slider
+                  defaultValue={[formData.radius]}
+                  min={10}
+                  max={200}
+                  step={10}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, radius: value[0] })
+                  }
+                />
+                <div className="flex justify-between">
+                  <span className="text-xs text-muted-foreground">10 mi</span>
+                  <span className="text-xs text-muted-foreground">200 mi</span>
+                </div>
+              </Field>
+            )}
 
-            {/* Date range */}
+            {/* Date range — end date is clamped to [startDate, startDate + 1 year] */}
             <Field>
               <FieldLabel className={labelClass}>Start Date</FieldLabel>
               <Input
                 type="date"
                 value={formData.startDate}
-                onChange={(e) =>
-                  setFormData({ ...formData, startDate: e.target.value })
-                }
+                onChange={(e) => handleStartDateChange(e.target.value)}
               />
             </Field>
             <Field>
@@ -223,9 +283,9 @@ function Form({
               <Input
                 type="date"
                 value={formData.endDate}
-                onChange={(e) =>
-                  setFormData({ ...formData, endDate: e.target.value })
-                }
+                min={formData.startDate}
+                max={addOneYear(formData.startDate)}
+                onChange={(e) => handleEndDateChange(e.target.value)}
               />
             </Field>
 
