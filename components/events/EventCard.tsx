@@ -9,17 +9,8 @@ import { motion } from "motion/react";
 import { Badge } from "../ui/badge";
 import { getCategoryConfig } from "@/lib/categoryConfig";
 import Link from "next/link";
+import { formatDateTime } from "@/lib/utils";
 
-// Formats an ISO date string to a readable "Month Day, Year at HH:MM AM/PM" label
-const formatDateTime = (date: string) => {
-  return new Date(date).toLocaleDateString("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-};
 
 // Returns a Tailwind color class based on how full the event is
 const getProgressColor = (pct: number) => {
