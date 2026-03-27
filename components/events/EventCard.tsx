@@ -126,7 +126,7 @@ function EventCard({ event }: { event: Event }) {
             </div>
             <div className="flex gap-2">
               <MapPin className="w-4 h-4 text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">{event.location}</p>
+              <p className="text-sm text-muted-foreground">{event.address}</p>
             </div>
             <div className="flex gap-2">
               <Calendar className="w-4 h-4 text-muted-foreground" />
