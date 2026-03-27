@@ -7,6 +7,7 @@ import { Event } from "@/lib/types";
 import { todayDateString, daysFromNowDateString } from "@/lib/utils";
 import EventList from "@/components/map-view/EventList";
 import { getEvents } from "@/lib/events";
+import { APIProvider } from "@vis.gl/react-google-maps";
 
 function page() {
   const [events, setEvents] = useState<Event[]>([]);
@@ -37,6 +38,7 @@ function page() {
   }, []);
 
   return (
+    <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!}>
     <div className="h-svh flex flex-col md:flex-row">
       {/* Side panel — desktop only */}
       <div className="hidden md:flex flex-col p-4 gap-4 w-80 h-full border-r overflow-y-auto">
@@ -52,6 +54,7 @@ function page() {
         <EventList events={events} />
       </div>
     </div>
+    </APIProvider>
   );
 }
 

@@ -50,7 +50,7 @@ export default function FiltersDrawer({
 }) {
   const [open, setOpen] = useState(false);
   const [trackedFormData, setTrackedFormData] = useState<FormData>(DEFAULTS);
-  const formRef = useRef<HTMLFormElement>(null);
+  const formRef = useRef<HTMLFormElement | null>(null);
 
   const activeCount = countActiveFilters(trackedFormData);
 
@@ -84,7 +84,7 @@ export default function FiltersDrawer({
             }}
             hideSubmitButton
             onFormDataChange={setTrackedFormData}
-            formRef={formRef}
+            formRef={formRef as React.RefObject<HTMLFormElement>}
           />
         </div>
         <DrawerFooter>

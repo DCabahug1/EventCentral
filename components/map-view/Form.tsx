@@ -2,7 +2,8 @@
 import React, { useEffect, useState } from "react";
 import { Field, FieldGroup, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
-import { LayoutGrid, Locate, MapPin, Search } from "lucide-react";
+import { LayoutGrid, Locate, Search } from "lucide-react";
+import LocationInput from "./LocationInput";
 import { Separator } from "../ui/separator";
 import { Button } from "../ui/button";
 import { Slider } from "../ui/slider";
@@ -73,10 +74,10 @@ function Form({
             <Field>
               {/* Location field */}
               <FieldLabel className={labelClass}>Location</FieldLabel>
-              <div className="relative">
-                <MapPin className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground size-4" />
-                <Input placeholder="Location (e.g. Northridge, CA)" className="pr-10" value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })} />
-              </div>
+              <LocationInput
+                value={formData.location}
+                onChange={(value) => setFormData({ ...formData, location: value })}
+              />
               {/* Use your location button */}
               <Button
                 type="button"
