@@ -18,6 +18,8 @@ import { daysFromNowDateString, todayDateString } from "@/lib/utils";
 type FormData = {
   location: string;
   useUserLocation: boolean;
+  coordinates?: { lat: number; lng: number };
+  locationValid: boolean;
   radius: number;
   startDate: string;
   endDate: string;
@@ -27,6 +29,7 @@ type FormData = {
 const DEFAULTS: FormData = {
   location: "",
   useUserLocation: true,
+  locationValid: true,
   radius: 10,
   startDate: todayDateString(),
   endDate: daysFromNowDateString(30),
@@ -45,8 +48,10 @@ function countActiveFilters(formData: FormData): number {
 
 export default function FiltersDrawer({
   fetchEvents,
+  onFormDataChange,
 }: {
   fetchEvents: (formData: FormData) => void;
+  onFormDataChange?: (formData: FormData) => void;
 }) {
   const [open, setOpen] = useState(false);
   const [trackedFormData, setTrackedFormData] = useState<FormData>(DEFAULTS);
@@ -83,7 +88,10 @@ export default function FiltersDrawer({
               setOpen(false);
             }}
             hideSubmitButton
-            onFormDataChange={setTrackedFormData}
+            onFormDataChange={(data) => {
+              setTrackedFormData(data);
+              onFormDataChange?.(data);
+            }}
             formRef={formRef as React.RefObject<HTMLFormElement>}
           />
         </div>

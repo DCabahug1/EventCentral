@@ -10,18 +10,36 @@ type Suggestion = {
   description: string;
 };
 
+// Text input with Google Places city autocomplete.
+// Supports a read-only mode for when geolocation is active — clicking the input
+// in that state calls onActivate (which re-enables manual editing) instead of
+// opening the dropdown.
 export default function LocationInput({
   value,
   onChange,
+  // When true, the input is locked and shows the geolocated city name
+  readOnly,
+  // Called when the user clicks/focuses the input while readOnly is true —
+  // signals the parent to disable geolocation and restore manual editing
+  onActivate,
+  // Called false when the user starts typing (unvalidated),
+  // called true when the user selects a suggestion (validated city)
+  onValidityChange,
 }: {
   value: string;
   onChange: (value: string) => void;
+  readOnly?: boolean;
+  onActivate?: () => void;
+  onValidityChange?: (valid: boolean) => void;
 }) {
+  // Lazily load the Places library — only fetched when this component mounts
   const placesLib = useMapsLibrary("places");
   const [autocompleteService, setAutocompleteService] =
     useState<google.maps.places.AutocompleteService | null>(null);
+
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [open, setOpen] = useState(false);
+  // Tracks the keyboard-highlighted suggestion index (-1 = none)
   const [activeIndex, setActiveIndex] = useState(-1);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -31,7 +49,7 @@ export default function LocationInput({
     }
   }, [placesLib]);
 
-  // Close dropdown when clicking outside
+  // Close the dropdown when the user clicks outside the input container
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
@@ -42,6 +60,8 @@ export default function LocationInput({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Fetches city suggestions from the Places Autocomplete API.
+  // Requires at least 2 characters to avoid noisy results.
   const fetchSuggestions = (input: string) => {
     if (!autocompleteService || input.trim().length < 2) {
       setSuggestions([]);
@@ -71,19 +91,25 @@ export default function LocationInput({
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (readOnly) return;
     const val = e.target.value;
     onChange(val);
+    // Mark as unvalidated while the user is typing freely
+    onValidityChange?.(false);
     setActiveIndex(-1);
     fetchSuggestions(val);
   };
 
+  // Selecting a suggestion confirms it as a valid city
   const handleSelect = (description: string) => {
     onChange(description);
+    onValidityChange?.(true);
     setSuggestions([]);
     setOpen(false);
     setActiveIndex(-1);
   };
 
+  // Keyboard navigation for the suggestions dropdown
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (!open || suggestions.length === 0) return;
     if (e.key === "ArrowDown") {
@@ -105,13 +131,20 @@ export default function LocationInput({
       <MapPin className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground size-4 z-10 pointer-events-none" />
       <Input
         placeholder="Location (e.g. Northridge, CA)"
-        className="pr-10"
+        className={cn("pr-10", readOnly && "cursor-pointer text-muted-foreground")}
         value={value}
         onChange={handleInputChange}
-        onKeyDown={handleKeyDown}
-        onFocus={() => suggestions.length > 0 && setOpen(true)}
+        onKeyDown={readOnly ? undefined : handleKeyDown}
+        onFocus={() => {
+          // While locked by geolocation, focusing re-enables manual editing
+          if (readOnly) { onActivate?.(); return; }
+          suggestions.length > 0 && setOpen(true);
+        }}
+        readOnly={readOnly}
         autoComplete="off"
       />
+
+      {/* Suggestions dropdown */}
       {open && suggestions.length > 0 && (
         <ul className="absolute top-full left-0 right-0 z-50 mt-1 bg-background border rounded-md shadow-lg overflow-hidden">
           {suggestions.map((s, i) => (
@@ -124,6 +157,7 @@ export default function LocationInput({
                   : "hover:bg-accent hover:text-accent-foreground"
               )}
               onMouseDown={(e) => {
+                // Prevent blur from firing before the click registers
                 e.preventDefault();
                 handleSelect(s.description);
               }}

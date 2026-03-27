@@ -1,8 +1,9 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import { useMapsLibrary } from "@vis.gl/react-google-maps";
 import { Field, FieldGroup, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
-import { LayoutGrid, Locate, Search } from "lucide-react";
+import { LayoutGrid, Locate, LoaderCircle, Search } from "lucide-react";
 import LocationInput from "./LocationInput";
 import { Separator } from "../ui/separator";
 import { Button } from "../ui/button";
@@ -19,7 +20,13 @@ import { daysFromNowDateString, todayDateString } from "@/lib/utils";
 
 type FormData = {
   location: string;
+  // True while the browser geolocation API is active as the location source
   useUserLocation: boolean;
+  // Raw lat/lng from geolocation — present only when useUserLocation is true
+  coordinates?: { lat: number; lng: number };
+  // True when the location was set via autocomplete selection or geolocation.
+  // False while the user is typing freely. Gates form submission.
+  locationValid: boolean;
   radius: number;
   startDate: string;
   endDate: string;
@@ -28,8 +35,13 @@ type FormData = {
 
 function Form({
   fetchEvents,
+  // When true, the submit button is hidden (used inside the mobile drawer,
+  // which provides its own "Find Events" button in the footer)
   hideSubmitButton,
+  // Called on every form data change — used by the map to update focus live
   onFormDataChange,
+  // Forwarded ref to the <form> element so the drawer can trigger submission
+  // programmatically via formRef.current?.requestSubmit()
   formRef,
 }: {
   fetchEvents: (formData: FormData) => void;
@@ -39,16 +51,85 @@ function Form({
 }) {
   const [formData, setFormData] = useState<FormData>({
     location: "Northridge, CA",
-    useUserLocation: true,
+    useUserLocation: false,
+    locationValid: true,
     radius: 10,
     startDate: todayDateString(),
     endDate: daysFromNowDateString(30),
     eventType: "all",
   });
 
+  // Tracks whether the geolocation + reverse geocode request is in flight
+  const [locating, setLocating] = useState(false);
+
+  // Lazily load the Geocoding library so it's only fetched when needed
+  const geocodingLib = useMapsLibrary("geocoding");
+  const [geocoder, setGeocoder] = useState<google.maps.Geocoder | null>(null);
+
+  useEffect(() => {
+    if (geocodingLib) setGeocoder(new geocodingLib.Geocoder());
+  }, [geocodingLib]);
+
+  // Notify the parent (page.tsx) of any form data change so the map
+  // can update its focus without waiting for form submission
   useEffect(() => {
     onFormDataChange?.(formData);
   }, [formData]);
+
+  const handleUseMyLocation = () => {
+    // Toggle off: clear geolocation state and mark location as unvalidated
+    if (formData.useUserLocation) {
+      setFormData({ ...formData, useUserLocation: false, coordinates: undefined, locationValid: false });
+      return;
+    }
+    if (!navigator.geolocation) return;
+
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude: lat, longitude: lng } = pos.coords;
+
+        // If the geocoder isn't ready yet, store raw coordinates without a city name
+        if (!geocoder) {
+          setLocating(false);
+          setFormData((prev) => ({ ...prev, useUserLocation: true, coordinates: { lat, lng }, locationValid: true }));
+          return;
+        }
+
+        // Reverse geocode the coordinates to extract a human-readable city/state string
+        geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+          setLocating(false);
+          if (status === "OK" && results && results[0]) {
+            const comps = results[0].address_components;
+            const city = comps.find((c) => c.types.includes("locality"))?.long_name;
+            const state = comps.find((c) =>
+              c.types.includes("administrative_area_level_1")
+            )?.short_name;
+            // Prefer "City, ST" format; fall back to the full formatted address
+            const locationStr =
+              city && state
+                ? `${city}, ${state}`
+                : results[0].formatted_address;
+            setFormData((prev) => ({
+              ...prev,
+              location: locationStr,
+              useUserLocation: true,
+              coordinates: { lat, lng },
+              locationValid: true,
+            }));
+          } else {
+            // Reverse geocode failed — still store coordinates, just no city name
+            setFormData((prev) => ({ ...prev, useUserLocation: true, coordinates: { lat, lng }, locationValid: true }));
+          }
+        });
+      },
+      () => {
+        // User denied permission or geolocation otherwise failed
+        setLocating(false);
+        setFormData((prev) => ({ ...prev, useUserLocation: true }));
+      }
+    );
+  };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -59,7 +140,7 @@ function Form({
 
   return (
     <>
-      {/* Header — desktop only */}
+      {/* Header — desktop only (hidden inside the mobile drawer) */}
       <div className="hidden md:flex flex-col gap-1">
         <h1 className="text-2xl font-bold">Map View</h1>
         <h2 className="text-sm text-muted-foreground">
@@ -67,36 +148,45 @@ function Form({
         </h2>
       </div>
       <Separator className="hidden md:block" />
-      {/* Fields */}
       <div className="flex flex-col gap-4">
         <form ref={formRef} onSubmit={handleSubmit}>
           <FieldGroup>
+            {/* Location — autocomplete input + geolocation toggle */}
             <Field>
-              {/* Location field */}
               <FieldLabel className={labelClass}>Location</FieldLabel>
+              {/* LocationInput handles Places autocomplete suggestions.
+                  readOnly locks it while geolocation is active; onActivate
+                  re-enables manual editing and clears geolocation state. */}
               <LocationInput
                 value={formData.location}
                 onChange={(value) => setFormData({ ...formData, location: value })}
+                readOnly={formData.useUserLocation}
+                onActivate={() => setFormData({ ...formData, useUserLocation: false, coordinates: undefined, locationValid: false })}
+                onValidityChange={(valid) => setFormData((prev) => ({ ...prev, locationValid: valid }))}
               />
-              {/* Use your location button */}
+              {/* Geolocation toggle — shows a spinner while the browser resolves
+                  the position and reverse geocodes it to a city name */}
               <Button
                 type="button"
                 variant="outline"
+                disabled={locating}
                 className={`w-full ${formData.useUserLocation ? "border-primary! bg-primary/10 text-primary! hover:bg-primary/10" : ""}`}
-                onClick={() =>
-                  setFormData({
-                    ...formData,
-                    useUserLocation: !formData.useUserLocation,
-                  })
-                }
+                onClick={handleUseMyLocation}
               >
-                <Locate className="size-4" />
-                {formData.useUserLocation
+                {locating ? (
+                  <LoaderCircle className="size-4 animate-spin" />
+                ) : (
+                  <Locate className="size-4" />
+                )}
+                {locating
+                  ? "Locating..."
+                  : formData.useUserLocation
                   ? "Using your location"
                   : "Use my location"}
               </Button>
             </Field>
-            {/* Radius field */}
+
+            {/* Radius slider — 5 to 50 miles */}
             <Field>
               <div className="flex items-center justify-between">
                 <FieldLabel className={labelClass}>Radius</FieldLabel>
@@ -105,18 +195,19 @@ function Form({
               <Slider
                 defaultValue={[formData.radius]}
                 min={5}
-                max={100}
-                step={1}
+                max={50}
+                step={5}
                 onValueChange={(value) =>
                   setFormData({ ...formData, radius: value[0] })
                 }
               />
               <div className="flex justify-between">
                 <span className="text-xs text-muted-foreground">5 mi</span>
-                <span className="text-xs text-muted-foreground">100 mi</span>
+                <span className="text-xs text-muted-foreground">50 mi</span>
               </div>
             </Field>
-            {/* Date Range field */}
+
+            {/* Date range */}
             <Field>
               <FieldLabel className={labelClass}>Start Date</FieldLabel>
               <Input
@@ -137,7 +228,8 @@ function Form({
                 }
               />
             </Field>
-            {/* Event Type field */}
+
+            {/* Event type filter */}
             <Field>
               <FieldLabel className={labelClass}>Event Type</FieldLabel>
               <Select
@@ -162,8 +254,11 @@ function Form({
                 </SelectContent>
               </Select>
             </Field>
+
+            {/* Submit — disabled until a valid location is confirmed.
+                Hidden when rendered inside the mobile drawer (drawer provides its own button). */}
             {!hideSubmitButton && (
-              <Button type="submit">
+              <Button type="submit" disabled={!formData.locationValid}>
                 <Search className="size-4" /> Find Events
               </Button>
             )}
