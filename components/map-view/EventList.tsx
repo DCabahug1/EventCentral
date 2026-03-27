@@ -3,7 +3,15 @@ import { Event } from "@/lib/types";
 import EventItem from "./EventItem";
 import { motion } from "motion/react";
 
-function EventList({ events }: { events: Event[] }) {
+function EventList({
+  events,
+  selectedEventId,
+  onEventSelect,
+}: {
+  events: Event[];
+  selectedEventId?: number | null;
+  onEventSelect?: (id: number) => void;
+}) {
   return (
     <div className="flex flex-col border-t">
       {/* Header */}
@@ -11,7 +19,6 @@ function EventList({ events }: { events: Event[] }) {
         <h2 className="text-2xl font-bold">Events Nearby</h2>
       </div>
       <div className="flex flex-col">
-        {/* Events */}
         {events.map((event) => (
           <motion.div
             key={event.id}
@@ -19,7 +26,11 @@ function EventList({ events }: { events: Event[] }) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
           >
-            <EventItem event={event} />
+            <EventItem
+              event={event}
+              selected={event.id === selectedEventId}
+              onSelect={onEventSelect}
+            />
           </motion.div>
         ))}
       </div>

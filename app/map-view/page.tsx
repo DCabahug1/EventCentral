@@ -2,7 +2,7 @@
 import Form from "@/components/map-view/Form";
 import MapView from "@/components/map-view/Map";
 import FiltersDrawer from "@/components/map-view/FiltersDrawer";
-import React, { useState, useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Event } from "@/lib/types";
 import { todayDateString, daysFromNowDateString } from "@/lib/utils";
 import EventList from "@/components/map-view/EventList";
@@ -18,6 +18,12 @@ function page() {
   const [mapRadius, setMapRadius] = useState(10);
   const [mapCoordinates, setMapCoordinates] = useState<{ lat: number; lng: number } | undefined>(undefined);
   const [mapLocationValid, setMapLocationValid] = useState(true);
+
+  // Tracks which event is selected — syncs the map popup and list highlight
+  const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
+
+  // Ref on the map wrapper div used to scroll it into view when a list card is clicked
+  const mapRef = useRef<HTMLDivElement>(null);
 
   // Receives form data changes and keeps map focus state in sync.
   // Called by both the desktop Form and the mobile FiltersDrawer on every change.
@@ -49,6 +55,21 @@ function page() {
     console.log(formData);
     const newEvents = await getEvents();
     setEvents(newEvents);
+  };
+
+  // Called when the user clicks an event card in the list.
+  // Scrolls back to the map and sets the selected event so the map pans to it.
+  const handleEventSelect = (id: number) => {
+    setSelectedEventId(id);
+    mapRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  // Called from the "View event" button inside a map marker popup.
+  // Highlights the event card and scrolls the page down to it.
+  const handleScrollToEvent = (id: number) => {
+    setSelectedEventId(id);
+    const card = document.querySelector(`[data-event-id="${id}"]`);
+    card?.scrollIntoView({ behavior: "smooth", block: "center" });
   };
 
   // Load an initial set of events on mount using the default form values
@@ -85,14 +106,26 @@ function page() {
           <FiltersDrawer fetchEvents={fetchEvents} onFormDataChange={handleMapFocus} />
         </div>
 
-        <MapView
-          eventCount={events.length}
-          location={mapLocation}
-          radius={mapRadius}
-          coordinates={mapCoordinates}
-          locationValid={mapLocationValid}
+        {/* Map wrapper — ref used for scroll-to-map from event list clicks */}
+        <div ref={mapRef}>
+          <MapView
+            eventCount={events.length}
+            location={mapLocation}
+            radius={mapRadius}
+            coordinates={mapCoordinates}
+            locationValid={mapLocationValid}
+            events={events}
+            selectedEventId={selectedEventId}
+            onEventSelect={setSelectedEventId}
+            onScrollToEvent={handleScrollToEvent}
+          />
+        </div>
+
+        <EventList
+          events={events}
+          selectedEventId={selectedEventId}
+          onEventSelect={handleEventSelect}
         />
-        <EventList events={events} />
       </div>
     </div>
     </APIProvider>
