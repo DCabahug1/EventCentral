@@ -53,7 +53,7 @@ function Hero({
           className="object-cover object-[center_40%]"
         />
       </motion.div>
-      <div className="absolute inset-0 -z-10 bg-gradient-to-t from-black/70 dark:from-background to-transparent" />
+      <div className="absolute inset-0 -z-10 bg-linear-to-t from-black/70 to-transparent" />
 
       {/* Headline */}
       <motion.div
@@ -62,9 +62,9 @@ function Hero({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
-        <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold leading-tight text-white">
+        <h1 className="text-5xl sm:text-6xl md:text-7xl font-extrabold leading-tight text-white">
           Discover{" "}
-          <span className="bg-linear-to-r from-primary to-secondary bg-clip-text text-transparent">
+          <span className="text-primary">
             Events
           </span>
         </h1>
