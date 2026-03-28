@@ -104,8 +104,10 @@ function EventsList({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="text-2xl font-bold lg:text-start text-center w-full max-w-7xl"
+            className="flex items-center gap-2 text-2xl font-bold lg:text-start text-center w-full max-w-7xl"
           >
+            {/* Color Line */}
+            <div className="h-5 w-1 bg-primary"></div>
             {heading}
           </motion.div>
         )}
