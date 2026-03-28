@@ -85,7 +85,7 @@ function EventsList({
     ? `Results for "${query}"`
     : activeTag
       ? `Tagged: ${activeTag}`
-      : 'All Events';
+      : "All Events";
   const emptyContext = query
     ? `"${query}"`
     : activeTag
@@ -94,7 +94,7 @@ function EventsList({
   const { happening, upcoming, past } = partitionEvents(events);
 
   return (
-    <div className="flex flex-col gap-4 p-4 items-center w-full">
+    <div className="flex flex-col gap-4 px-6 py-8 items-center w-full border-t">
       {/* Heading — only shown when a search query is active */}
       <AnimatePresence mode="wait">
         {heading && (
@@ -117,62 +117,62 @@ function EventsList({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, ease: "easeOut", delay: 0.1 }}
       >
-      <Tabs defaultValue="upcoming" className="w-full">
-        <TabsList className="lg:self-start self-center">
-          <TabsTrigger value="happening">
-            Happening Now
-            {happening.length > 0 && (
-              <span className="ml-1.5 inline-flex h-4 w-4 items-center justify-center rounded-full bg-green-500 text-[10px] font-bold text-white">
-                {happening.length}
-              </span>
+        <Tabs defaultValue="upcoming" className="w-full">
+          <TabsList className="lg:self-start self-center">
+            <TabsTrigger value="happening">
+              Happening Now
+              {happening.length > 0 && (
+                <span className="ml-1.5 inline-flex h-4 w-4 items-center justify-center rounded-full bg-green-500 text-[10px] font-bold text-white">
+                  {happening.length}
+                </span>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
+            <TabsTrigger value="past">Past</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="happening" className="mt-4">
+            {happening.length === 0 ? (
+              <EmptyState
+                message={
+                  emptyContext
+                    ? `No live events match ${emptyContext}.`
+                    : "No events are happening right now."
+                }
+              />
+            ) : (
+              <EventGrid events={happening} />
             )}
-          </TabsTrigger>
-          <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
-          <TabsTrigger value="past">Past</TabsTrigger>
-        </TabsList>
+          </TabsContent>
 
-        <TabsContent value="happening" className="mt-4">
-          {happening.length === 0 ? (
-            <EmptyState
-              message={
-                emptyContext
-                  ? `No live events match ${emptyContext}.`
-                  : "No events are happening right now."
-              }
-            />
-          ) : (
-            <EventGrid events={happening} />
-          )}
-        </TabsContent>
+          <TabsContent value="upcoming" className="mt-4">
+            {upcoming.length === 0 ? (
+              <EmptyState
+                message={
+                  emptyContext
+                    ? `No upcoming events match ${emptyContext}.`
+                    : "No upcoming events scheduled."
+                }
+              />
+            ) : (
+              <EventGrid events={upcoming} />
+            )}
+          </TabsContent>
 
-        <TabsContent value="upcoming" className="mt-4">
-          {upcoming.length === 0 ? (
-            <EmptyState
-              message={
-                emptyContext
-                  ? `No upcoming events match ${emptyContext}.`
-                  : "No upcoming events scheduled."
-              }
-            />
-          ) : (
-            <EventGrid events={upcoming} />
-          )}
-        </TabsContent>
-
-        <TabsContent value="past" className="mt-4">
-          {past.length === 0 ? (
-            <EmptyState
-              message={
-                emptyContext
-                  ? `No past events match ${emptyContext}.`
-                  : "No past events to show."
-              }
-            />
-          ) : (
-            <EventGrid events={past} />
-          )}
-        </TabsContent>
-      </Tabs>
+          <TabsContent value="past" className="mt-4">
+            {past.length === 0 ? (
+              <EmptyState
+                message={
+                  emptyContext
+                    ? `No past events match ${emptyContext}.`
+                    : "No past events to show."
+                }
+              />
+            ) : (
+              <EventGrid events={past} />
+            )}
+          </TabsContent>
+        </Tabs>
       </motion.div>
     </div>
   );
