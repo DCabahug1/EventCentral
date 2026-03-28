@@ -71,17 +71,17 @@ function EventCard({ event }: { event: Event }) {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <motion.div className="w-60 shrink-0">
+    <motion.div className="w-full h-full">
       <Link href={`/events/${event.id}`}>
         <Card
-          className="w-full p-0 gap-0 overflow-hidden cursor-pointer hover:shadow-lg transition-all duration-300"
+          className="w-full h-full p-0 gap-0 overflow-hidden cursor-pointer hover:scale-101 dark:brightness-90 dark:hover:brightness-100 transition-all duration-300"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
           {/* Image + overlays */}
           <div className="relative overflow-hidden">
             <div
-              className={`absolute inset-0 bg-linear-to-t from-black/70 dark:from-background to-transparent z-10 ${isHovered ? "opacity-70" : "opacity-80"} transition-all duration-300`}
+              className={`absolute inset-0 bg-gradient-to-t from-black/70 dark:from-background to-transparent z-10 ${isHovered ? "opacity-70" : "opacity-80"} transition-all duration-300`}
             />
 
             {/* Status badge — positioned over the image in the top-left */}
@@ -108,13 +108,18 @@ function EventCard({ event }: { event: Event }) {
                 alt={event.title}
                 width={500}
                 height={500}
-                className="w-full h-40 object-cover"
+                className="w-full h-48 object-cover"
               />
             </motion.div>
           </div>
 
           {/* Event details */}
-          <div className="flex flex-col gap-2 p-4">
+          <div className="flex flex-col gap-3 p-4">
+            {/* Heading */}
+            <div className="flex flex-col gap-1">
+              <h2 className="text-sm text-muted-foreground">Organization Placeholder</h2>
+              <h1 className="text-2xl font-bold">{event.title}</h1>
+            </div>
             {/* Tags */}
             <div className="flex flex-wrap gap-2">
               {event.tags.map((tag) => {
@@ -128,23 +133,23 @@ function EventCard({ event }: { event: Event }) {
                 );
               })}
             </div>
-            {/* Heading */}
-            <div className="flex flex-col gap-1">
-              <h2 className="text-sm text-muted-foreground">
-                Organization Placeholder
-              </h2>
-              <h1 className="text-lg font-bold">{event.title}</h1>
+            <div className="flex gap-2">
+              <MapPin className="w-4 h-4 text-muted-foreground" />
+              <p className="text-sm text-muted-foreground">{event.location}</p>
             </div>
             <div className="flex gap-2">
-              <MapPin className="w-3 h-3 text-muted-foreground" />
-              <p className="text-xs text-muted-foreground">{event.location}</p>
-            </div>
-            <div className="flex gap-2">
-              <Calendar className="w-3 h-3 text-muted-foreground" />
-              <p className="text-xs text-muted-foreground">
+              <Calendar className="w-4 h-4 text-muted-foreground" />
+              <p className="text-sm text-muted-foreground">
                 {formatDateTime(event.start_time)}
               </p>
             </div>
+            <div className="flex gap-2">
+              <Users className="w-4 h-4 text-muted-foreground" />
+              <p className="text-sm text-muted-foreground">
+                {attendees + " / " + event.max_capacity + " attendees"}
+              </p>
+            </div>
+
             {/* Capacity bar — color shifts as the event fills up */}
             <Progress value={pct} indicatorClassName={getProgressColor(pct)} />
           </div>
