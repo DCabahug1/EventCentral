@@ -542,8 +542,8 @@ export const getEvents = async (filters?: {
       const miles = distanceBetweenLocations(
         coordinates.lat,
         coordinates.lng,
-        event.lat,
-        event.lng,
+        event.lat!,
+        event.lng!,
       );
       if (miles > radius) return false;
     } else if (!useUserLocation && regionBounds) {
@@ -551,10 +551,10 @@ export const getEvents = async (filters?: {
       // bounding box of the selected city / state / country
       const { north, south, east, west } = regionBounds;
       if (
-        event.lat < south ||
-        event.lat > north ||
-        event.lng < west ||
-        event.lng > east
+        event.lat! < south ||
+        event.lat! > north ||
+        event.lng! < west ||
+        event.lng! > east
       )
         return false;
     }
