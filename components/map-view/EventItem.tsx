@@ -45,8 +45,8 @@ function EventItem({
             <MapPin className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
             <div className="flex flex-col">
               <p className="text-sm text-muted-foreground">{event.address}</p>
-              {event.address_details && (
-                <p className="text-xs text-muted-foreground/70">{event.address_details}</p>
+              {event.location_details && (
+                <p className="text-xs text-muted-foreground/70">{event.location_details}</p>
               )}
             </div>
           </div>
