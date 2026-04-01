@@ -16,7 +16,10 @@ function EventItem({
   selected?: boolean;
   onSelect?: (id: number) => void;
 }) {
-  const categoryConfig = getCategoryConfig(event.category);
+  const categoryLabel = event.category ?? "Uncategorized";
+  const eventAddress = event.address ?? "Location TBD";
+  const maxCapacity = event.max_capacity ?? 0;
+  const categoryConfig = getCategoryConfig(categoryLabel);
   const Icon = categoryConfig?.icon;
   return (
     <div
@@ -44,7 +47,7 @@ function EventItem({
           <div className="flex items-start gap-1">
             <MapPin className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
             <div className="flex flex-col">
-              <p className="text-sm text-muted-foreground">{event.address}</p>
+              <p className="text-sm text-muted-foreground">{eventAddress}</p>
               {event.location_details && (
                 <p className="text-xs text-muted-foreground/70">{event.location_details}</p>
               )}
@@ -61,13 +64,13 @@ function EventItem({
           <div className="flex items-center gap-1">
             <Users className="w-4 h-4 text-muted-foreground" />
             <p className="text-sm text-muted-foreground">
-              {50} / {event.max_capacity} attendees
+              {50} / {maxCapacity} attendees
             </p>
           </div>
           {/* Capacity bar */}
           <Progress
-            value={(50 / event.max_capacity) * 100}
-            max={event.max_capacity}
+            value={maxCapacity > 0 ? (50 / maxCapacity) * 100 : 0}
+            max={maxCapacity}
             className="w-full"
             indicatorClassName="bg-primary"
           />
