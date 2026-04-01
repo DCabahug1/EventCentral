@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { Profile } from "@/lib/types";
 import { Button } from "../ui/button";
-import { Compass, Menu, Plus, User, X } from "lucide-react";
+import { Compass, MapPin, Menu, Plus, User, X } from "lucide-react";
 import AvatarButton from "./AvatarButton";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -56,6 +56,16 @@ function MobileNav({ profile }: MobileNavProps) {
                   <Link href="/">
                     <Compass />
                     Discover
+                  </Link>
+                </Button>
+                <Button
+                  variant={pathname === "/map-view" ? "default" : "ghost"}
+                  className="w-full justify-start"
+                  asChild
+                >
+                  <Link href="/map-view">
+                    <MapPin />
+                    Map View
                   </Link>
                 </Button>
                 <Button

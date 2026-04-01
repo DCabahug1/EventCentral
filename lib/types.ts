@@ -15,8 +15,11 @@ export type Event = {
   description: string;
   start_time: string;
   end_time: string;
-  location: string;
+  address: string;
+  location_details?: string;
+  lat: number;
+  lng: number;
   max_capacity: number;
   image_url: string;
-  tags: string[];
+  category: string;
 }

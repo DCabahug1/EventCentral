@@ -2,7 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { Profile } from "@/lib/types";
 import { Button } from "../ui/button";
-import { Compass, Plus, User } from "lucide-react";
+import { Compass, MapPin, Plus, User } from "lucide-react";
 import AvatarButton from "./AvatarButton";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -27,6 +27,12 @@ function DesktopNav({ profile, pathname }: DesktopNavProps) {
             <Link href="/">
               <Compass />
               Discover
+            </Link>
+          </Button>
+          <Button variant={pathname === "/map-view" ? "default" : "ghost"} asChild>
+            <Link href="/map-view">
+              <MapPin />
+              Map View
             </Link>
           </Button>
           <Button

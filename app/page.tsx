@@ -8,7 +8,7 @@ import { Event } from "@/lib/types";
 function page() {
   const [events, setEvents] = useState<Event[]>([]);
   const [query, setQuery] = useState("");
-  const [activeTag, setActiveTag] = useState("");
+  const [activeCategory, setActiveCategory] = useState("");
   const [input, setInput] = useState("");
   const eventsListRef = useRef<HTMLDivElement>(null);
 
@@ -26,14 +26,14 @@ function page() {
 
   const handleSearch = (q: string) => {
     setQuery(q);
-    setActiveTag(""); // tag filter and keyword search are mutually exclusive
+    setActiveCategory(""); // category filter and keyword search are mutually exclusive
     scrollToEvents();
   };
 
-  const handleTagSelect = (tag: string) => {
+  const handleCategorySelect = (category: string) => {
     // Toggle off if already selected
-    const next = activeTag === tag ? "" : tag;
-    setActiveTag(next);
+    const next = activeCategory === category ? "" : category;
+    setActiveCategory(next);
     setQuery("");
     setInput("");
     scrollToEvents();
@@ -44,14 +44,14 @@ function page() {
     setInput("");
   };
 
-  const filteredEvents = activeTag
-    ? events.filter((e) => e.tags.includes(activeTag))
+  const filteredEvents = activeCategory
+    ? events.filter((event) => event.category === activeCategory)
     : query
     ? events.filter((e) => {
         const q = query.toLowerCase();
         return (
           e.title.toLowerCase().includes(q) ||
-          e.location.toLowerCase().includes(q)
+          e.address.toLowerCase().includes(q)
         );
       })
     : events;
@@ -60,15 +60,15 @@ function page() {
     <div className="flex flex-col w-full">
       <Hero
         onSearch={handleSearch}
-        onTagSelect={handleTagSelect}
-        activeTag={activeTag}
+        onCategorySelect={handleCategorySelect}
+        activeCategory={activeCategory}
         query={query}
         input={input}
         onInputChange={setInput}
         onClearSearch={handleClearSearch}
       />
       <div ref={eventsListRef}>
-        <EventsList events={filteredEvents} query={query} activeTag={activeTag} />
+        <EventsList events={filteredEvents} query={query} activeCategory={activeCategory} />
       </div>
     </div>
   );

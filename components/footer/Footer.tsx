@@ -1,7 +1,16 @@
+"use client";
 import Link from "next/link";
 import React from "react";
+import { usePathname } from "next/navigation";
 
 function Footer() {
+  const pathname = usePathname();
+  const isMapView = pathname === "/map-view";
+
+  if (isMapView) {
+    return null;
+  }
+
   return (
     <div className="flex items-center justify-center w-full h-16 bg-background border-t gap-2">
       <Link href="/">
