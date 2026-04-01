@@ -20,6 +20,8 @@ Install the following in order before anything else:
    pnpm install
    ```
 
+Use `pnpm` only in this repository. Do not run `npm install` or commit `package-lock.json`.
+
 ## Environment Variables
 
 Create a file named `.env.local` in the root of the project and fill in the values below. The actual values can be found in the **#documentation** channel on the team Discord.
