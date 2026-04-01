@@ -57,6 +57,8 @@ function EventCard({ event }: { event: Event }) {
   const pct = (attendees / event.max_capacity) * 100;
   const status = getEventStatus(event.start_time, event.end_time);
   const { label, className, dot } = statusConfig[status];
+  const categoryConfig = getCategoryConfig(event.category);
+  const CategoryIcon = categoryConfig?.icon;
 
   // For the hover effect
   const [isHovered, setIsHovered] = useState(false);
@@ -111,18 +113,12 @@ function EventCard({ event }: { event: Event }) {
               <h2 className="text-sm text-muted-foreground">Organization Placeholder</h2>
               <h1 className="text-2xl font-bold">{event.title}</h1>
             </div>
-            {/* Tags */}
+            {/* Category */}
             <div className="flex flex-wrap gap-2">
-              {event.tags.map((tag) => {
-                const config = getCategoryConfig(tag);
-                const Icon = config?.icon;
-                return (
-                  <Badge key={tag} variant="outline">
-                    {Icon && <Icon className={config?.colorClass} />}
-                    {tag}
-                  </Badge>
-                );
-              })}
+              <Badge variant="outline">
+                {CategoryIcon && <CategoryIcon className={categoryConfig?.colorClass} />}
+                {event.category}
+              </Badge>
             </div>
             <div className="flex gap-2">
               <MapPin className="w-4 h-4 text-muted-foreground" />

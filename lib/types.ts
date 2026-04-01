@@ -21,5 +21,5 @@ export type Event = {
   lng: number;
   max_capacity: number;
   image_url: string;
-  tags: string[];
+  category: string;
 }

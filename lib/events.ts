@@ -16,7 +16,7 @@ const mockEvents = <Event[]>[
     lng: -118.5290,
     max_capacity: 500,
     image_url: "/mock-event-assets/mockEventImages/tech.jpg",
-    tags: ["Tech"],
+    category: "Tech",
   },
   {
     id: 2,
@@ -31,7 +31,7 @@ const mockEvents = <Event[]>[
     lng: -118.5353,
     max_capacity: 600,
     image_url: "/mock-event-assets/mockEventImages/food-and-drink.jpg",
-    tags: ["Food & Drink", "Outdoor"],
+    category: "Food & Drink",
   },
  
   // --- Ventura, CA ---
@@ -48,7 +48,7 @@ const mockEvents = <Event[]>[
     lng: -119.2618,
     max_capacity: 1200,
     image_url: "/mock-event-assets/mockEventImages/music.jpg",
-    tags: ["Music", "Outdoor"],
+    category: "Music",
   },
   {
     id: 4,
@@ -63,7 +63,7 @@ const mockEvents = <Event[]>[
     lng: -119.2332,
     max_capacity: 1500,
     image_url: "/mock-event-assets/mockEventImages/sports.jpg",
-    tags: ["Sports", "Outdoor"],
+    category: "Sports",
   },
  
   // --- Camarillo, CA ---
@@ -80,7 +80,7 @@ const mockEvents = <Event[]>[
     lng: -119.0432,
     max_capacity: 800,
     image_url: "/mock-event-assets/mockEventImages/food-and-drink.jpg",
-    tags: ["Food & Drink", "Music"],
+    category: "Food & Drink",
   },
  
   // --- Oxnard, CA ---
@@ -97,7 +97,7 @@ const mockEvents = <Event[]>[
     lng: -119.1820,
     max_capacity: 1000,
     image_url: "/mock-event-assets/mockEventImages/sports.jpg",
-    tags: ["Sports", "Outdoor"],
+    category: "Sports",
   },
  
   // --- Thousand Oaks, CA ---
@@ -114,7 +114,7 @@ const mockEvents = <Event[]>[
     lng: -118.8509,
     max_capacity: 400,
     image_url: "/mock-event-assets/mockEventImages/tech.jpg",
-    tags: ["Tech"],
+    category: "Tech",
   },
  
   // --- Los Angeles (Griffith Park) ---
@@ -131,7 +131,7 @@ const mockEvents = <Event[]>[
     lng: -118.3004,
     max_capacity: 60,
     image_url: "/mock-event-assets/mockEventImages/outdoor.jpg",
-    tags: ["Outdoor"],
+    category: "Outdoor",
   },
  
   // --- Los Angeles (Downtown) ---
@@ -148,7 +148,7 @@ const mockEvents = <Event[]>[
     lng: -118.2503,
     max_capacity: 700,
     image_url: "/mock-event-assets/mockEventImages/art.jpg",
-    tags: ["Art"],
+    category: "Art",
   },
  
   // --- Los Angeles (Hollywood) ---
@@ -165,7 +165,7 @@ const mockEvents = <Event[]>[
     lng: -118.3242,
     max_capacity: 200,
     image_url: "/mock-event-assets/mockEventImages/tech.jpg",
-    tags: ["Tech"],
+    category: "Tech",
   },
  
   // --- Los Angeles (Silver Lake) ---
@@ -182,7 +182,7 @@ const mockEvents = <Event[]>[
     lng: -118.2975,
     max_capacity: 800,
     image_url: "/mock-event-assets/mockEventImages/art.jpg",
-    tags: ["Art", "Outdoor"],
+    category: "Art",
   },
  
   // --- Los Angeles (Koreatown) ---
@@ -199,7 +199,7 @@ const mockEvents = <Event[]>[
     lng: -118.2978,
     max_capacity: 60,
     image_url: "/mock-event-assets/mockEventImages/food-and-drink.jpg",
-    tags: ["Food & Drink"],
+    category: "Food & Drink",
   },
  
   // --- Santa Monica, CA ---
@@ -216,7 +216,7 @@ const mockEvents = <Event[]>[
     lng: -118.4965,
     max_capacity: 3000,
     image_url: "/mock-event-assets/mockEventImages/parties.jpg",
-    tags: ["Parties", "Music", "Outdoor"],
+    category: "Parties",
   },
  
   // --- Pasadena, CA ---
@@ -233,7 +233,7 @@ const mockEvents = <Event[]>[
     lng: -118.1430,
     max_capacity: 250,
     image_url: "/mock-event-assets/mockEventImages/tech.jpg",
-    tags: ["Tech"],
+    category: "Tech",
   },
  
   // --- Long Beach, CA ---
@@ -250,7 +250,7 @@ const mockEvents = <Event[]>[
     lng: -118.1913,
     max_capacity: 2000,
     image_url: "/mock-event-assets/mockEventImages/sports.jpg",
-    tags: ["Sports", "Outdoor"],
+    category: "Sports",
   },
  
   // --- Burbank, CA ---
@@ -267,7 +267,7 @@ const mockEvents = <Event[]>[
     lng: -118.3234,
     max_capacity: 400,
     image_url: "/mock-event-assets/mockEventImages/parties.jpg",
-    tags: ["Parties"],
+    category: "Parties",
   },
  
   // --- Glendale, CA ---
@@ -284,7 +284,7 @@ const mockEvents = <Event[]>[
     lng: -118.2564,
     max_capacity: 2500,
     image_url: "/mock-event-assets/mockEventImages/food-and-drink.jpg",
-    tags: ["Food & Drink", "Music", "Outdoor"],
+    category: "Food & Drink",
   },
  
   // --- San Diego (Downtown) ---
@@ -301,7 +301,7 @@ const mockEvents = <Event[]>[
     lng: -117.1622,
     max_capacity: 2000,
     image_url: "/mock-event-assets/mockEventImages/tech.jpg",
-    tags: ["Tech"],
+    category: "Tech",
   },
  
   // --- San Diego (Balboa Park) ---
@@ -318,7 +318,7 @@ const mockEvents = <Event[]>[
     lng: -117.1446,
     max_capacity: 5000,
     image_url: "/mock-event-assets/mockEventImages/art.jpg",
-    tags: ["Art", "Music", "Outdoor"],
+    category: "Art",
   },
  
   // --- San Diego (Pacific Beach) ---
@@ -335,7 +335,7 @@ const mockEvents = <Event[]>[
     lng: -117.2559,
     max_capacity: 160,
     image_url: "/mock-event-assets/mockEventImages/sports.jpg",
-    tags: ["Sports", "Outdoor"],
+    category: "Sports",
   },
  
   // --- Riverside, CA ---
@@ -352,7 +352,7 @@ const mockEvents = <Event[]>[
     lng: -117.3672,
     max_capacity: 1500,
     image_url: "/mock-event-assets/mockEventImages/food-and-drink.jpg",
-    tags: ["Food & Drink", "Outdoor"],
+    category: "Food & Drink",
   },
   {
     id: 22,
@@ -367,7 +367,7 @@ const mockEvents = <Event[]>[
     lng: -117.3741,
     max_capacity: 800,
     image_url: "/mock-event-assets/mockEventImages/tech.jpg",
-    tags: ["Tech"],
+    category: "Tech",
   },
  
   // --- San Jacinto, CA ---
@@ -384,7 +384,7 @@ const mockEvents = <Event[]>[
     lng: -116.9139,
     max_capacity: 300,
     image_url: "/mock-event-assets/mockEventImages/sports.jpg",
-    tags: ["Sports", "Outdoor"],
+    category: "Sports",
   },
   {
     id: 24,
@@ -399,7 +399,7 @@ const mockEvents = <Event[]>[
     lng: -116.9613,
     max_capacity: 2000,
     image_url: "/mock-event-assets/mockEventImages/music.jpg",
-    tags: ["Music", "Outdoor"],
+    category: "Music",
   },
  
   // --- Temecula, CA ---
@@ -416,7 +416,7 @@ const mockEvents = <Event[]>[
     lng: -117.1022,
     max_capacity: 600,
     image_url: "/mock-event-assets/mockEventImages/music.jpg",
-    tags: ["Music", "Food & Drink", "Outdoor"],
+    category: "Music",
   },
  
   // --- Escondido, CA ---
@@ -433,7 +433,7 @@ const mockEvents = <Event[]>[
     lng: -117.0578,
     max_capacity: 1200,
     image_url: "/mock-event-assets/mockEventImages/food-and-drink.jpg",
-    tags: ["Food & Drink", "Outdoor"],
+    category: "Food & Drink",
   },
  
   // --- Palm Springs, CA ---
@@ -450,7 +450,7 @@ const mockEvents = <Event[]>[
     lng: -116.5452,
     max_capacity: 500,
     image_url: "/mock-event-assets/mockEventImages/art.jpg",
-    tags: ["Art"],
+    category: "Art",
   },
  
   // --- Inglewood, CA ---
@@ -467,7 +467,7 @@ const mockEvents = <Event[]>[
     lng: -118.3617,
     max_capacity: 3000,
     image_url: "/mock-event-assets/mockEventImages/parties.jpg",
-    tags: ["Parties", "Music", "Outdoor"],
+    category: "Parties",
   },
  
   // --- Santa Barbara, CA ---
@@ -484,7 +484,7 @@ const mockEvents = <Event[]>[
     lng: -120.1214,
     max_capacity: 30,
     image_url: "/mock-event-assets/mockEventImages/outdoor.jpg",
-    tags: ["Outdoor", "Food & Drink"],
+    category: "Outdoor",
   },
  
   // --- Pomona, CA ---
@@ -501,7 +501,7 @@ const mockEvents = <Event[]>[
     lng: -117.8213,
     max_capacity: 600,
     image_url: "/mock-event-assets/mockEventImages/tech.jpg",
-    tags: ["Tech"],
+    category: "Tech",
   },
 ];
 
@@ -534,7 +534,7 @@ export const getEvents = async (filters?: {
     if (eventDate < startDate || eventDate > endDate) return false;
 
     // 2. Event type: skip check when "all", otherwise event must include the tag
-    if (eventType !== "all" && !event.tags.includes(eventType)) return false;
+    if (eventType !== "all" && event.category !== eventType) return false;
 
     // 3. Location filter — two mutually exclusive modes:
     if (useUserLocation && coordinates) {
@@ -564,3 +564,4 @@ export const getEvents = async (filters?: {
     return true;
   });
 };
+

@@ -75,21 +75,21 @@ function EmptyState({ message }: { message: string }) {
 function EventsList({
   events,
   query,
-  activeTag,
+  activeCategory,
 }: {
   events: Event[];
   query: string;
-  activeTag: string;
+  activeCategory: string;
 }) {
   const heading = query
     ? `Results for "${query}"`
-    : activeTag
-      ? `Tagged: ${activeTag}`
+    : activeCategory
+      ? `Category: ${activeCategory}`
       : "All Events";
   const emptyContext = query
     ? `"${query}"`
-    : activeTag
-      ? `"${activeTag}"`
+    : activeCategory
+      ? `"${activeCategory}"`
       : null;
   const { happening, upcoming, past } = partitionEvents(events);
 

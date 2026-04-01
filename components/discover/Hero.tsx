@@ -10,16 +10,16 @@ import { CATEGORY_CONFIG } from "@/lib/categoryConfig";
 
 function Hero({
   onSearch,
-  onTagSelect,
-  activeTag,
+  onCategorySelect,
+  activeCategory,
   query,
   input,
   onInputChange,
   onClearSearch,
 }: {
   onSearch: (q: string) => void;
-  onTagSelect: (tag: string) => void;
-  activeTag: string;
+  onCategorySelect: (category: string) => void;
+  activeCategory: string;
   query: string;
   input: string;
   onInputChange: (value: string) => void;
@@ -105,7 +105,7 @@ function Hero({
         </Button>
       </motion.div>
 
-      {/* Category filter tags */}
+      {/* Category filter chips */}
       <motion.div
         className="flex flex-wrap justify-center gap-2"
         initial={{ opacity: 0, y: 20 }}
@@ -117,13 +117,13 @@ function Hero({
             key={label}
             asChild
             className={`cursor-pointer backdrop-blur-sm transition-colors px-3 py-1 text-xs ${
-              activeTag === label
+              activeCategory === label
                 ? "border-primary bg-primary text-primary-foreground [&>svg]:text-primary-foreground"
                 : "border-white/20 bg-white/10 text-white/80 hover:bg-white/20"
             }`}
           >
-            <button onClick={() => onTagSelect(label)}>
-              <Icon className={activeTag === label ? "" : colorClass} />
+            <button onClick={() => onCategorySelect(label)}>
+              <Icon className={activeCategory === label ? "" : colorClass} />
               {label}
             </button>
           </Badge>

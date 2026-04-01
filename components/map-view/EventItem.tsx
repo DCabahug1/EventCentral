@@ -16,7 +16,7 @@ function EventItem({
   selected?: boolean;
   onSelect?: (id: number) => void;
 }) {
-  const categoryConfig = getCategoryConfig(event.tags[0]);
+  const categoryConfig = getCategoryConfig(event.category);
   const Icon = categoryConfig?.icon;
   return (
     <div
