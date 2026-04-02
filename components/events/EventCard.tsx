@@ -50,14 +50,18 @@ const statusConfig: Record<
 };
 
 function EventCard({ event }: { event: Event }) {
+  const maxCapacity = event.max_capacity ?? 0;
+  const categoryLabel = event.category ?? "Uncategorized";
+  const eventAddress = event.address ?? "Location TBD";
+  const eventImageUrl = event.image_url ?? "/discover-page/Hero.jpg";
   // Randomized attendee count used as a stand-in until real registration data exists
   const [attendees, setAttendees] = useState(
-    Math.floor(Math.random() * event.max_capacity),
+    Math.floor(Math.random() * Math.max(maxCapacity, 1)),
   );
-  const pct = (attendees / event.max_capacity) * 100;
+  const pct = maxCapacity > 0 ? (attendees / maxCapacity) * 100 : 0;
   const status = getEventStatus(event.start_time, event.end_time);
   const { label, className, dot } = statusConfig[status];
-  const categoryConfig = getCategoryConfig(event.category);
+  const categoryConfig = getCategoryConfig(categoryLabel);
   const CategoryIcon = categoryConfig?.icon;
 
   // For the hover effect
@@ -97,7 +101,7 @@ function EventCard({ event }: { event: Event }) {
               transition={{ duration: 0.4, ease: "easeOut" }}
             >
               <Image
-                src={event.image_url}
+                src={eventImageUrl}
                 alt={event.title}
                 width={500}
                 height={500}
@@ -117,12 +121,12 @@ function EventCard({ event }: { event: Event }) {
             <div className="flex flex-wrap gap-2">
               <Badge variant="outline">
                 {CategoryIcon && <CategoryIcon className={categoryConfig?.colorClass} />}
-                {event.category}
+                {categoryLabel}
               </Badge>
             </div>
             <div className="flex gap-2">
               <MapPin className="w-4 h-4 text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">{event.address}</p>
+              <p className="text-sm text-muted-foreground">{eventAddress}</p>
             </div>
             <div className="flex gap-2">
               <Calendar className="w-4 h-4 text-muted-foreground" />
@@ -133,7 +137,7 @@ function EventCard({ event }: { event: Event }) {
             <div className="flex gap-2">
               <Users className="w-4 h-4 text-muted-foreground" />
               <p className="text-sm text-muted-foreground">
-                {attendees + " / " + event.max_capacity + " attendees"}
+                {attendees + " / " + maxCapacity + " attendees"}
               </p>
             </div>
 

@@ -12,6 +12,8 @@ import { Event } from "@/lib/types";
 import { formatDateTime } from "@/lib/utils";
 import { X, ArrowRight } from "lucide-react";
 
+type MappableEvent = Event & { lat: number; lng: number };
+
 // Converts a search radius in miles to an appropriate Google Maps zoom level.
 // Clamped to [8, 12] to match the supported radius range of 5–50 miles.
 // Formula: 14 - log2(miles) approximates the zoom needed to fit the radius in view.
@@ -99,7 +101,7 @@ function MapViewInner({
 
   // When an event is selected from the list, pan to its coordinates and zoom in
   useEffect(() => {
-    if (!map || !selectedEvent) return;
+    if (!map || !selectedEvent || selectedEvent.lat == null || selectedEvent.lng == null) return;
     map.panTo({ lat: selectedEvent.lat, lng: selectedEvent.lng });
     map.setZoom(14);
   }, [map, selectedEvent]);
@@ -198,8 +200,15 @@ export default function MapView({
         )}
 
         {/* Event markers — one per event, with an inline custom popup when active */}
-        {events.map((event) => {
+        {events
+          .filter(
+            (event): event is MappableEvent =>
+              event.lat != null && event.lng != null,
+          )
+          .map((event) => {
           const isActive = activeMarkerId === event.id;
+          const eventImageUrl = event.image_url ?? "/discover-page/Hero.jpg";
+          const eventAddress = event.address ?? "Location TBD";
           return (
             <AdvancedMarker
               key={event.id}
@@ -220,7 +229,7 @@ export default function MapView({
                     {/* Event image header */}
                     <div className="relative h-24 w-full">
                       <img
-                        src={event.image_url}
+                        src={eventImageUrl}
                         alt={event.title}
                         className="w-full h-full object-cover"
                       />
@@ -245,7 +254,7 @@ export default function MapView({
                         {formatDateTime(event.start_time)}
                       </p>
                       <p className="text-xs text-muted-foreground truncate">
-                        {event.address}
+                        {eventAddress}
                       </p>
 
                       {/* Scroll-to-card button */}
@@ -273,7 +282,7 @@ export default function MapView({
                     }`}
                   >
                     <img
-                      src={event.image_url}
+                      src={eventImageUrl}
                       alt={event.title}
                       className="w-full h-full object-cover"
                     />
