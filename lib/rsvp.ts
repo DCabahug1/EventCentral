@@ -55,7 +55,7 @@ export const createRSVP = async (
       .eq('event_id', input.event_id)
       .eq('status', 'CONFIRMED');
 
-    if (count !== null && event?.max_capacity !== null && count >= event.max_capacity) {
+      if (count !== null && event && event.max_capacity !== null && count >= event.max_capacity) {
       return new Error("This event is at full capacity.");
     }
   }
