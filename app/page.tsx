@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import EventsList from "@/components/discover/EventsList";
 import Hero from "@/components/discover/Hero";
-import { getEvents } from "@/lib/events";
+import { getEvents } from "@/lib/eventsClient";
 import { Event } from "@/lib/types";
 
 function page() {

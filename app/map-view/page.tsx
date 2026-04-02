@@ -6,7 +6,7 @@ import React, { useRef, useState, useEffect } from "react";
 import { Event } from "@/lib/types";
 import { todayDateString, daysFromNowDateString } from "@/lib/utils";
 import EventList from "@/components/map-view/EventList";
-import { getEvents } from "@/lib/events";
+import { getEvents } from "@/lib/eventsClient";
 import { APIProvider } from "@vis.gl/react-google-maps";
 
 function page() {
