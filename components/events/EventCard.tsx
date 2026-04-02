@@ -49,7 +49,13 @@ const statusConfig: Record<
   },
 };
 
-function EventCard({ event }: { event: Event }) {
+function EventCard({
+  event,
+  organizationName,
+}: {
+  event: Event;
+  organizationName?: string;
+}) {
   const maxCapacity = event.max_capacity ?? 0;
   const categoryLabel = event.category ?? "Uncategorized";
   const eventAddress = event.address ?? "Location TBD";
@@ -114,7 +120,9 @@ function EventCard({ event }: { event: Event }) {
           <div className="flex flex-col gap-3 p-4">
             {/* Heading */}
             <div className="flex flex-col gap-1">
-              <h2 className="text-sm text-muted-foreground">Organization Placeholder</h2>
+              <h2 className="text-sm text-muted-foreground">
+                {organizationName ?? "Organization"}
+              </h2>
               <h1 className="text-2xl font-bold">{event.title}</h1>
             </div>
             {/* Category */}
