@@ -478,7 +478,7 @@ export default function OrganizationPage() {
           </div>
 
           <div className="relative z-10 -mt-12 sm:-mt-14 md:-mt-16">
-            <Card className="flex-1 sm:flex-row items-center gap-4 p-6 rounded-2xl border-border/80 bg-card/95 shadow-sm backdrop-blur-sm">
+            <Card className="flex-1 sm:flex-row items-center gap-4 p-6">
               <div
                 className={cn(
                   "relative size-48 sm:size-24 shrink-0 overflow-hidden rounded-2xl border-4 border-background bg-card shadow-lg sm:size-28 md:size-32",
