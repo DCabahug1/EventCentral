@@ -770,7 +770,7 @@ export default function OrganizationPage() {
                       <label
                         htmlFor={bannerInputId}
                         className={cn(
-                          "flex h-28 w-full cursor-pointer flex-col items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-border transition-colors hover:border-muted-foreground",
+                          "flex h-48 w-full max-w-[600px] cursor-pointer flex-col items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-border transition-colors hover:border-muted-foreground",
                         )}
                       >
                         {bannerPreview ? (
