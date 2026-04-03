@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { Card, CardHeader, CardTitle } from "../ui/card";
-import { Event } from "@/lib/types";
+import { Event, Organization } from "@/lib/types";
 import Image from "next/image";
 import { MapPin, Calendar, Users } from "lucide-react";
 import { Progress } from "../ui/progress";
@@ -10,7 +10,9 @@ import { Badge } from "../ui/badge";
 import { getCategoryConfig } from "@/lib/categoryConfig";
 import Link from "next/link";
 import { formatDateTime } from "@/lib/utils";
-
+import { useEffect } from "react";
+import { getOrganizationById } from "@/lib/organizations";
+import { PostgrestError } from "@supabase/supabase-js";
 
 // Returns a Tailwind color class based on how full the event is
 const getProgressColor = (pct: number) => {
@@ -51,12 +53,13 @@ const statusConfig: Record<
 
 function EventCard({
   event,
-  organizationName,
+  org,
 }: {
   event: Event;
-  organizationName?: string;
+  org?: Organization | null;
 }) {
   const maxCapacity = event.max_capacity ?? 0;
+  const [organization, setOrganization] = useState<Organization | null>(null);
   const categoryLabel = event.category ?? "Uncategorized";
   const eventAddress = event.address ?? "Location TBD";
   const eventImageUrl = event.image_url ?? "/discover-page/Hero.jpg";
@@ -72,6 +75,30 @@ function EventCard({
 
   // For the hover effect
   const [isHovered, setIsHovered] = useState(false);
+
+  useEffect(() => {
+    const fetchOrganization = async () => {
+      if (!event.organization_id || org?.id) return;
+
+      if (org) {
+        setOrganization(org);
+        return;
+      }
+
+      const result = await getOrganizationById(event.organization_id);
+
+      if (result instanceof Error || result instanceof PostgrestError) {
+        console.error(result.message);
+        return;
+      }
+
+      if (result) {
+        setOrganization(result);
+      }
+    };
+
+    fetchOrganization();
+  }, []);
 
   return (
     <motion.div className="w-full h-full">
@@ -120,15 +147,17 @@ function EventCard({
           <div className="flex flex-col gap-3 p-4">
             {/* Heading */}
             <div className="flex flex-col gap-1">
-              <h2 className="text-sm text-muted-foreground">
-                {organizationName ?? "Organization"}
-              </h2>
+                <h2 className="text-sm text-muted-foreground">
+                  {org?.name ?? organization?.name ?? "Organization"}
+                </h2>
               <h1 className="text-2xl font-bold">{event.title}</h1>
             </div>
             {/* Category */}
             <div className="flex flex-wrap gap-2">
               <Badge variant="outline">
-                {CategoryIcon && <CategoryIcon className={categoryConfig?.colorClass} />}
+                {CategoryIcon && (
+                  <CategoryIcon className={categoryConfig?.colorClass} />
+                )}
                 {categoryLabel}
               </Badge>
             </div>

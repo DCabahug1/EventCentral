@@ -42,7 +42,12 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/utils";
+import {
+  cn,
+  formatUsPhoneDisplay,
+  formatUsPhoneInput,
+  phoneDigitsForTel,
+} from "@/lib/utils";
 import {
   deleteOrganization,
   getOrganizationById,
@@ -256,7 +261,7 @@ export default function OrganizationPage() {
       setLocation(rawOrg.location ?? "");
       setWebsite(rawOrg.website ?? "");
       setEmail(rawOrg.email ?? "");
-      setPhone(rawOrg.phone ?? "");
+      setPhone(formatUsPhoneDisplay(rawOrg.phone));
 
       if (typeof document !== "undefined") {
         document.title = `${rawOrg.name} | EventCentral`;
@@ -278,7 +283,7 @@ export default function OrganizationPage() {
     setLocation(org.location ?? "");
     setWebsite(org.website ?? "");
     setEmail(org.email ?? "");
-    setPhone(org.phone ?? "");
+    setPhone(formatUsPhoneDisplay(org.phone));
     setAvatarFile(null);
     setBannerFile(null);
     setAvatarPreview(null);
@@ -574,13 +579,13 @@ export default function OrganizationPage() {
                       {org.email}
                     </a>
                   ) : null}
-                  {org.phone ? (
+                  {phoneDigitsForTel(org.phone) ? (
                     <a
-                      href={`tel:${org.phone.replace(/\s/g, "")}`}
+                      href={`tel:${phoneDigitsForTel(org.phone)}`}
                       className="flex items-center gap-2 text-sm text-primary hover:underline"
                     >
                       <Phone className="size-4 shrink-0" />
-                      {org.phone}
+                      {formatUsPhoneDisplay(org.phone)}
                     </a>
                   ) : null}
                 </div>
@@ -606,7 +611,7 @@ export default function OrganizationPage() {
                     <EventCard
                       key={ev.id}
                       event={ev}
-                      organizationName={org.name}
+                      org={org}
                     />
                   ))}
                 </div>
@@ -630,7 +635,7 @@ export default function OrganizationPage() {
                     <EventCard
                       key={ev.id}
                       event={ev}
-                      organizationName={org.name}
+                      org={org}
                     />
                   ))}
                 </div>
@@ -911,9 +916,13 @@ export default function OrganizationPage() {
                         <Input
                           id="edit-phone"
                           type="tel"
+                          inputMode="numeric"
+                          autoComplete="tel"
                           className="pl-10"
                           value={phone}
-                          onChange={(e) => setPhone(e.target.value)}
+                          onChange={(e) =>
+                            setPhone(formatUsPhoneInput(e.target.value))
+                          }
                         />
                       </div>
                     </FieldContent>
