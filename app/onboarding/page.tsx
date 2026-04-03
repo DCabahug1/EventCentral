@@ -36,11 +36,11 @@ function page() {
     setLoading(true);
 
     try {
-      const result = await createProfile(
-        formData.username,
-        unformatPhoneNumber(formData.phone_number),
-        formData.description,
-      );
+      const result = await createProfile({
+        username: formData.username,
+        phone_number: unformatPhoneNumber(formData.phone_number),
+        description: formData.description,
+      });
 
       if (result instanceof AuthError) {
         setErrorMessage(result.message);
