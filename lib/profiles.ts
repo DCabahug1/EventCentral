@@ -1,44 +1,92 @@
 'use server'
 import { createClient } from "./supabase/server";
+import { Profile } from "./types";
+import { PostgrestError } from "@supabase/supabase-js";
 
-export const createProfile = async (username: string, phone_number: string, description: string) => {
+type ProfileInput = Omit<Profile, "id" | "user_id" | "email" | "created_at" | "updated_at">;
+type ProfileUpdate = Partial<ProfileInput>;
+
+// Creates a new profile for the currently authenticated user.
+// Returns the inserted row or an Error/PostgrestError on failure.
+export const createProfile = async (
+  input: ProfileInput
+): Promise<Profile | Error | PostgrestError | null> => {
   const supabase = await createClient();
-  const {data, error} = await supabase.auth.getUser();
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-  if (error) {
-    // Handle as AuthError
-    return error;
+  if (authError || !user) {
+    return new Error("User must be authenticated to create a profile.");
   }
 
-  const {data: profileData, error: profileError} = await supabase.from('profiles').insert({
-    user_id: data.user?.id,
-    email: data.user?.email,
-    username: username,
-    phone_number: phone_number || null,
-    description: description || null,
-  });
+  const { data, error } = await supabase
+    .from('profiles')
+    .insert({
+      ...input,
+      user_id: user.id,
+      email: user.email,
+    })
+    .select()
+    .single();
 
-  if (profileError) {
-    // Handle as PostgrestError
-    return profileError;
-  }
-
-  return profileData;
+  if (error) return error;
+  return data as Profile;
 }
 
-export const getProfile = async (user_id: string) => {
+// Fetches a profile by user_id.
+// Returns the profile row, null if not found, or a PostgrestError on failure.
+export const getProfile = async (
+  user_id: string
+): Promise<Profile | PostgrestError | null> => {
   const supabase = await createClient();
 
-  const { data: profileData, error: profileError } = await supabase
+  const { data, error } = await supabase
     .from('profiles')
     .select('*')
     .eq('user_id', user_id)
     .maybeSingle();
 
-  if (profileError) {
-    // Handle as PostgrestError
-    return profileError;
+  if (error) return error;
+  return data as Profile;
+}
+
+// Updates the currently authenticated user's profile.
+// Returns the updated row or an Error/PostgrestError on failure.
+export const updateProfile = async (
+  updates: ProfileUpdate
+): Promise<Profile | Error | PostgrestError | null> => {
+  const supabase = await createClient();
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    return new Error("User must be authenticated to update a profile.");
   }
 
-  return profileData;
+  const { data, error } = await supabase
+    .from('profiles')
+    .update(updates)
+    .eq('user_id', user.id)
+    .select()
+    .single();
+
+  if (error) return error;
+  return data as Profile;
+}
+
+// Deletes the currently authenticated user's profile.
+// Returns null on success or an Error/PostgrestError on failure.
+export const deleteProfile = async (): Promise<null | Error | PostgrestError> => {
+  const supabase = await createClient();
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    return new Error("User must be authenticated to delete a profile.");
+  }
+
+  const { error } = await supabase
+    .from('profiles')
+    .delete()
+    .eq('user_id', user.id);
+
+  if (error) return error;
+  return null;
 }

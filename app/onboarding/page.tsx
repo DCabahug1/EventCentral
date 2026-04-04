@@ -20,6 +20,12 @@ function unformatPhoneNumber(value: string): string {
   return value.replace(/\D/g, "");
 }
 
+function phoneDigitsToNumber(digits: string): number | null {
+  if (!digits) return null;
+  const n = parseInt(digits, 10);
+  return Number.isNaN(n) ? null : n;
+}
+
 function page() {
   const [formData, setFormData] = useState({
     username: "",
@@ -36,11 +42,14 @@ function page() {
     setLoading(true);
 
     try {
-      const result = await createProfile(
-        formData.username,
-        unformatPhoneNumber(formData.phone_number),
-        formData.description,
-      );
+      const result = await createProfile({
+        username: formData.username,
+        avatar_url: null,
+        phone_number: phoneDigitsToNumber(
+          unformatPhoneNumber(formData.phone_number),
+        ),
+        description: formData.description,
+      });
 
       if (result instanceof AuthError) {
         setErrorMessage(result.message);
