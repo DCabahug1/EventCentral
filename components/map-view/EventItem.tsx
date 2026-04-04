@@ -1,11 +1,13 @@
-import React from "react";
-import { Event } from "@/lib/types";
+import React, { useState, useEffect } from "react";
+import { Event, Organization } from "@/lib/types";
 import { ArrowUpRight, Calendar, MapPin, Users } from "lucide-react";
 import { formatDateTime } from "@/lib/utils";
 import { getCategoryConfig } from "@/lib/categoryConfig";
 import { Progress } from "../ui/progress";
 import { Button } from "../ui/button";
 import Link from "next/link";
+import { getOrganizationById } from "@/lib/organizations";
+import { PostgrestError } from "@supabase/supabase-js";
 
 function EventItem({
   event,
@@ -21,11 +23,29 @@ function EventItem({
   const maxCapacity = event.max_capacity ?? 0;
   const categoryConfig = getCategoryConfig(categoryLabel);
   const Icon = categoryConfig?.icon;
+  const [organization, setOrganization] = useState<Organization | null>(null);
+  useEffect(() => {
+    const fetchOrganization = async () => {
+      if (!event.organization_id) return;
+      const result = await getOrganizationById(event.organization_id);
+      if (result instanceof Error || result instanceof PostgrestError) {
+        console.error(result.message);
+        return;
+      }
+      if (result) {
+        setOrganization(result);
+      }
+    };
+    fetchOrganization();
+  }, []);
+
   return (
     <div
       data-event-id={event.id}
       className={`flex flex-col gap-4 p-4 border-b cursor-pointer transition-all duration-300 ${
-        selected ? "bg-primary/5 border-l-2 border-l-primary" : "hover:opacity-80"
+        selected
+          ? "bg-primary/5 border-l-2 border-l-primary"
+          : "hover:opacity-80"
       }`}
       onClick={() => onSelect?.(event.id)}
     >
@@ -37,6 +57,14 @@ function EventItem({
         </div>
         {/* Information */}
         <div className="flex flex-col gap-2 w-full">
+          {/* Organization */}
+
+          <Link href={`/organizations/${event.organization_id}`}>
+            <p className="text-sm text-muted-foreground hover:underline">
+              {organization?.name}
+            </p>
+          </Link>
+
           {/* Title */}
           <h1 className="text-lg font-bold">{event.title}</h1>
           {/* Description */}
@@ -49,7 +77,9 @@ function EventItem({
             <div className="flex flex-col">
               <p className="text-sm text-muted-foreground">{eventAddress}</p>
               {event.location_details && (
-                <p className="text-xs text-muted-foreground/70">{event.location_details}</p>
+                <p className="text-xs text-muted-foreground/70">
+                  {event.location_details}
+                </p>
               )}
             </div>
           </div>
@@ -76,7 +106,12 @@ function EventItem({
           />
         </div>
         {/* View Event Button */}
-        <Button variant="outline" size="icon" asChild onClick={(e) => e.stopPropagation()}>
+        <Button
+          variant="outline"
+          size="icon"
+          asChild
+          onClick={(e) => e.stopPropagation()}
+        >
           <Link href={`/events/${event.id}`}>
             <ArrowUpRight className="w-4 h-4" />
           </Link>
