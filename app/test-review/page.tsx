@@ -4,15 +4,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Field, FieldContent, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { createReview } from '@/lib/reviews'
+import { createReview, } from '@/lib/reviews'
 import { PostgrestError } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/client'
 import React, { useState } from 'react'
 
 function page() {
   const [formData, setFormData] = useState({
-    event_id: 5,
-    rating: 0,
+    event_id: 0,
+    rating: 5,
     review: '',
   })
   const [errorMessage, setErrorMessage] = useState('')
