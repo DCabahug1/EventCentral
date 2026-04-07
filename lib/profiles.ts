@@ -3,7 +3,7 @@ import { createClient } from "./supabase/server";
 import { Profile } from "./types";
 import { PostgrestError } from "@supabase/supabase-js";
 
-type ProfileInput = Omit<Profile, "id" | "user_id" | "email" | "created_at" | "updated_at">;
+type ProfileInput = Omit<Profile, "id" | "user_id" | "email" | "created_at" | "updated_at" | "avatar_url"> & { avatar_url?: string | null };
 type ProfileUpdate = Partial<ProfileInput>;
 
 // Creates a new profile for the currently authenticated user.
