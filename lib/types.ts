@@ -28,6 +28,8 @@ export type Organization = {
 export type Event = {
   id: number;
   organization_id: number | null;
+  /** Denormalized from organizations.name; avoids a separate org fetch when set. */
+  organization_name: string | null;
   user_id: string;
   title: string;
   description: string | null;

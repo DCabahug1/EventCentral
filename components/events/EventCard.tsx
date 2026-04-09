@@ -79,15 +79,16 @@ function EventCard({
   const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
+    if (org) {
+      setOrganization(org);
+      return;
+    }
+    if (!event.organization_id || event.organization_name) {
+      return;
+    }
+
     const fetchOrganization = async () => {
-      if (!event.organization_id) return;
-
-      if (org) {
-        setOrganization(org);
-        return;
-      }
-
-      const result = await getOrganizationById(event.organization_id);
+      const result = await getOrganizationById(event.organization_id!);
 
       if (result instanceof PostgrestError) {
         console.error(result.message);
@@ -99,8 +100,8 @@ function EventCard({
       }
     };
 
-    fetchOrganization();
-  }, [event.organization_id, org]);
+    void fetchOrganization();
+  }, [event.organization_id, event.organization_name, org]);
 
   const imageHeightClass =
     variant === "featured" ? "h-64 sm:h-72" : "h-48";
@@ -153,7 +154,10 @@ function EventCard({
             {/* Heading */}
             <div className="flex flex-col gap-1">
               <h2 className="text-sm text-muted-foreground">
-                {org?.name ?? organization?.name ?? "Organization"}
+                {org?.name ??
+                  event.organization_name ??
+                  organization?.name ??
+                  "Organization"}
               </h2>
               <h1 className="text-2xl font-bold">{event.title}</h1>
             </div>
