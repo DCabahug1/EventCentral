@@ -1,7 +1,7 @@
 "use client";
-import React, { useState } from "react";
-import { Card, CardHeader, CardTitle } from "../ui/card";
-import { Event } from "@/lib/types";
+import React, { useEffect, useState } from "react";
+import { Card } from "../ui/card";
+import { Event, Organization } from "@/lib/types";
 import Image from "next/image";
 import { MapPin, Calendar, Users } from "lucide-react";
 import { Progress } from "../ui/progress";
@@ -10,6 +10,8 @@ import { Badge } from "../ui/badge";
 import { getCategoryConfig } from "@/lib/categoryConfig";
 import Link from "next/link";
 import { formatDateTime } from "@/lib/utils";
+import { getOrganizationById } from "@/lib/organizations";
+import { PostgrestError } from "@supabase/supabase-js";
 
 
 // Returns a Tailwind color class based on how full the event is
@@ -49,8 +51,17 @@ const statusConfig: Record<
   },
 };
 
-function EventCard({ event }: { event: Event }) {
+function EventCard({
+  event,
+  org,
+  variant = "default",
+}: {
+  event: Event;
+  org?: Organization | null;
+  variant?: "default" | "featured";
+}) {
   const maxCapacity = event.max_capacity ?? 0;
+  const [organization, setOrganization] = useState<Organization | null>(null);
   const categoryLabel = event.category ?? "Uncategorized";
   const eventAddress = event.address ?? "Location TBD";
   const eventImageUrl = event.image_url ?? "/discover-page/Hero.jpg";
@@ -67,18 +78,45 @@ function EventCard({ event }: { event: Event }) {
   // For the hover effect
   const [isHovered, setIsHovered] = useState(false);
 
+  useEffect(() => {
+    const fetchOrganization = async () => {
+      if (!event.organization_id) return;
+
+      if (org) {
+        setOrganization(org);
+        return;
+      }
+
+      const result = await getOrganizationById(event.organization_id);
+
+      if (result instanceof PostgrestError) {
+        console.error(result.message);
+        return;
+      }
+
+      if (result) {
+        setOrganization(result);
+      }
+    };
+
+    fetchOrganization();
+  }, [event.organization_id, org]);
+
+  const imageHeightClass =
+    variant === "featured" ? "h-64 sm:h-72" : "h-48";
+
   return (
     <motion.div className="w-full h-full">
       <Link href={`/events/${event.id}`}>
         <Card
-          className="w-full h-full p-0 gap-0 overflow-hidden cursor-pointer hover:scale-101 dark:brightness-90 dark:hover:brightness-100 transition-all duration-300"
+          className={`w-full h-full p-0 gap-0 overflow-hidden cursor-pointer hover:scale-101 dark:brightness-90 dark:hover:brightness-100 transition-all duration-300 ${variant === "featured" ? "min-h-0" : ""}`}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
           {/* Image + overlays */}
           <div className="relative overflow-hidden">
             <div
-              className={`absolute inset-0 bg-gradient-to-t from-black/70 dark:from-background to-transparent z-10 ${isHovered ? "opacity-70" : "opacity-80"} transition-all duration-300`}
+              className={`absolute inset-0 bg-linear-to-t from-black/70 dark:from-background to-transparent z-10 ${isHovered ? "opacity-70" : "opacity-80"} transition-all duration-300`}
             />
 
             {/* Status badge — positioned over the image in the top-left */}
@@ -105,7 +143,7 @@ function EventCard({ event }: { event: Event }) {
                 alt={event.title}
                 width={500}
                 height={500}
-                className="w-full h-48 object-cover"
+                className={`w-full object-cover ${imageHeightClass}`}
               />
             </motion.div>
           </div>
@@ -114,7 +152,9 @@ function EventCard({ event }: { event: Event }) {
           <div className="flex flex-col gap-3 p-4">
             {/* Heading */}
             <div className="flex flex-col gap-1">
-              <h2 className="text-sm text-muted-foreground">Organization Placeholder</h2>
+              <h2 className="text-sm text-muted-foreground">
+                {org?.name ?? organization?.name ?? "Organization"}
+              </h2>
               <h1 className="text-2xl font-bold">{event.title}</h1>
             </div>
             {/* Category */}

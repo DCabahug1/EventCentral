@@ -4,9 +4,14 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { Profile } from "@/lib/types";
 import { Button } from "../ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 import { Compass, MapPin, Menu, Plus, User, X } from "lucide-react";
 import AvatarButton from "./AvatarButton";
-import { motion, AnimatePresence } from "motion/react";
 
 interface MobileNavProps {
   profile: Profile | null;
@@ -21,78 +26,61 @@ function MobileNav({ profile }: MobileNavProps) {
   }, [pathname]);
 
   return (
-    <>
-      {/* Hamburger toggle row in the header bar */}
-      <div className="flex sm:hidden items-center gap-2">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setOpen((prev) => !prev)}
-          aria-label="Toggle menu"
-        >
-          {open ? <X /> : <Menu />}
-        </Button>
-        {profile && <AvatarButton profile={profile} />}
-      </div>
-
-      {/* Slide-down panel */}
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            key="mobile-menu"
-            initial={{ opacity: 0, y: -6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            transition={{ duration: 0.15, ease: "easeOut" }}
-            className="sm:hidden fixed top-16 left-0 right-0 z-40 bg-background border-b px-4 py-3 flex flex-col gap-1"
-          >
-            {profile ? (
-              <>
-                <Button
-                  variant={pathname === "/" ? "default" : "ghost"}
-                  className="w-full justify-start"
-                  asChild
-                >
-                  <Link href="/">
-                    <Compass />
-                    Discover
-                  </Link>
-                </Button>
-                <Button
-                  variant={pathname === "/map-view" ? "default" : "ghost"}
-                  className="w-full justify-start"
-                  asChild
-                >
-                  <Link href="/map-view">
-                    <MapPin />
-                    Map View
-                  </Link>
-                </Button>
-                <Button
-                  variant={
-                    pathname.startsWith("/create-event") ? "default" : "ghost"
-                  }
-                  className="w-full justify-start"
-                  asChild
-                >
-                  <Link href="/create-event">
-                    <Plus />
-                    Host an Event
-                  </Link>
-                </Button>
-              </>
-            ) : (
-              <Button className="w-full" asChild>
-                <Link href="/auth/login">
-                  <User />
-                  Sign in
+    <div className="flex sm:hidden items-center gap-2">
+      <DropdownMenu open={open} onOpenChange={setOpen}>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon" aria-label="Toggle menu">
+            {open ? <X /> : <Menu />}
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" side="bottom" className="w-56">
+          {profile ? (
+            <>
+              <DropdownMenuItem asChild className={pathname === "/" ? "bg-accent" : ""}>
+                <Link href="/" className="flex cursor-pointer items-center gap-2">
+                  <Compass className="size-4" />
+                  Discover
                 </Link>
-              </Button>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                asChild
+                className={pathname === "/map-view" ? "bg-accent" : ""}
+              >
+                <Link href="/map-view" className="flex cursor-pointer items-center gap-2">
+                  <MapPin className="size-4" />
+                  Map View
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                asChild
+                className={
+                  pathname.startsWith("/create-event") ? "bg-accent" : ""
+                }
+              >
+                <Link
+                  href="/create-event"
+                  className="flex cursor-pointer items-center gap-2"
+                >
+                  <Plus className="size-4" />
+                  Host an Event
+                </Link>
+              </DropdownMenuItem>
+            </>
+          ) : (
+            <DropdownMenuItem asChild>
+              <Link
+                href="/auth/login"
+                className="flex cursor-pointer items-center gap-2"
+              >
+                <User className="size-4" />
+                Sign in
+              </Link>
+            </DropdownMenuItem>
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
+      {profile && <AvatarButton profile={profile} />}
+    </div>
   );
 }
 
