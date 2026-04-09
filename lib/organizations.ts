@@ -75,6 +75,12 @@ export const getOrganizationById = async (id: number): Promise<Organization | Po
 
 export const updateOrganization = async (id: number, name: string, description: string, avatar_url: string | null, banner_url: string | null, website: string | null, email: string | null, phone: string | null, location: string | null): Promise<Organization | Error | PostgrestError | null> => {
   const supabase = await createClient();
+  const { data: authData, error: authError } = await supabase.auth.getUser();
+
+  if (authError || !authData.user) {
+    return new Error("You must be signed in to update an organization.");
+  }
+
   const { data, error } = await supabase
     .from("organizations")
     .update({
@@ -88,6 +94,7 @@ export const updateOrganization = async (id: number, name: string, description: 
       location: location,
     })
     .eq("id", id)
+    .eq("user_id", authData.user.id)
     .select()
     .single();
   
@@ -100,7 +107,23 @@ export const updateOrganization = async (id: number, name: string, description: 
 
 export const deleteOrganization = async (id: number): Promise<void | PostgrestError | null> => {
   const supabase = await createClient();
-  const { error } = await supabase.from("organizations").delete().eq("id", id);
+  const { data: authData, error: authError } = await supabase.auth.getUser();
+
+  if (authError || !authData.user) {
+    return {
+      message: "You must be signed in.",
+      details: "",
+      hint: "",
+      code: "401",
+      name: "PostgrestError",
+    } as PostgrestError;
+  }
+
+  const { error } = await supabase
+    .from("organizations")
+    .delete()
+    .eq("id", id)
+    .eq("user_id", authData.user.id);
   
   if (error) {
     return error;

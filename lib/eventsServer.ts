@@ -3,6 +3,23 @@ import { createClient } from "./supabase/server";
 import { Event } from "./types";
 import { PostgrestError } from "@supabase/supabase-js";
 
+/** All events for an organization, ordered by start time (soonest first). */
+export async function getEventsByOrganizationId(
+  organizationId: number,
+): Promise<Event[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("events")
+    .select("*")
+    .eq("organization_id", organizationId)
+    .order("start_time", { ascending: true });
+
+  if (error || !data) {
+    return [];
+  }
+  return data as Event[];
+}
+
 type EventInput = Omit<Event, "id" | "user_id" | "created_at" | "updated_at">;
 type EventUpdate = Partial<EventInput>;
 
