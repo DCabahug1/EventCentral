@@ -16,7 +16,7 @@ function DiscoverPageContent() {
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("");
   const [input, setInput] = useState("");
-  const [locationInput, setLocationInput] = useState("United States");
+  const [locationInput, setLocationInput] = useState("");
   const [useUserLocation, setUseUserLocation] = useState(false);
   const [coordinates, setCoordinates] = useState<
     { lat: number; lng: number } | undefined
@@ -95,7 +95,7 @@ function DiscoverPageContent() {
     setUseUserLocation(false);
     setCoordinates(undefined);
     setRegionBounds(undefined);
-    setLocationInput("United States");
+    setLocationInput("");
   };
 
   const handleActivateManualLocation = () => {
@@ -107,7 +107,7 @@ function DiscoverPageContent() {
   const handleClearSearch = () => {
     setQuery("");
     setInput("");
-    setLocationInput("United States");
+    setLocationInput("");
     setUseUserLocation(false);
     setCoordinates(undefined);
     setRegionBounds(undefined);

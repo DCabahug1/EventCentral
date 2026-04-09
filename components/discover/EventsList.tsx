@@ -253,8 +253,8 @@ function EventsList({
               transition={{ duration: 0.2, ease: "easeOut" }}
               className="flex w-full flex-wrap items-start justify-between gap-4 text-2xl font-bold lg:text-start"
             >
-              <div className="flex min-w-0 flex-1 flex-col gap-1 text-center lg:text-left">
-                <div className="flex items-center justify-center gap-2 lg:justify-start">
+              <div className="flex min-w-0 flex-1 flex-col gap-1 text-left">
+                <div className="flex items-center gap-2 justify-start">
                   <div className="h-5 w-1 shrink-0 bg-primary" />
                   <span className="min-w-0">{heading}</span>
                 </div>
