@@ -156,6 +156,9 @@ function DiscoverPageContent() {
           events={filteredEvents}
           query={query}
           activeCategory={activeCategory}
+          locationInput={locationInput}
+          useUserLocation={useUserLocation}
+          hasRegionBounds={Boolean(regionBounds)}
         />
       </div>
     </div>

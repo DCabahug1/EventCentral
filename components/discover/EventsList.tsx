@@ -5,6 +5,7 @@ import EventCard from "../events/EventCard";
 import HappeningNowRail from "./HappeningNowRail";
 import PaginationBar from "./PaginationBar";
 import {
+  DISCOVER_NEAR_ME_RADIUS_MILES,
   DISCOVER_PAGE_SIZE_GRID,
   DISCOVER_PAGE_SIZE_HAPPENING,
 } from "@/lib/discoverConstants";
@@ -46,6 +47,24 @@ const partitionEvents = (events: Event[]) => {
 
   return { happening, upcoming, past };
 };
+
+function locationSummaryLine(
+  locationInput: string,
+  useUserLocation: boolean,
+  hasRegionBounds: boolean,
+): string {
+  if (useUserLocation) {
+    const label = locationInput.trim();
+    if (!label || label === "Near you") {
+      return `Within ${DISCOVER_NEAR_ME_RADIUS_MILES} mi of your location`;
+    }
+    return `Within ${DISCOVER_NEAR_ME_RADIUS_MILES} mi of ${label}`;
+  }
+  if (hasRegionBounds) {
+    return `In ${locationInput}`;
+  }
+  return "All locations";
+}
 
 // Staggered grid of event cards
 function EventGrid({
@@ -109,10 +128,16 @@ function EventsList({
   events,
   query,
   activeCategory,
+  locationInput,
+  useUserLocation,
+  hasRegionBounds,
 }: {
   events: Event[];
   query: string;
   activeCategory: string;
+  locationInput: string;
+  useUserLocation: boolean;
+  hasRegionBounds: boolean;
 }) {
   const heading = query
     ? `Results for "${query}"`
@@ -124,6 +149,11 @@ function EventsList({
     : activeCategory
       ? `"${activeCategory}"`
       : null;
+  const locationLine = locationSummaryLine(
+    locationInput,
+    useUserLocation,
+    hasRegionBounds,
+  );
   const { happening, upcoming, past } = partitionEvents(events);
 
   const [happeningPage, setHappeningPage] = useState(1);
@@ -134,7 +164,14 @@ function EventsList({
     setHappeningPage(1);
     setUpcomingPage(1);
     setPastPage(1);
-  }, [query, activeCategory, events.length]);
+  }, [
+    query,
+    activeCategory,
+    events.length,
+    locationInput,
+    useUserLocation,
+    hasRegionBounds,
+  ]);
 
   const happeningTotalPages = Math.max(
     1,
@@ -209,18 +246,23 @@ function EventsList({
         <AnimatePresence mode="wait">
           {heading && (
             <motion.div
-              key={heading}
+              key={`${heading}|${locationLine}`}
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
-              className="flex items-center justify-between gap-4 text-2xl font-bold lg:text-start text-center w-full flex-wrap"
+              className="flex w-full flex-wrap items-start justify-between gap-4 text-2xl font-bold lg:text-start"
             >
-              <div className="flex items-center gap-2">
-                <div className="h-5 w-1 bg-primary" />
-                {heading}
+              <div className="flex min-w-0 flex-1 flex-col gap-1 text-center lg:text-left">
+                <div className="flex items-center justify-center gap-2 lg:justify-start">
+                  <div className="h-5 w-1 shrink-0 bg-primary" />
+                  <span className="min-w-0">{heading}</span>
+                </div>
+                <p className="pl-3 text-sm font-normal text-muted-foreground">
+                  {locationLine}
+                </p>
               </div>
-              <span className="text-sm font-normal text-muted-foreground">
+              <span className="text-sm font-normal text-muted-foreground shrink-0">
                 {upcoming.length + past.length}{" "}
                 {upcoming.length + past.length === 1 ? "event" : "events"}
               </span>
