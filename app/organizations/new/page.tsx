@@ -148,7 +148,7 @@ export default function Page() {
       );
 
       if (isOrganization(result)) {
-        router.push("/");
+        router.push(`/organizations/${result.id}`);
         router.refresh();
         return;
       }
@@ -213,13 +213,15 @@ export default function Page() {
             <CardContent>
               <FieldGroup className="gap-6">
                 <Field>
-                  <FieldLabel
-                    htmlFor={avatarInputId}
-                    className="text-muted-foreground"
-                  >
-                    Avatar
-                  </FieldLabel>
-                  <FieldContent className="gap-2">
+                  <div className="flex justify-center w-full">
+                    <FieldLabel
+                      htmlFor={avatarInputId}
+                      className="text-muted-foreground"
+                    >
+                      Avatar
+                    </FieldLabel>
+                  </div>
+                  <FieldContent className="items-center gap-2">
                     <label
                       htmlFor={avatarInputId}
                       className={cn(
@@ -251,11 +253,6 @@ export default function Page() {
                         }
                       />
                     </label>
-                    {avatarFile ? (
-                      <p className="text-muted-foreground text-xs">
-                        {avatarFile.name}
-                      </p>
-                    ) : null}
                   </FieldContent>
                 </Field>
 
@@ -301,11 +298,6 @@ export default function Page() {
                         }
                       />
                     </label>
-                    {bannerFile ? (
-                      <p className="text-muted-foreground text-xs">
-                        {bannerFile.name}
-                      </p>
-                    ) : null}
                   </FieldContent>
                 </Field>
 
@@ -375,6 +367,7 @@ export default function Page() {
                       id="org-location"
                       value={location}
                       onChange={setLocation}
+                      mapPinSide="left"
                     />
                   </FieldContent>
                 </Field>

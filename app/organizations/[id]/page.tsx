@@ -871,6 +871,7 @@ export default function OrganizationPage() {
                         id="edit-location"
                         value={location}
                         onChange={setLocation}
+                        mapPinSide="left"
                       />
                     </FieldContent>
                   </Field>

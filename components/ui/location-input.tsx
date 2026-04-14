@@ -25,6 +25,7 @@ export function LocationInput({
   onInputKeyDown,
   placeholder = "City, neighborhood, state, or country",
   hideMapPin = false,
+  mapPinSide = "right",
   anchorClassName,
   inputClassName,
 }: {
@@ -38,6 +39,8 @@ export function LocationInput({
   onInputKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   placeholder?: string;
   hideMapPin?: boolean;
+  /** Which side of the input the map pin icon sits on. Defaults to "right". */
+  mapPinSide?: "left" | "right";
   anchorClassName?: string;
   inputClassName?: string;
 }) {
@@ -140,7 +143,12 @@ export function LocationInput({
           className={cn("relative w-full", anchorClassName)}
         >
           {!hideMapPin && (
-            <MapPin className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground size-4 z-10 pointer-events-none" />
+            <MapPin
+              className={cn(
+                "absolute top-1/2 -translate-y-1/2 text-muted-foreground size-4 z-10 pointer-events-none",
+                mapPinSide === "left" ? "left-3" : "right-3",
+              )}
+            />
           )}
           <Input
             id={id}
@@ -158,7 +166,11 @@ export function LocationInput({
             }}
             readOnly={readOnly}
             autoComplete="off"
-            className={cn(hideMapPin ? "" : "pr-9", inputClassName)}
+            className={cn(
+              !hideMapPin && mapPinSide === "left" && "pl-9",
+              !hideMapPin && mapPinSide === "right" && "pr-9",
+              inputClassName,
+            )}
           />
         </div>
       </PopoverAnchor>

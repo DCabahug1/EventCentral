@@ -7,6 +7,11 @@ const remotePatterns: NonNullable<
     protocol: "https",
     hostname: "images.unsplash.com",
   },
+  {
+    protocol: "https",
+    hostname: "*.supabase.co",
+    pathname: "/storage/v1/object/public/**",
+  },
 ];
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
