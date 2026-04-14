@@ -45,7 +45,7 @@ export default function HappeningNowRail({
         </p>
       ) : (
         <>
-          <div className="flex gap-4 overflow-x-auto pb-2 scroll-smooth snap-x snap-mandatory [-webkit-overflow-scrolling:touch]">
+          <div className="flex gap-4 overflow-x-auto py-6 scroll-smooth snap-x snap-mandatory [-webkit-overflow-scrolling:touch]">
             {events.map((event) => (
               <div
                 key={event.id}

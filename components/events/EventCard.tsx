@@ -5,7 +5,6 @@ import { Event, Organization } from "@/lib/types";
 import Image from "next/image";
 import { MapPin, Calendar, Users } from "lucide-react";
 import { Progress } from "../ui/progress";
-import { motion } from "motion/react";
 import { Badge } from "../ui/badge";
 import { getCategoryConfig } from "@/lib/categoryConfig";
 import Link from "next/link";
@@ -49,6 +48,15 @@ const statusConfig: Record<
     label: "Ended",
     className: "bg-black/50 text-white/50 border border-white/10",
   },
+};
+
+// Returns capacity badge props when the event is getting full, null otherwise
+const getCapacityBadge = (
+  pct: number,
+): { label: string; className: string } | null => {
+  if (pct >= 100) return { label: "Full", className: "bg-destructive text-white" };
+  if (pct >= 75) return { label: "Almost Full", className: "bg-orange-500 text-white" };
+  return null;
 };
 
 function EventCard({
@@ -103,14 +111,108 @@ function EventCard({
     void fetchOrganization();
   }, [event.organization_id, event.organization_name, org]);
 
-  const imageHeightClass =
-    variant === "featured" ? "h-64 sm:h-72" : "h-48";
+  const capacityBadge = getCapacityBadge(pct);
+
+  if (variant === "featured") {
+    return (
+      <div className="w-full h-full">
+        <Link href={`/events/${event.id}`}>
+          <Card
+            className="relative w-full h-72 p-0 gap-0 overflow-hidden cursor-pointer transition-all duration-300 shadow-xs"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+          >
+            {/* Full-bleed background image */}
+            <div className="absolute inset-0">
+              <Image
+                src={eventImageUrl}
+                alt={event.title}
+                fill
+                className="object-cover"
+              />
+            </div>
+
+            {/* Gradient overlay for readability */}
+            <div className={`absolute inset-0 bg-linear-to-t from-black/90 via-black/60 to-transparent z-10 ${isHovered ? "opacity-50" : "opacity-80"} transition-all duration-300`} />
+
+            {/* Status badge — top-left */}
+            <div
+              className={`absolute top-3 left-3 z-20 flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold backdrop-blur-sm ${className}`}
+            >
+              {dot && (
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-white" />
+                </span>
+              )}
+              {label}
+            </div>
+
+            {/* Capacity badge — top-right */}
+            {capacityBadge && (
+              <div className="absolute top-3 right-3 z-20">
+                <Badge className={capacityBadge.className}>
+                  {capacityBadge.label}
+                </Badge>
+              </div>
+            )}
+
+            {/* Bottom overlay — event details */}
+            <div className="absolute inset-x-0 bottom-0 z-20 flex flex-col gap-2 px-4 pb-6">
+              {/* Category + org */}
+              <div className="flex items-center gap-2 flex-wrap">
+                <Badge variant='outline' className="bg-black/50 border-white/20 text-white">
+                  {CategoryIcon && <CategoryIcon className={categoryConfig?.colorClass} />}
+                  {categoryLabel}
+                </Badge>
+                <span className="text-xs text-white/70">
+                  {org?.name ?? event.organization_name ?? organization?.name}
+                </span>
+              </div>
+
+              {/* Title */}
+              <h1 className="text-2xl font-bold text-white leading-tight">
+                {event.title}
+              </h1>
+
+              {/* Meta row */}
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-white/80">
+                <span className="flex items-center gap-1">
+                  <MapPin className="w-4 h-4" />
+                  {eventAddress}
+                </span>
+                <span className="text-white/40">·</span>
+                <span className="flex items-center gap-1">
+                  <Calendar className="w-4 h-4" />
+                  {formatDateTime(event.start_time)}
+                </span>
+                <span className="text-white/40">·</span>
+                <span className="flex items-center gap-1">
+                  <Users className="w-4 h-4" />
+                  {attendees}/{maxCapacity}
+                </span>
+              </div>
+            </div>
+
+            {/* Progress bar flush at the bottom edge */}
+            <div className="absolute bottom-0 inset-x-0 z-30">
+              <Progress
+                value={pct}
+                indicatorClassName={getProgressColor(pct)}
+                className="rounded-none h-1.5"
+              />
+            </div>
+          </Card>
+        </Link>
+      </div>
+    );
+  }
 
   return (
-    <motion.div className="w-full h-full">
+    <div className="w-full h-full">
       <Link href={`/events/${event.id}`}>
         <Card
-          className={`w-full h-full p-0 gap-0 overflow-hidden cursor-pointer hover:scale-101 dark:brightness-90 dark:hover:brightness-100 transition-all duration-300 ${variant === "featured" ? "min-h-0" : ""}`}
+          className="w-full h-full p-0 gap-0 overflow-hidden cursor-pointer dark:brightness-90 dark:hover:brightness-100 transition-all duration-300"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
@@ -125,7 +227,6 @@ function EventCard({
               className={`absolute top-3 left-3 z-20 flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold backdrop-blur-sm ${className}`}
             >
               {dot && (
-                // Ping animation only shown for live events
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-white" />
@@ -134,19 +235,13 @@ function EventCard({
               {label}
             </div>
 
-            {/* Image scales up slightly on hover */}
-            <motion.div
-              whileHover={{ scale: 1.04 }}
-              transition={{ duration: 0.4, ease: "easeOut" }}
-            >
-              <Image
-                src={eventImageUrl}
-                alt={event.title}
-                width={500}
-                height={500}
-                className={`w-full object-cover ${imageHeightClass}`}
-              />
-            </motion.div>
+            <Image
+              src={eventImageUrl}
+              alt={event.title}
+              width={500}
+              height={500}
+              className="w-full object-cover h-48"
+            />
           </div>
 
           {/* Event details */}
@@ -190,7 +285,7 @@ function EventCard({
           </div>
         </Card>
       </Link>
-    </motion.div>
+    </div>
   );
 }
 

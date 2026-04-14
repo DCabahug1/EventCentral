@@ -12,7 +12,7 @@ export const createOrganization = async (
   email: string | null,
   phone: string | null,
   location: string | null,
-) : Promise<Organization | Error | PostgrestError | null> => {
+): Promise<Organization | Error | PostgrestError | null> => {
   const supabase = await createClient();
   const { data: authData, error: authError } = await supabase.auth.getUser();
 
@@ -53,18 +53,29 @@ export const createOrganization = async (
   return data;
 };
 
-export const getOrganizationsByUserId = async (user_id: string): Promise<Organization[] | PostgrestError | null> => {
+export const getOrganizationsByUserId = async (
+  user_id: string,
+): Promise<Organization[] | PostgrestError | null> => {
   const supabase = await createClient();
-  const { data, error } = await supabase.from("organizations").select("*").eq("user_id", user_id);
+  const { data, error } = await supabase
+    .from("organizations")
+    .select("*")
+    .eq("user_id", user_id);
   if (error) {
     return error;
   }
   return data;
 };
 
-export const getOrganizationById = async (id: number): Promise<Organization | PostgrestError | null> => {
+export const getOrganizationById = async (
+  id: number,
+): Promise<Organization | PostgrestError | null> => {
   const supabase = await createClient();
-  const { data, error } = await supabase.from("organizations").select("*").eq("id", id).single();
+  const { data, error } = await supabase
+    .from("organizations")
+    .select("*")
+    .eq("id", id)
+    .single();
 
   if (error) {
     return error;
@@ -73,7 +84,17 @@ export const getOrganizationById = async (id: number): Promise<Organization | Po
   return data;
 };
 
-export const updateOrganization = async (id: number, name: string, description: string, avatar_url: string | null, banner_url: string | null, website: string | null, email: string | null, phone: string | null, location: string | null): Promise<Organization | Error | PostgrestError | null> => {
+export const updateOrganization = async (
+  id: number,
+  name: string,
+  description: string,
+  avatar_url: string | null,
+  banner_url: string | null,
+  website: string | null,
+  email: string | null,
+  phone: string | null,
+  location: string | null,
+): Promise<Organization | Error | PostgrestError | null> => {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("organizations")
@@ -90,18 +111,20 @@ export const updateOrganization = async (id: number, name: string, description: 
     .eq("id", id)
     .select()
     .single();
-  
+
   if (error) {
     return error;
   }
 
   return data;
-}
+};
 
-export const deleteOrganization = async (id: number): Promise<void | PostgrestError | null> => {
+export const deleteOrganization = async (
+  id: number,
+): Promise<void | PostgrestError | null> => {
   const supabase = await createClient();
   const { error } = await supabase.from("organizations").delete().eq("id", id);
-  
+
   if (error) {
     return error;
   }
