@@ -12,7 +12,6 @@ import { formatDateTime } from "@/lib/utils";
 import { getOrganizationById } from "@/lib/organizations";
 import { PostgrestError } from "@supabase/supabase-js";
 
-
 // Returns a Tailwind color class based on how full the event is
 const getProgressColor = (pct: number) => {
   if (pct >= 100) return "bg-red-500";
@@ -54,8 +53,10 @@ const statusConfig: Record<
 const getCapacityBadge = (
   pct: number,
 ): { label: string; className: string } | null => {
-  if (pct >= 100) return { label: "Full", className: "bg-destructive text-white" };
-  if (pct >= 75) return { label: "Almost Full", className: "bg-orange-500 text-white" };
+  if (pct >= 100)
+    return { label: "Full", className: "bg-destructive text-white" };
+  if (pct >= 75)
+    return { label: "Almost Full", className: "bg-orange-500 text-white" };
   return null;
 };
 
@@ -133,7 +134,9 @@ function EventCard({
             </div>
 
             {/* Gradient overlay for readability */}
-            <div className={`absolute inset-0 bg-linear-to-t from-black/90 via-black/60 to-transparent z-10 ${isHovered ? "opacity-50" : "opacity-80"} transition-all duration-300`} />
+            <div
+              className={`absolute inset-0 bg-linear-to-t from-black/90 via-black/60 to-transparent z-10 ${isHovered ? "opacity-50" : "opacity-80"} transition-all duration-300`}
+            />
 
             {/* Status badge — top-left */}
             <div
@@ -161,8 +164,13 @@ function EventCard({
             <div className="absolute inset-x-0 bottom-0 z-20 flex flex-col gap-2 px-4 pb-6">
               {/* Category + org */}
               <div className="flex items-center gap-2 flex-wrap">
-                <Badge variant='outline' className="bg-black/50 border-white/20 text-white">
-                  {CategoryIcon && <CategoryIcon className={categoryConfig?.colorClass} />}
+                <Badge
+                  variant="outline"
+                  className="bg-black/50 border-white/20 text-white"
+                >
+                  {CategoryIcon && (
+                    <CategoryIcon className={categoryConfig?.colorClass} />
+                  )}
                   {categoryLabel}
                 </Badge>
                 <span className="text-xs text-white/70">
@@ -192,15 +200,14 @@ function EventCard({
                   {attendees}/{maxCapacity}
                 </span>
               </div>
-            </div>
-
-            {/* Progress bar flush at the bottom edge */}
-            <div className="absolute bottom-0 inset-x-0 z-30">
-              <Progress
-                value={pct}
-                indicatorClassName={getProgressColor(pct)}
-                className="rounded-none h-1.5"
-              />
+              {/* Progress bar */}
+              <div className="">
+                <Progress
+                  value={pct}
+                  indicatorClassName={getProgressColor(pct)}
+                  className=""
+                />
+              </div>
             </div>
           </Card>
         </Link>
