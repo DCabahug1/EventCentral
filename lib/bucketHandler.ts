@@ -29,3 +29,17 @@ export const uploadImageToBucket = async (
   const { data } = supabase.storage.from(bucket).getPublicUrl(path);
   return data.publicUrl;
 };
+
+/** Public bucket for org avatar & banner images (create in Supabase if missing). */
+export const ORGANIZATIONS_BUCKET = "organizations";
+
+export async function uploadOrganizationAsset(
+  file: File,
+  userId: string,
+  kind: "avatar" | "banner",
+): Promise<string> {
+  const extMatch = file.name.match(/\.(jpe?g|png|webp)$/i);
+  const ext = extMatch ? extMatch[0].toLowerCase() : ".jpg";
+  const path = `${userId}/${kind}-${crypto.randomUUID()}${ext}`;
+  return uploadImageToBucket(file, ORGANIZATIONS_BUCKET, path);
+}

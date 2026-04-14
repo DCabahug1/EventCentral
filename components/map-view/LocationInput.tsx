@@ -16,6 +16,7 @@ type Suggestion = {
 // in that state calls onActivate (which re-enables manual editing) instead of
 // opening the dropdown.
 export default function LocationInput({
+  id,
   value,
   onChange,
   // When true, the input is locked and shows the geolocated city name
@@ -30,6 +31,7 @@ export default function LocationInput({
   // place ID so the parent can geocode the selection to lat/lng coordinates
   onPlaceSelect,
 }: {
+  id?: string;
   value: string;
   onChange: (value: string) => void;
   readOnly?: boolean;
@@ -137,6 +139,7 @@ export default function LocationInput({
     <div ref={containerRef} className="relative">
       <MapPin className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground size-4 z-10 pointer-events-none" />
       <Input
+        id={id}
         placeholder="City, neighborhood, state, or country"
         className={cn("pr-10", readOnly && "cursor-pointer text-muted-foreground")}
         value={value}
