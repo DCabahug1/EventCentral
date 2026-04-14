@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import { useMapsLibrary } from "@vis.gl/react-google-maps";
-import { Input } from "../ui/input";
+import { Popover, PopoverAnchor, PopoverContent } from "../ui/popover";
 import { MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -10,26 +10,30 @@ type Suggestion = {
   description: string;
 };
 
+const suggestionItemClass =
+  "relative flex w-full cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none select-none focus:bg-accent focus:text-accent-foreground";
+
 // Text input with Google Places region autocomplete.
 // Supports countries, states, cities, and neighborhoods.
 // Supports a read-only mode for when geolocation is active — clicking the input
 // in that state calls onActivate (which re-enables manual editing) instead of
-// opening the dropdown.
+// opening the suggestions panel.
 export default function LocationInput({
   id,
   value,
   onChange,
-  // When true, the input is locked and shows the geolocated city name
   readOnly,
-  // Called when the user clicks/focuses the input while readOnly is true —
-  // signals the parent to disable geolocation and restore manual editing
   onActivate,
-  // Called false when the user starts typing (unvalidated),
-  // called true when the user selects a suggestion (validated city)
   onValidityChange,
-  // Called when the user selects a suggestion — passes the display text and
-  // place ID so the parent can geocode the selection to lat/lng coordinates
   onPlaceSelect,
+  /** Fires for key events when the suggestions list is not handling navigation (e.g. Enter to submit). */
+  onInputKeyDown,
+  inputClassName,
+  placeholder = "City, neighborhood, state, or country",
+  /** When true, the trailing map pin is omitted (e.g. parent supplies layout / icons). */
+  hideMapPin = false,
+  /** Merged onto the popover anchor wrapper (width, flex, rounded, etc.). */
+  anchorClassName,
 }: {
   id?: string;
   value: string;
@@ -38,15 +42,18 @@ export default function LocationInput({
   onActivate?: () => void;
   onValidityChange?: (valid: boolean) => void;
   onPlaceSelect?: (description: string, placeId: string) => void;
+  onInputKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  inputClassName?: string;
+  placeholder?: string;
+  hideMapPin?: boolean;
+  anchorClassName?: string;
 }) {
-  // Lazily load the Places library — only fetched when this component mounts
   const placesLib = useMapsLibrary("places");
   const [autocompleteService, setAutocompleteService] =
     useState<google.maps.places.AutocompleteService | null>(null);
 
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [open, setOpen] = useState(false);
-  // Tracks the keyboard-highlighted suggestion index (-1 = none)
   const [activeIndex, setActiveIndex] = useState(-1);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -56,20 +63,6 @@ export default function LocationInput({
     }
   }, [placesLib]);
 
-  // Close the dropdown when the user clicks outside the input container
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  // Fetches region suggestions (countries, states, cities, neighborhoods) from
-  // the Places Autocomplete API. Uses the "geocode" type to include geographic
-  // areas while excluding businesses. Requires at least 2 characters.
   const fetchSuggestions = (input: string) => {
     if (!autocompleteService || input.trim().length < 2) {
       setSuggestions([]);
@@ -87,14 +80,14 @@ export default function LocationInput({
             predictions.slice(0, 5).map((p) => ({
               placeId: p.place_id,
               description: p.description,
-            }))
+            })),
           );
           setOpen(true);
         } else {
           setSuggestions([]);
           setOpen(false);
         }
-      }
+      },
     );
   };
 
@@ -102,13 +95,11 @@ export default function LocationInput({
     if (readOnly) return;
     const val = e.target.value;
     onChange(val);
-    // Mark as unvalidated while the user is typing freely
     onValidityChange?.(false);
     setActiveIndex(-1);
     fetchSuggestions(val);
   };
 
-  // Selecting a suggestion confirms it as a valid city
   const handleSelect = (description: string, placeId: string) => {
     onChange(description);
     onValidityChange?.(true);
@@ -118,9 +109,11 @@ export default function LocationInput({
     setActiveIndex(-1);
   };
 
-  // Keyboard navigation for the suggestions dropdown
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (!open || suggestions.length === 0) return;
+    if (!open || suggestions.length === 0) {
+      onInputKeyDown?.(e);
+      return;
+    }
     if (e.key === "ArrowDown") {
       e.preventDefault();
       setActiveIndex((i) => Math.min(i + 1, suggestions.length - 1));
@@ -129,56 +122,93 @@ export default function LocationInput({
       setActiveIndex((i) => Math.max(i - 1, 0));
     } else if (e.key === "Enter" && activeIndex >= 0) {
       e.preventDefault();
-      handleSelect(suggestions[activeIndex].description, suggestions[activeIndex].placeId);
+      handleSelect(
+        suggestions[activeIndex].description,
+        suggestions[activeIndex].placeId,
+      );
     } else if (e.key === "Escape") {
       setOpen(false);
     }
   };
 
-  return (
-    <div ref={containerRef} className="relative">
-      <MapPin className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground size-4 z-10 pointer-events-none" />
-      <Input
-        id={id}
-        placeholder="City, neighborhood, state, or country"
-        className={cn("pr-10", readOnly && "cursor-pointer text-muted-foreground")}
-        value={value}
-        onChange={handleInputChange}
-        onKeyDown={readOnly ? undefined : handleKeyDown}
-        onFocus={() => {
-          // While locked by geolocation, focusing re-enables manual editing
-          if (readOnly) { onActivate?.(); return; }
-          suggestions.length > 0 && setOpen(true);
-        }}
-        readOnly={readOnly}
-        autoComplete="off"
-      />
+  const popoverOpen =
+    !readOnly && open && suggestions.length > 0;
 
-      {/* Suggestions dropdown */}
-      {open && suggestions.length > 0 && (
-        <ul className="absolute top-full left-0 right-0 z-50 mt-1 bg-background border rounded-md shadow-lg overflow-hidden">
+  return (
+    <Popover
+      open={popoverOpen}
+      onOpenChange={(next) => {
+        if (!next) setOpen(false);
+      }}
+      modal={false}
+    >
+      <PopoverAnchor asChild>
+        <div
+          ref={containerRef}
+          className={cn("relative w-full", anchorClassName)}
+        >
+          {!hideMapPin && (
+            <MapPin className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground size-4 z-10 pointer-events-none" />
+          )}
+          <input
+            id={id}
+            type="text"
+            placeholder={placeholder}
+            className={cn(
+              "block w-full min-w-0 bg-transparent text-base outline-none focus:outline-none focus-visible:ring-0 md:text-sm",
+              hideMapPin ? "pr-3" : "pr-10",
+              readOnly && "cursor-pointer text-muted-foreground",
+              inputClassName,
+            )}
+            value={value}
+            onChange={handleInputChange}
+            onKeyDown={readOnly ? undefined : handleKeyDown}
+            onFocus={() => {
+              if (readOnly) {
+                onActivate?.();
+                return;
+              }
+              suggestions.length > 0 && setOpen(true);
+            }}
+            readOnly={readOnly}
+            autoComplete="off"
+          />
+        </div>
+      </PopoverAnchor>
+      <PopoverContent
+        align="start"
+        side="bottom"
+        sideOffset={4}
+        className="w-(--radix-popover-anchor-width) p-1"
+        onOpenAutoFocus={(e) => e.preventDefault()}
+        onCloseAutoFocus={(e) => e.preventDefault()}
+      >
+        <ul className="max-h-[min(280px,var(--radix-popover-content-available-height))] overflow-y-auto" role="listbox">
           {suggestions.map((s, i) => (
-            <li
-              key={s.placeId}
-              className={cn(
-                "flex items-center gap-2 px-3 py-2 text-sm cursor-pointer select-none",
-                i === activeIndex
-                  ? "bg-accent text-accent-foreground"
-                  : "hover:bg-accent hover:text-accent-foreground"
-              )}
-              onMouseDown={(e) => {
-                // Prevent blur from firing before the click registers
-                e.preventDefault();
-                handleSelect(s.description, s.placeId);
-              }}
-              onMouseEnter={() => setActiveIndex(i)}
-            >
-              <MapPin className="size-3 shrink-0 text-muted-foreground" />
-              {s.description}
+            <li key={s.placeId} role="presentation">
+              <button
+                type="button"
+                role="option"
+                aria-selected={i === activeIndex}
+                className={cn(
+                  suggestionItemClass,
+                  i === activeIndex
+                    ? "bg-accent text-accent-foreground"
+                    : "hover:bg-accent hover:text-accent-foreground",
+                )}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  handleSelect(s.description, s.placeId);
+                }}
+                onMouseEnter={() => setActiveIndex(i)}
+              >
+                <MapPin className="size-3 shrink-0 text-muted-foreground" />
+                {s.description}
+              </button>
             </li>
           ))}
         </ul>
-      )}
-    </div>
+      </PopoverContent>
+    </Popover>
   );
 }

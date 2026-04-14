@@ -14,12 +14,12 @@ function Footer() {
   return (
     <div className="flex items-center justify-center w-full h-16 bg-background border-t gap-2">
       <Link href="/">
-        <h1 className="text-xl font-bold">
+        <h1 className="text-lg sm:text-xl font-bold">
           Event<span className="text-primary ">Central</span>
         </h1>
       </Link>
       <div className=" w-[2px] h-[20px] bg-border" />
-      <p className="text-muted-foreground">
+      <p className="text-muted-foreground text-xs sm:text-base">
         Discover what's happening around you.
       </p>
     </div>
