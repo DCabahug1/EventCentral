@@ -4,7 +4,7 @@ import { useMapsLibrary } from "@vis.gl/react-google-maps";
 import { Field, FieldGroup, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
 import { LayoutGrid, Locate, LoaderCircle, Search } from "lucide-react";
-import LocationInput from "./LocationInput";
+import { LocationInput } from "@/components/ui/location-input";
 import { Separator } from "../ui/separator";
 import { Button } from "../ui/button";
 import { Slider } from "../ui/slider";

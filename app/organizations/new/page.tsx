@@ -12,7 +12,7 @@ import {
   ImageIcon,
 } from "lucide-react";
 import { APIProvider } from "@vis.gl/react-google-maps";
-import LocationInput from "@/components/map-view/LocationInput";
+import { LocationInput } from "@/components/ui/location-input";
 import {
   Field,
   FieldContent,
