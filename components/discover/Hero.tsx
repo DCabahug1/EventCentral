@@ -162,8 +162,11 @@ function Hero({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
-        <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight text-white px-1">
-          Discover <span className="text-primary">Events</span>
+        <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold leading-tight text-white">
+          Discover{" "}
+          <span className="text-primary">
+            Events
+          </span>
         </h1>
       </motion.div>
       <motion.div
