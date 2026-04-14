@@ -223,7 +223,7 @@ function EventsList({
 
   return (
     <div className="flex flex-col gap-10 px-6 py-8 items-center w-full border-t">
-      {happening.length > 0 && (
+      {(happening.length > 0 || emptyContext !== null) && (
         <motion.div
           className="w-full flex flex-col items-center"
           initial={{ opacity: 0, y: 16 }}

@@ -37,13 +37,13 @@ export default function HappeningNowRail({
         </span>
       </div>
 
-      {totalCount === 0 ? (
-        <p className="text-muted-foreground text-sm py-8 text-center w-full border border-dashed rounded-lg">
+      {totalCount === 0 ? 
+        <p className="text-muted-foreground text-sm py-8 text-center w-full ">
           {emptyContext
             ? `No live events match ${emptyContext}.`
             : "No events are happening right now."}
         </p>
-      ) : (
+       : (
         <>
           <div className="flex gap-4 overflow-x-auto py-6 scroll-smooth snap-x snap-mandatory [-webkit-overflow-scrolling:touch]">
             {events.map((event) => (
