@@ -44,8 +44,8 @@ function DiscoverPageContent() {
   }, [useUserLocation, coordinates, regionBounds]);
 
   useEffect(() => {
-    void getEvents().then(setEvents);
-  }, []);
+    void fetchEvents();
+  }, [fetchEvents]);
 
   const scrollToEvents = () =>
     eventsListRef.current?.scrollIntoView({
