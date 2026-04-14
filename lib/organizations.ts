@@ -96,6 +96,12 @@ export const updateOrganization = async (
   location: string | null,
 ): Promise<Organization | Error | PostgrestError | null> => {
   const supabase = await createClient();
+  const { data: authData, error: authError } = await supabase.auth.getUser();
+
+  if (authError || !authData.user) {
+    return new Error("You must be signed in to update an organization.");
+  }
+
   const { data, error } = await supabase
     .from("organizations")
     .update({
@@ -109,6 +115,7 @@ export const updateOrganization = async (
       location: location,
     })
     .eq("id", id)
+    .eq("user_id", authData.user.id)
     .select()
     .single();
 

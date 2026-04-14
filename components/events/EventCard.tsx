@@ -259,7 +259,9 @@ function EventCard({
             {/* Category */}
             <div className="flex flex-wrap gap-2">
               <Badge variant="outline">
-                {CategoryIcon && <CategoryIcon className={categoryConfig?.colorClass} />}
+                {CategoryIcon && (
+                  <CategoryIcon className={categoryConfig?.colorClass} />
+                )}
                 {categoryLabel}
               </Badge>
             </div>

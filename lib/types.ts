@@ -19,7 +19,8 @@ export type Organization = {
   banner_url: string | null;
   website: string | null;
   email: string | null;
-  phone: string | null;
+  /** Stored as text; Supabase may deserialize as string or number */
+  phone: string | number | null;
   location: string | null;
   created_at: string;
   updated_at: string;
