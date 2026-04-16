@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo } from "react"
+import { forwardRef, useMemo } from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
@@ -183,14 +183,12 @@ function FieldSeparator({
   )
 }
 
-function FieldError({
-  className,
-  children,
-  errors,
-  ...props
-}: React.ComponentProps<"div"> & {
-  errors?: Array<{ message?: string } | undefined>
-}) {
+const FieldError = forwardRef<
+  HTMLDivElement,
+  React.ComponentProps<"div"> & {
+    errors?: Array<{ message?: string } | undefined>
+  }
+>(function FieldError({ className, children, errors, ...props }, ref) {
   const content = useMemo(() => {
     if (children) {
       return children
@@ -224,6 +222,7 @@ function FieldError({
 
   return (
     <div
+      ref={ref}
       role="alert"
       data-slot="field-error"
       className={cn("text-destructive text-sm font-normal", className)}
@@ -232,7 +231,7 @@ function FieldError({
       {content}
     </div>
   )
-}
+})
 
 export {
   Field,
