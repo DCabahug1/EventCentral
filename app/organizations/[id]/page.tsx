@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useId, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -211,6 +211,8 @@ export default function OrganizationPage() {
 
   const avatarInputId = useId();
   const bannerInputId = useId();
+  const formErrorRef = useRef<HTMLDivElement>(null);
+  const formScrollContainerRef = useRef<HTMLDivElement>(null);
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -311,6 +313,15 @@ export default function OrganizationPage() {
     return () => URL.revokeObjectURL(url);
   }, [bannerFile]);
 
+  useEffect(() => {
+    if (!formError) return;
+    const container = formScrollContainerRef.current;
+    const error = formErrorRef.current;
+    if (!container || !error) return;
+    const errorTop = error.getBoundingClientRect().top - container.getBoundingClientRect().top;
+    container.scrollBy({ top: errorTop, behavior: "smooth" });
+  }, [formError]);
+
   const handleEditSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!org) return;
@@ -390,6 +401,7 @@ export default function OrganizationPage() {
         (result as { message: string }).message.includes("organizations_name")
       ) {
         setFormError("Name must be unique.");
+
         return;
       }
 
@@ -608,11 +620,7 @@ export default function OrganizationPage() {
               ) : (
                 <div className="grid gap-6 sm:grid-cols-2">
                   {upcoming.map((ev) => (
-                    <EventCard
-                      key={ev.id}
-                      event={ev}
-                      org={org}
-                    />
+                    <EventCard key={ev.id} event={ev} org={org} />
                   ))}
                 </div>
               )}
@@ -632,11 +640,7 @@ export default function OrganizationPage() {
               ) : (
                 <div className="grid gap-6 sm:grid-cols-2">
                   {past.map((ev) => (
-                    <EventCard
-                      key={ev.id}
-                      event={ev}
-                      org={org}
-                    />
+                    <EventCard key={ev.id} event={ev} org={org} />
                   ))}
                 </div>
               )}
@@ -701,10 +705,7 @@ export default function OrganizationPage() {
               <DrawerHeader className="shrink-0">
                 <DrawerTitle>Edit organization</DrawerTitle>
               </DrawerHeader>
-              <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-2 [-webkit-overflow-scrolling:touch]">
-                {formError ? (
-                  <FieldError className="mb-4">{formError}</FieldError>
-                ) : null}
+              <div ref={formScrollContainerRef} className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-2 [-webkit-overflow-scrolling:touch]">
                 <FieldGroup className="gap-5">
                   <Field>
                     <FieldLabel
@@ -827,6 +828,7 @@ export default function OrganizationPage() {
                         />
                         <Input
                           id="edit-name"
+                          placeholder="e.g. SoundWave Productions"
                           required
                           className="pl-10"
                           value={name}
@@ -853,6 +855,7 @@ export default function OrganizationPage() {
                           id="edit-description"
                           className="min-h-24 resize-none"
                           value={description}
+                          placeholder="Tell people about your organization..."
                           onChange={(e) => setDescription(e.target.value)}
                         />
                       </div>
@@ -869,6 +872,7 @@ export default function OrganizationPage() {
                     <FieldContent>
                       <LocationInput
                         id="edit-location"
+                        placeholder="City, neighborhood, state, or country"
                         value={location}
                         onChange={setLocation}
                         mapPinSide="left"
@@ -904,6 +908,7 @@ export default function OrganizationPage() {
                         <Input
                           id="edit-email"
                           type="email"
+                          placeholder="Contact email"
                           className="pl-10"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
@@ -919,6 +924,7 @@ export default function OrganizationPage() {
                           type="tel"
                           inputMode="numeric"
                           autoComplete="tel"
+                          placeholder="Phone"
                           className="pl-10"
                           value={phone}
                           onChange={(e) =>
@@ -926,6 +932,12 @@ export default function OrganizationPage() {
                           }
                         />
                       </div>
+                      {/* Error message */}
+                      {formError ? (
+                        <FieldError ref={formErrorRef} id="edit-org-error" className="mb-4">
+                          {formError}
+                        </FieldError>
+                      ) : null}
                     </FieldContent>
                   </Field>
                 </FieldGroup>
