@@ -127,10 +127,7 @@ function DiscoverPageContent() {
       : events;
 
   const filtersActive = Boolean(
-    query ||
-      activeCategory ||
-      regionBounds ||
-      (useUserLocation && coordinates),
+    query || activeCategory || regionBounds || (useUserLocation && coordinates),
   );
 
   return (

@@ -219,7 +219,7 @@ function EventCard({
     <div className="w-full h-full">
       <Link href={`/events/${event.id}`}>
         <Card
-          className="w-full p-0 gap-0 overflow-hidden cursor-pointer dark:brightness-90 dark:hover:brightness-100 transition-all duration-300"
+          className="w-full h-full p-0 gap-0 overflow-hidden cursor-pointer dark:brightness-90 dark:hover:brightness-100 transition-all duration-300"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
@@ -289,8 +289,6 @@ function EventCard({
               </p>
             </div>
 
-            {/* Capacity bar — color shifts as the event fills up */}
-            <Progress value={pct} indicatorClassName={getProgressColor(pct)} />
           </div>
         </Card>
       </Link>

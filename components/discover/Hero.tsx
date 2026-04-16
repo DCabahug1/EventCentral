@@ -248,8 +248,9 @@ function Hero({
           <Button
             type="button"
             variant="default"
-            className="h-10 flex-1 rounded-full sm:flex-initial"
+            className="h-10 flex-1 rounded-full sm:flex-initial bg-accent-foreground!"
             onClick={submit}
+
           >
             <SearchIcon className="size-4" />
             Search

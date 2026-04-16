@@ -251,7 +251,7 @@ function EventsList({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
-              className="flex w-full flex-wrap items-start justify-between gap-4 text-2xl font-bold lg:text-start"
+              className="flex w-full flex-wrap items-start justify-between gap-4 text-2xl lg:text-start"
             >
               <div className="flex min-w-0 flex-1 flex-col gap-1 text-left">
                 <div className="flex items-center gap-2 justify-start">
