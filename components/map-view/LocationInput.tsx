@@ -4,6 +4,7 @@ import { useMapsLibrary } from "@vis.gl/react-google-maps";
 import { Popover, PopoverAnchor, PopoverContent } from "../ui/popover";
 import { MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Input } from "../ui/input";
 
 type Suggestion = {
   placeId: string;
@@ -150,16 +151,11 @@ export default function LocationInput({
           {!hideMapPin && (
             <MapPin className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground size-4 z-10 pointer-events-none" />
           )}
-          <input
+          <Input
             id={id}
             type="text"
             placeholder={placeholder}
-            className={cn(
-              "block w-full min-w-0 bg-transparent text-base outline-none focus:outline-none focus-visible:ring-0 md:text-sm",
-              hideMapPin ? "pr-3" : "pr-10",
-              readOnly && "cursor-pointer text-muted-foreground",
-              inputClassName,
-            )}
+            className={inputClassName}
             value={value}
             onChange={handleInputChange}
             onKeyDown={readOnly ? undefined : handleKeyDown}

@@ -1,9 +1,19 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Alexandria, Noto_Serif } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/header/Header";
 import { ThemeProvider } from "@/components/theme-provider";
 import Footer from "@/components/footer/Footer";
+
+const fontSans = Alexandria({
+  subsets: ["latin"],
+  variable: "--font-sans",
+});
+
+const fontSerif = Noto_Serif({
+  subsets: ["latin"],
+  variable: "--font-serif",
+});
 
 export const metadata: Metadata = {
   title: "EventCentral",
@@ -25,10 +35,7 @@ export default function RootLayout({
         />
       </head>
 
-      <body
-        className="antialiased font-sans
-"
-      >
+      <body className={`${fontSans.variable} ${fontSerif.variable} antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="dark">
           <Header />
           {children}

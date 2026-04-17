@@ -4,13 +4,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import {
-  X,
-  LoaderCircle,
-  Locate,
-  MapPin,
-  SearchIcon,
-} from "lucide-react";
+import { X, LoaderCircle, Locate, MapPin, SearchIcon } from "lucide-react";
 import { motion, useScroll, useTransform } from "motion/react";
 import { CATEGORY_CONFIG } from "@/lib/categoryConfig";
 import { useMapsLibrary } from "@vis.gl/react-google-maps";
@@ -131,8 +125,7 @@ function Hero({
     onFindIt(input.trim());
   };
 
-  const heroInputClass =
-    "pl-8 backdrop-blur-lg border-white/20! border! bg-black/10! rounded-full text-white! h-10 placeholder:text-white/50";
+  const heroInputClass = "pl-8 h-10 bg-card!";
 
   return (
     <div
@@ -163,10 +156,7 @@ function Hero({
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
         <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold leading-tight text-white">
-          Discover{" "}
-          <span className="text-primary">
-            Events
-          </span>
+          Discover <span className="text-primary">Events</span>
         </h1>
       </motion.div>
       <motion.div
@@ -175,6 +165,25 @@ function Hero({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut", delay: 0.15 }}
       >
+        {hasActiveFilters && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            
+            transition={{ duration: 0.6, ease: "easeOut", delay: 0.15 }}
+          >
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={onClearSearch}
+              className="h-10 w-10 shrink-0"
+              aria-label="Clear search"
+            >
+              <X className="size-4" />
+            </Button>
+          </motion.div>
+        )}
         <div className="flex w-full flex-1 flex-col gap-2 sm:flex-row sm:items-center">
           <div className="relative w-full min-w-0 sm:max-w-md sm:flex-1">
             <SearchIcon className="pointer-events-none absolute left-3 top-1/2 z-10 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -203,7 +212,7 @@ function Hero({
                 anchorClassName="w-full"
                 inputClassName={cn(
                   heroInputClass,
-                  useUserLocation && "cursor-pointer text-white/90",
+                  useUserLocation && "cursor-pointer",
                 )}
               />
             </div>
@@ -211,16 +220,10 @@ function Hero({
               type="button"
               variant="default"
               disabled={locatingGps}
-              aria-label={
-                useUserLocation
-                  ? "Stop using your location"
-                  : "Use your location"
-              }
-              className={cn(
-                "h-10 shrink-0 rounded-full border! border-white/20! bg-black/10! text-muted-foreground! backdrop-blur-lg! hover:bg-black/20!",
-                useUserLocation &&
-                  "border-primary! bg-primary/20! text-white hover:bg-primary/30!",
-              )}
+              className={`
+                h-10 shrink-0
+                ${useUserLocation ? "" : "opacity-50"}
+              `}
               onClick={handleUseMyLocation}
             >
               {locatingGps ? (
@@ -228,34 +231,19 @@ function Hero({
               ) : (
                 <Locate className="size-4" />
               )}
-              <span className="hidden md:inline">Use my location</span>
+              {/* <span className="hidden md:inline">{useUserLocation ? "Stop using your location" : "Use my location"}</span> */}
             </Button>
           </div>
         </div>
-        <div className="flex w-full shrink-0 items-center gap-2 sm:w-auto sm:justify-end">
-          {hasActiveFilters && (
-            <Button
-              type="button"
-              variant="default"
-              size="icon"
-              onClick={onClearSearch}
-              className="h-10 w-10 shrink-0 rounded-full border! border-white/20! bg-black/10! text-muted-foreground! backdrop-blur-lg! hover:bg-black/20!"
-              aria-label="Clear search"
-            >
-              <X className="size-4" />
-            </Button>
-          )}
-          <Button
-            type="button"
-            variant="default"
-            className="h-10 flex-1 rounded-full sm:flex-initial bg-accent-foreground!"
-            onClick={submit}
-
-          >
-            <SearchIcon className="size-4" />
-            Search
-          </Button>
-        </div>
+        <Button
+          type="button"
+          variant="default"
+          className="h-10 flex-1 sm:flex-initial"
+          onClick={submit}
+        >
+          <SearchIcon className="size-4" />
+          Search
+        </Button>
       </motion.div>
 
       <motion.div
@@ -270,10 +258,10 @@ function Hero({
             variant="outline"
             asChild
             className={cn(
-              "cursor-pointer rounded-full border px-3 py-1 text-xs backdrop-blur-lg transition-colors",
+              "cursor-pointer rounded-full border border-input bg-card px-3 py-1 text-xs shadow-xs backdrop-blur-lg transition-[color,box-shadow,background-color,border-color] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
               activeCategory === label
-                ? "border-primary bg-primary/25 text-primary hover:bg-primary/35"
-                : "border-white/20! bg-black/10! text-white/90 hover:bg-black/20",
+                ? "border-primary text-primary "
+                : "text-foreground/90 hover:bg-accent hover:text-accent-foreground",
             )}
           >
             <button type="button" onClick={() => onCategorySelect(label)}>
