@@ -82,20 +82,14 @@ function EventItem({
               {safeAttendees} / {maxCapacity} attendees
             </p>
           </div>
-          {/* Capacity bar */}
-          <Progress
-            value={maxCapacity > 0 ? (safeAttendees / maxCapacity) * 100 : 0}
-            max={maxCapacity}
-            className="w-full"
-            indicatorClassName="bg-primary"
-          />
         </div>
         {/* View Event Button */}
         <Button
-          variant="outline"
+          variant='outline'
           size="icon"
           asChild
           onClick={(e) => e.stopPropagation()}
+          className=" text-primary "
         >
           <Link href={`/events/${event.id}`}>
             <ArrowUpRight className="w-4 h-4" />

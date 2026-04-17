@@ -96,7 +96,7 @@ export default function LocationInput({
     if (readOnly) return;
     const val = e.target.value;
     onChange(val);
-    onValidityChange?.(false);
+    onValidityChange?.(val.trim() === "" ? true : false);
     setActiveIndex(-1);
     fetchSuggestions(val);
   };

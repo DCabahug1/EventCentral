@@ -71,7 +71,7 @@ function MapViewInner({
   useEffect(() => {
     if (!map || !geocoder || coordinates) return;
     // rather than geocoding it (which would resolve to a single point and zoom in)
-    if (!locationValid || !location || location === "United States") {
+    if (!locationValid || !location?.trim()) {
       map.panTo(DEFAULT_CENTER);
       map.setZoom(DEFAULT_ZOOM);
       return;

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useMapsLibrary } from "@vis.gl/react-google-maps";
 import { Field, FieldGroup, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
-import { LayoutGrid, Locate, LoaderCircle, Search } from "lucide-react";
+import { LayoutGrid, Locate, LoaderCircle, Search, X } from "lucide-react";
 import { LocationInput } from "@/components/ui/location-input";
 import { Separator } from "../ui/separator";
 import { Button } from "../ui/button";
@@ -26,6 +26,7 @@ type RegionBounds = {
 };
 
 type FormData = {
+  keyword: string;
   location: string;
   // True while the browser geolocation API is active as the location source
   useUserLocation: boolean;
@@ -43,6 +44,34 @@ type FormData = {
   // Not set in geolocation mode (which uses coordinates + radius instead).
   regionBounds?: RegionBounds;
 };
+
+const buildDefaultFormData = (): FormData => ({
+  keyword: "",
+  location: "",
+  useUserLocation: false,
+  locationValid: true,
+  radius: 10,
+  startDate: todayDateString(),
+  endDate: daysFromNowDateString(30),
+  eventType: "all",
+});
+
+/** True when form matches the baseline "original" query (what Clear resets to). */
+function matchesOriginalDefaults(data: FormData): boolean {
+  const orig = buildDefaultFormData();
+  return (
+    data.keyword.trim() === orig.keyword &&
+    data.location === orig.location &&
+    data.useUserLocation === orig.useUserLocation &&
+    data.locationValid === orig.locationValid &&
+    data.radius === orig.radius &&
+    data.startDate === orig.startDate &&
+    data.endDate === orig.endDate &&
+    data.eventType === orig.eventType &&
+    data.coordinates === undefined &&
+    data.regionBounds === undefined
+  );
+}
 
 function Form({
   fetchEvents,
@@ -65,16 +94,7 @@ function Form({
   formRef?: React.RefObject<HTMLFormElement>;
   onCanSubmitChange?: (canSubmit: boolean) => void;
 }) {
-  const [formData, setFormData] = useState<FormData>({
-    location: "United States",
-    useUserLocation: false,
-    locationValid: true,
-    radius: 10,
-    startDate: todayDateString(),
-    endDate: daysFromNowDateString(30),
-    eventType: "all",
-    // No regionBounds — the "United States" default shows all events (no location filter)
-  });
+  const [formData, setFormData] = useState<FormData>(appliedQuery);
 
   // Tracks whether the geolocation + reverse geocode request is in flight
   const [locating, setLocating] = useState(false);
@@ -86,6 +106,12 @@ function Form({
   useEffect(() => {
     if (geocodingLib) setGeocoder(new geocodingLib.Geocoder());
   }, [geocodingLib]);
+
+  // Keep local form state aligned with the latest applied query.
+  // This ensures drawer reopen on mobile shows the last submitted values.
+  useEffect(() => {
+    setFormData(appliedQuery);
+  }, [appliedQuery]);
 
   // Notify the parent (page.tsx) of any form data change so the map
   // can update its focus without waiting for form submission
@@ -107,7 +133,8 @@ function Form({
     : "";
 
   const isDirty = Boolean(
-    formData.location !== appliedQuery.location ||
+    formData.keyword !== appliedQuery.keyword ||
+      formData.location !== appliedQuery.location ||
       formData.useUserLocation !== appliedQuery.useUserLocation ||
       formCoordinatesKey !== appliedCoordinatesKey ||
       formData.locationValid !== appliedQuery.locationValid ||
@@ -119,6 +146,8 @@ function Form({
   );
 
   const canSubmit = formData.locationValid && isDirty;
+
+  const showClearFilters = !matchesOriginalDefaults(formData);
 
   useEffect(() => {
     onCanSubmitChange?.(canSubmit);
@@ -248,6 +277,18 @@ function Form({
           <FieldGroup>
             {/* Location — autocomplete input + geolocation toggle */}
             <Field>
+              <FieldLabel className={labelClass}>Keyword</FieldLabel>
+              <Input
+                type="text"
+                placeholder="Search event title or description"
+                value={formData.keyword}
+                onChange={(e) =>
+                  setFormData({ ...formData, keyword: e.target.value })
+                }
+              />
+            </Field>
+
+            <Field>
               <FieldLabel className={labelClass}>Location</FieldLabel>
               {/* LocationInput handles Places autocomplete suggestions.
                   readOnly locks it while geolocation is active; onActivate
@@ -354,11 +395,29 @@ function Form({
 
             {/* Submit — disabled until a valid location is confirmed.
                 Hidden when rendered inside the mobile drawer (drawer provides its own button). */}
-            {!hideSubmitButton && (
-              <Button type="submit" disabled={!canSubmit}>
-                <Search className="size-4" /> Find Events
-              </Button>
-            )}
+            <div
+              className={`flex w-full gap-2 ${hideSubmitButton && !showClearFilters ? "hidden" : ""} ${hideSubmitButton ? "justify-end" : ""}`}
+            >
+              {showClearFilters && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  className={hideSubmitButton ? "w-full" : "flex-1"}
+                  onClick={() => setFormData(buildDefaultFormData())}
+                >
+                  <X className="size-4" /> Clear filters
+                </Button>
+              )}
+              {!hideSubmitButton && (
+                <Button
+                  type="submit"
+                  disabled={!canSubmit}
+                  className={showClearFilters ? "flex-1" : "w-full"}
+                >
+                  <Search className="size-4" /> Find Events
+                </Button>
+              )}
+            </div>
           </FieldGroup>
         </form>
       </div>
