@@ -205,7 +205,7 @@ function Hero({
               type="button"
               variant={useUserLocation ? "default" : "outline"}
               disabled={locatingGps}
-              className={`h-10 w-10 shrink-0 ${useUserLocation ? "" : " bg-card!"} opacity-100!`}
+              className={`h-10 w-10 shrink-0 ${useUserLocation ? "" : " bg-card!"} opacity-100! text-muted-foreground`}
               onClick={handleUseMyLocation}
             >
               {locatingGps ? (
