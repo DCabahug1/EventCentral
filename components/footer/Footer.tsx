@@ -6,8 +6,9 @@ import { usePathname } from "next/navigation";
 function Footer() {
   const pathname = usePathname();
   const isMapView = pathname === "/map-view";
+  const isAuthRoute = pathname.startsWith("/auth");
 
-  if (isMapView) {
+  if (isMapView || isAuthRoute) {
     return null;
   }
 
