@@ -6,6 +6,7 @@ import Image from "next/image";
 import { MapPin, Calendar, Users } from "lucide-react";
 import { Progress } from "../ui/progress";
 import { Badge } from "../ui/badge";
+import { Skeleton } from "../ui/skeleton";
 import { getCategoryConfig } from "@/lib/categoryConfig";
 import Link from "next/link";
 import { formatDateTime } from "@/lib/utils";
@@ -13,9 +14,9 @@ import { getOrganizationById } from "@/lib/organizations";
 import { PostgrestError } from "@supabase/supabase-js";
 
 // Returns a Tailwind color class based on how full the event is
-const getProgressColor = (pct: number) => {
-  if (pct >= 100) return "bg-red-500";
-  if (pct >= 75) return "bg-orange-500";
+const getProgressColor = (capacityPercentage: number) => {
+  if (capacityPercentage >= 100) return "bg-red-500";
+  if (capacityPercentage >= 75) return "bg-orange-500";
   return "bg-primary";
 };
 
@@ -30,39 +31,36 @@ const getEventStatus = (start: string, end: string): EventStatus => {
 };
 
 // Visual config for each status — controls badge label, styles, and whether to show a pulse dot
-const statusConfig: Record<
-  EventStatus,
-  { label: string; className: string; dot?: boolean }
-> = {
-  upcoming: {
-    label: "Upcoming",
-    className: "bg-black/50 text-white border border-white/20",
-  },
-  live: {
-    label: "Live",
-    className: "bg-green-500/90 text-white",
-    dot: true, // pulsing dot to draw attention to active events
-  },
-  ended: {
-    label: "Ended",
-    className: "bg-black/50 text-white/50 border border-white/10",
-  },
-};
+const statusConfig: Record<EventStatus, { label: string; className: string }> =
+  {
+    upcoming: {
+      label: "Upcoming",
+      className: "bg-black/50 text-white border border-white/20",
+    },
+    live: {
+      label: "Live",
+      className: "bg-green-500/90 text-white",
+    },
+    ended: {
+      label: "Ended",
+      className: "bg-black/50 text-white/50 border border-white/10",
+    },
+  };
 
 // Returns capacity badge props when the event is getting full, null otherwise
 const getCapacityBadge = (
-  pct: number,
+  capacityPercentage: number,
 ): { label: string; className: string } | null => {
-  if (pct >= 100)
+  if (capacityPercentage >= 100)
     return { label: "Full", className: "bg-destructive text-white" };
-  if (pct >= 75)
+  if (capacityPercentage >= 75)
     return { label: "Almost Full", className: "bg-orange-500 text-white" };
   return null;
 };
 
 function EventCard({
   event,
-  org,
+  org: providedOrganization,
   variant = "default",
 }: {
   event: Event;
@@ -71,25 +69,24 @@ function EventCard({
 }) {
   const maxCapacity = event.max_capacity ?? 0;
   const [organization, setOrganization] = useState<Organization | null>(null);
-  const categoryLabel = event.category ?? "Uncategorized";
-  const eventAddress = event.address ?? "Location TBD";
-  const eventImageUrl = event.image_url ?? "/discover-page/Hero.jpg";
-  // Randomized attendee count used as a stand-in until real registration data exists
-  const [attendees, setAttendees] = useState(
-    Math.floor(Math.random() * Math.max(maxCapacity, 1)),
-  );
-  const pct = maxCapacity > 0 ? (attendees / maxCapacity) * 100 : 0;
-  const status = getEventStatus(event.start_time, event.end_time);
-  const { label, className, dot } = statusConfig[status];
-  const categoryConfig = getCategoryConfig(categoryLabel);
+  const [hasImageLoadError, setHasImageLoadError] = useState(false);
+  const attendeeCount = Number(event.rsvp_count) || 0;
+  const eventImageSource = event.image_url ?? "/discover-page/Hero.jpg";
+  const capacityPercentage =
+    maxCapacity > 0 ? (attendeeCount / maxCapacity) * 100 : 0;
+  const { label: statusLabel, className: statusClassName } =
+    statusConfig[getEventStatus(event.start_time, event.end_time)];
+  const categoryConfig = getCategoryConfig(event.category ?? "Uncategorized");
   const CategoryIcon = categoryConfig?.icon;
+  const organizationName =
+    providedOrganization?.name ?? event.organization_name ?? organization?.name;
 
   // For the hover effect
   const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
-    if (org) {
-      setOrganization(org);
+    if (providedOrganization) {
+      setOrganization(providedOrganization);
       return;
     }
     if (!event.organization_id || event.organization_name) {
@@ -110,9 +107,15 @@ function EventCard({
     };
 
     void fetchOrganization();
-  }, [event.organization_id, event.organization_name, org]);
+  }, [event.organization_id, event.organization_name, providedOrganization]);
 
-  const capacityBadge = getCapacityBadge(pct);
+  // Reset image fallback when card data changes.
+  useEffect(() => {
+    setHasImageLoadError(false);
+  }, [event.id, eventImageSource]);
+
+  const capacityBadge = getCapacityBadge(capacityPercentage);
+  const statusBadgeClassName = `absolute top-3 left-3 z-20 backdrop-blur-sm ${statusClassName}`;
 
   if (variant === "featured") {
     return (
@@ -125,12 +128,17 @@ function EventCard({
           >
             {/* Full-bleed background image */}
             <div className="absolute inset-0">
-              <Image
-                src={eventImageUrl}
-                alt={event.title}
-                fill
-                className="object-cover"
-              />
+              {hasImageLoadError ? (
+                <Skeleton className="h-full w-full rounded-none bg-muted" />
+              ) : (
+                <Image
+                  src={eventImageSource}
+                  alt={event.title}
+                  fill
+                  className="object-cover"
+                  onError={() => setHasImageLoadError(true)}
+                />
+              )}
             </div>
 
             {/* Gradient overlay for readability */}
@@ -139,17 +147,9 @@ function EventCard({
             />
 
             {/* Status badge — top-left */}
-            <div
-              className={`absolute top-3 left-3 z-20 flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold backdrop-blur-sm ${className}`}
-            >
-              {dot && (
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-white" />
-                </span>
-              )}
-              {label}
-            </div>
+            <Badge className={statusBadgeClassName}>
+              {statusLabel}
+            </Badge>
 
             {/* Capacity badge — top-right */}
             {capacityBadge && (
@@ -171,10 +171,10 @@ function EventCard({
                   {CategoryIcon && (
                     <CategoryIcon className={categoryConfig?.colorClass} />
                   )}
-                  {categoryLabel}
+                  {event.category ?? "Uncategorized"}
                 </Badge>
                 <span className="text-xs text-white/70">
-                  {org?.name ?? event.organization_name ?? organization?.name}
+                  {organizationName}
                 </span>
               </div>
 
@@ -187,7 +187,7 @@ function EventCard({
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-white/80">
                 <span className="flex items-center gap-1">
                   <MapPin className="w-4 h-4" />
-                  {eventAddress}
+                  {event.address ?? "Location TBD"}
                 </span>
                 <span className="text-white/40">·</span>
                 <span className="flex items-center gap-1">
@@ -197,14 +197,14 @@ function EventCard({
                 <span className="text-white/40">·</span>
                 <span className="flex items-center gap-1">
                   <Users className="w-4 h-4" />
-                  {attendees}/{maxCapacity}
+                  {attendeeCount}/{maxCapacity}
                 </span>
               </div>
               {/* Progress bar */}
               <div className="">
                 <Progress
-                  value={pct}
-                  indicatorClassName={getProgressColor(pct)}
+                  value={capacityPercentage}
+                  indicatorClassName={getProgressColor(capacityPercentage)}
                   className=""
                 />
               </div>
@@ -219,7 +219,7 @@ function EventCard({
     <div className="w-full h-full">
       <Link href={`/events/${event.id}`}>
         <Card
-          className="w-full p-0 gap-0 overflow-hidden cursor-pointer dark:brightness-90 dark:hover:brightness-100 transition-all duration-300"
+          className="w-full h-full p-0 gap-0 overflow-hidden cursor-pointer dark:brightness-90 dark:hover:brightness-100 transition-all duration-300"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
@@ -230,25 +230,22 @@ function EventCard({
             />
 
             {/* Status badge — positioned over the image in the top-left */}
-            <div
-              className={`absolute top-3 left-3 z-20 flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold backdrop-blur-sm ${className}`}
-            >
-              {dot && (
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-white" />
-                </span>
-              )}
-              {label}
-            </div>
+            <Badge className={statusBadgeClassName}>
+              {statusLabel}
+            </Badge>
 
-            <Image
-              src={eventImageUrl}
-              alt={event.title}
-              width={500}
-              height={500}
-              className="w-full object-cover h-48"
-            />
+            {hasImageLoadError ? (
+              <Skeleton className="h-48 w-full rounded-none bg-muted" />
+            ) : (
+              <Image
+                src={eventImageSource}
+                alt={event.title}
+                width={500}
+                height={500}
+                className="w-full object-cover h-48"
+                onError={() => setHasImageLoadError(true)}
+              />
+            )}
           </div>
 
           {/* Event details */}
@@ -256,10 +253,7 @@ function EventCard({
             {/* Heading */}
             <div className="flex flex-col gap-1">
               <h2 className="text-sm text-muted-foreground">
-                {org?.name ??
-                  event.organization_name ??
-                  organization?.name ??
-                  "Organization"}
+                {organizationName ?? "Organization"}
               </h2>
               <h1 className="text-2xl font-bold">{event.title}</h1>
             </div>
@@ -269,12 +263,14 @@ function EventCard({
                 {CategoryIcon && (
                   <CategoryIcon className={categoryConfig?.colorClass} />
                 )}
-                {categoryLabel}
+                {event.category ?? "Uncategorized"}
               </Badge>
             </div>
             <div className="flex gap-2">
               <MapPin className="w-4 h-4 text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">{eventAddress}</p>
+              <p className="text-sm text-muted-foreground">
+                {event.address ?? "Location TBD"}
+              </p>
             </div>
             <div className="flex gap-2">
               <Calendar className="w-4 h-4 text-muted-foreground" />
@@ -285,12 +281,9 @@ function EventCard({
             <div className="flex gap-2">
               <Users className="w-4 h-4 text-muted-foreground" />
               <p className="text-sm text-muted-foreground">
-                {attendees + " / " + maxCapacity + " attendees"}
+                {attendeeCount + " / " + maxCapacity + " attendees"}
               </p>
             </div>
-
-            {/* Capacity bar — color shifts as the event fills up */}
-            <Progress value={pct} indicatorClassName={getProgressColor(pct)} />
           </div>
         </Card>
       </Link>

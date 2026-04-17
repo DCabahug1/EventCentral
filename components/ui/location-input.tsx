@@ -91,7 +91,8 @@ export function LocationInput({
     if (readOnly) return;
     const val = e.target.value;
     onChange(val);
-    onValidityChange?.(false);
+    // Empty field = no region chosen; treat as valid for optional "all locations" search.
+    onValidityChange?.(val.trim() === "" ? true : false);
     setActiveIndex(-1);
     fetchSuggestions(val);
   };

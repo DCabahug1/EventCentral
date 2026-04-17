@@ -139,16 +139,22 @@ function EventsList({
   useUserLocation: boolean;
   hasRegionBounds: boolean;
 }) {
-  const heading = query
-    ? `Results for "${query}"`
-    : activeCategory
-      ? `Category: ${activeCategory}`
-      : "All Events";
-  const emptyContext = query
-    ? `"${query}"`
-    : activeCategory
-      ? `"${activeCategory}"`
-      : null;
+  const hasQuery = Boolean(query.trim());
+  const hasCategory = Boolean(activeCategory);
+  const heading = hasQuery && hasCategory
+    ? `Results for "${query}" in ${activeCategory}`
+    : hasQuery
+      ? `Results for "${query}"`
+      : hasCategory
+        ? `Category: ${activeCategory}`
+        : "All Events";
+  const emptyContext = hasQuery && hasCategory
+    ? `"${query}" in "${activeCategory}"`
+    : hasQuery
+      ? `"${query}"`
+      : hasCategory
+        ? `"${activeCategory}"`
+        : null;
   const locationLine = locationSummaryLine(
     locationInput,
     useUserLocation,
@@ -251,7 +257,7 @@ function EventsList({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
-              className="flex w-full flex-wrap items-start justify-between gap-4 text-2xl font-bold lg:text-start"
+              className="flex w-full flex-wrap items-start justify-between gap-4 text-2xl lg:text-start"
             >
               <div className="flex min-w-0 flex-1 flex-col gap-1 text-left">
                 <div className="flex items-center gap-2 justify-start">

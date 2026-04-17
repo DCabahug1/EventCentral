@@ -24,19 +24,35 @@ function DiscoverPageContent() {
   const [regionBounds, setRegionBounds] = useState<
     DiscoverRegionBounds | undefined
   >(undefined);
+  const [draftCategory, setDraftCategory] = useState("");
+  const [draftLocationInput, setDraftLocationInput] = useState("");
+  const [draftUseUserLocation, setDraftUseUserLocation] = useState(false);
+  const [draftCoordinates, setDraftCoordinates] = useState<
+    { lat: number; lng: number } | undefined
+  >(undefined);
+  const [draftRegionBounds, setDraftRegionBounds] = useState<
+    DiscoverRegionBounds | undefined
+  >(undefined);
 
   const eventsListRef = useRef<HTMLDivElement>(null);
 
-  const fetchEvents = useCallback(async () => {
+  const fetchEvents = useCallback(async (filters?: {
+    useUserLocation: boolean;
+    coordinates: { lat: number; lng: number } | undefined;
+    regionBounds: DiscoverRegionBounds | undefined;
+  }) => {
+    const nextUseUserLocation = filters?.useUserLocation ?? useUserLocation;
+    const nextCoordinates = filters?.coordinates ?? coordinates;
+    const nextRegionBounds = filters?.regionBounds ?? regionBounds;
     let newEvents: Event[];
-    if (useUserLocation && coordinates) {
+    if (nextUseUserLocation && nextCoordinates) {
       newEvents = await getEvents({
         useUserLocation: true,
-        coordinates,
+        coordinates: nextCoordinates,
         radius: DISCOVER_NEAR_ME_RADIUS_MILES,
       });
-    } else if (regionBounds && !useUserLocation) {
-      newEvents = await getEvents({ regionBounds });
+    } else if (nextRegionBounds && !nextUseUserLocation) {
+      newEvents = await getEvents({ regionBounds: nextRegionBounds });
     } else {
       newEvents = await getEvents();
     }
@@ -54,83 +70,129 @@ function DiscoverPageContent() {
     });
 
   const handleFindIt = (keyword: string) => {
-    setQuery(keyword);
-    setActiveCategory("");
-    void fetchEvents();
+    const nextQuery = keyword.trim();
+    setInput(nextQuery);
+    setQuery(nextQuery);
+    setActiveCategory(draftCategory);
+    setLocationInput(draftLocationInput);
+    setUseUserLocation(draftUseUserLocation);
+    setCoordinates(draftCoordinates);
+    setRegionBounds(draftRegionBounds);
+    void fetchEvents({
+      useUserLocation: draftUseUserLocation,
+      coordinates: draftCoordinates,
+      regionBounds: draftRegionBounds,
+    });
     scrollToEvents();
   };
 
   const handleCategorySelect = (category: string) => {
-    const next = activeCategory === category ? "" : category;
-    setActiveCategory(next);
-    setQuery("");
-    setInput("");
-    scrollToEvents();
+    const next = draftCategory === category ? "" : category;
+    setDraftCategory(next);
   };
 
   const handleLocationInputChange = (value: string) => {
-    setLocationInput(value);
-    setRegionBounds(undefined);
-    setUseUserLocation(false);
-    setCoordinates(undefined);
+    setDraftLocationInput(value);
+    setDraftRegionBounds(undefined);
+    setDraftUseUserLocation(false);
+    setDraftCoordinates(undefined);
   };
 
   const handleRegionBounds = (bounds: DiscoverRegionBounds) => {
-    setUseUserLocation(false);
-    setCoordinates(undefined);
-    setRegionBounds(bounds);
+    setDraftUseUserLocation(false);
+    setDraftCoordinates(undefined);
+    setDraftRegionBounds(bounds);
   };
 
   const handleGeolocationSuccess = (
     coords: { lat: number; lng: number },
     label: string,
   ) => {
-    setUseUserLocation(true);
-    setCoordinates(coords);
-    setRegionBounds(undefined);
-    setLocationInput(label);
+    setDraftUseUserLocation(true);
+    setDraftCoordinates(coords);
+    setDraftRegionBounds(undefined);
+    setDraftLocationInput(label);
   };
 
   const handleToggleGeolocationOff = () => {
-    setUseUserLocation(false);
-    setCoordinates(undefined);
-    setRegionBounds(undefined);
-    setLocationInput("");
+    setDraftUseUserLocation(false);
+    setDraftCoordinates(undefined);
+    setDraftRegionBounds(undefined);
+    setDraftLocationInput("");
   };
 
   const handleActivateManualLocation = () => {
-    setUseUserLocation(false);
-    setCoordinates(undefined);
-    setRegionBounds(undefined);
+    setDraftUseUserLocation(false);
+    setDraftCoordinates(undefined);
+    setDraftRegionBounds(undefined);
   };
 
   const handleClearSearch = () => {
-    setQuery("");
     setInput("");
+    setQuery("");
+    setActiveCategory("");
     setLocationInput("");
     setUseUserLocation(false);
     setCoordinates(undefined);
     setRegionBounds(undefined);
+    setDraftCategory("");
+    setDraftLocationInput("");
+    setDraftUseUserLocation(false);
+    setDraftCoordinates(undefined);
+    setDraftRegionBounds(undefined);
     void getEvents().then(setEvents);
   };
 
-  const filteredEvents = activeCategory
-    ? events.filter((event) => event.category === activeCategory)
-    : query
-      ? events.filter((e) => {
-          const q = query.toLowerCase();
-          return (
-            e.title.toLowerCase().includes(q) ||
-            (e.address ?? "").toLowerCase().includes(q)
-          );
-        })
-      : events;
+  const filteredEvents = events.filter((event) => {
+    const matchesCategory =
+      !activeCategory || event.category === activeCategory;
+    if (!matchesCategory) return false;
 
+    const q = query.trim().toLowerCase();
+    if (!q) return true;
+
+    return (
+      event.title.toLowerCase().includes(q) ||
+      (event.address ?? "").toLowerCase().includes(q)
+    );
+  });
+
+  const hasDraftLocation = Boolean(
+    draftLocationInput ||
+      draftRegionBounds ||
+      (draftUseUserLocation && draftCoordinates),
+  );
+  const hasAppliedLocation = Boolean(
+    locationInput || regionBounds || (useUserLocation && coordinates),
+  );
+  const draftBoundsKey = draftRegionBounds
+    ? `${draftRegionBounds.north}:${draftRegionBounds.south}:${draftRegionBounds.east}:${draftRegionBounds.west}`
+    : "";
+  const appliedBoundsKey = regionBounds
+    ? `${regionBounds.north}:${regionBounds.south}:${regionBounds.east}:${regionBounds.west}`
+    : "";
+  const draftCoordsKey = draftCoordinates
+    ? `${draftCoordinates.lat}:${draftCoordinates.lng}`
+    : "";
+  const appliedCoordsKey = coordinates
+    ? `${coordinates.lat}:${coordinates.lng}`
+    : "";
   const filtersActive = Boolean(
-    query ||
+    input ||
+      draftCategory ||
+      hasDraftLocation ||
+      query ||
       activeCategory ||
-      regionBounds ||
-      (useUserLocation && coordinates),
+      hasAppliedLocation,
+  );
+
+  const canSearch = Boolean(
+    input.trim() !== query ||
+      draftCategory !== activeCategory ||
+      draftLocationInput !== locationInput ||
+      draftBoundsKey !== appliedBoundsKey ||
+      draftUseUserLocation !== useUserLocation ||
+      draftCoordsKey !== appliedCoordsKey,
   );
 
   return (
@@ -138,18 +200,19 @@ function DiscoverPageContent() {
       <Hero
         onFindIt={handleFindIt}
         onCategorySelect={handleCategorySelect}
-        activeCategory={activeCategory}
+        activeCategory={draftCategory}
         input={input}
         onInputChange={setInput}
         onClearSearch={handleClearSearch}
-        locationInput={locationInput}
+        locationInput={draftLocationInput}
         onLocationInputChange={handleLocationInputChange}
-        useUserLocation={useUserLocation}
+        useUserLocation={draftUseUserLocation}
         onRegionBounds={handleRegionBounds}
         onGeolocationSuccess={handleGeolocationSuccess}
         onToggleGeolocationOff={handleToggleGeolocationOff}
         onActivateManualLocation={handleActivateManualLocation}
         hasActiveFilters={filtersActive}
+        canSearch={canSearch}
       />
       <div ref={eventsListRef}>
         <EventsList
