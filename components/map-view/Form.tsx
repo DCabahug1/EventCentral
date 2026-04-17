@@ -46,6 +46,7 @@ type FormData = {
 
 function Form({
   fetchEvents,
+  appliedQuery,
   // When true, the submit button is hidden (used inside the mobile drawer,
   // which provides its own "Find Events" button in the footer)
   hideSubmitButton,
@@ -54,11 +55,15 @@ function Form({
   // Forwarded ref to the <form> element so the drawer can trigger submission
   // programmatically via formRef.current?.requestSubmit()
   formRef,
+  // Emits whether the current form state can be submitted.
+  onCanSubmitChange,
 }: {
   fetchEvents: (formData: FormData) => void;
+  appliedQuery: FormData;
   hideSubmitButton?: boolean;
   onFormDataChange?: (formData: FormData) => void;
   formRef?: React.RefObject<HTMLFormElement>;
+  onCanSubmitChange?: (canSubmit: boolean) => void;
 }) {
   const [formData, setFormData] = useState<FormData>({
     location: "United States",
@@ -86,7 +91,38 @@ function Form({
   // can update its focus without waiting for form submission
   useEffect(() => {
     onFormDataChange?.(formData);
-  }, [formData]);
+  }, [formData, onFormDataChange]);
+
+  const formCoordinatesKey = formData.coordinates
+    ? `${formData.coordinates.lat}:${formData.coordinates.lng}`
+    : "";
+  const appliedCoordinatesKey = appliedQuery.coordinates
+    ? `${appliedQuery.coordinates.lat}:${appliedQuery.coordinates.lng}`
+    : "";
+  const formRegionBoundsKey = formData.regionBounds
+    ? `${formData.regionBounds.north}:${formData.regionBounds.south}:${formData.regionBounds.east}:${formData.regionBounds.west}`
+    : "";
+  const appliedRegionBoundsKey = appliedQuery.regionBounds
+    ? `${appliedQuery.regionBounds.north}:${appliedQuery.regionBounds.south}:${appliedQuery.regionBounds.east}:${appliedQuery.regionBounds.west}`
+    : "";
+
+  const isDirty = Boolean(
+    formData.location !== appliedQuery.location ||
+      formData.useUserLocation !== appliedQuery.useUserLocation ||
+      formCoordinatesKey !== appliedCoordinatesKey ||
+      formData.locationValid !== appliedQuery.locationValid ||
+      formData.radius !== appliedQuery.radius ||
+      formData.startDate !== appliedQuery.startDate ||
+      formData.endDate !== appliedQuery.endDate ||
+      formData.eventType !== appliedQuery.eventType ||
+      formRegionBoundsKey !== appliedRegionBoundsKey,
+  );
+
+  const canSubmit = formData.locationValid && isDirty;
+
+  useEffect(() => {
+    onCanSubmitChange?.(canSubmit);
+  }, [canSubmit, onCanSubmitChange]);
 
   const handleUseMyLocation = () => {
     // Toggle off: clear geolocation and region state, mark location as unvalidated
@@ -191,6 +227,7 @@ function Form({
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!canSubmit) return;
     fetchEvents(formData);
   };
 
@@ -318,7 +355,7 @@ function Form({
             {/* Submit — disabled until a valid location is confirmed.
                 Hidden when rendered inside the mobile drawer (drawer provides its own button). */}
             {!hideSubmitButton && (
-              <Button type="submit" disabled={!formData.locationValid}>
+              <Button type="submit" disabled={!canSubmit}>
                 <Search className="size-4" /> Find Events
               </Button>
             )}

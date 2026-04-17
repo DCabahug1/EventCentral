@@ -48,13 +48,16 @@ function countActiveFilters(formData: FormData): number {
 
 export default function FiltersDrawer({
   fetchEvents,
+  appliedQuery,
   onFormDataChange,
 }: {
   fetchEvents: (formData: FormData) => void;
+  appliedQuery: FormData;
   onFormDataChange?: (formData: FormData) => void;
 }) {
   const [open, setOpen] = useState(false);
   const [trackedFormData, setTrackedFormData] = useState<FormData>(DEFAULTS);
+  const [canSubmit, setCanSubmit] = useState(false);
   const formRef = useRef<HTMLFormElement | null>(null);
 
   const activeCount = countActiveFilters(trackedFormData);
@@ -87,16 +90,19 @@ export default function FiltersDrawer({
               fetchEvents(data);
               setOpen(false);
             }}
+            appliedQuery={appliedQuery}
             hideSubmitButton
             onFormDataChange={(data) => {
               setTrackedFormData(data);
               onFormDataChange?.(data);
             }}
+            onCanSubmitChange={setCanSubmit}
             formRef={formRef as React.RefObject<HTMLFormElement>}
           />
         </div>
         <DrawerFooter>
           <Button
+            disabled={!canSubmit}
             className="w-full"
             onClick={() => {
               formRef.current?.requestSubmit();

@@ -139,16 +139,22 @@ function EventsList({
   useUserLocation: boolean;
   hasRegionBounds: boolean;
 }) {
-  const heading = query
-    ? `Results for "${query}"`
-    : activeCategory
-      ? `Category: ${activeCategory}`
-      : "All Events";
-  const emptyContext = query
-    ? `"${query}"`
-    : activeCategory
-      ? `"${activeCategory}"`
-      : null;
+  const hasQuery = Boolean(query.trim());
+  const hasCategory = Boolean(activeCategory);
+  const heading = hasQuery && hasCategory
+    ? `Results for "${query}" in ${activeCategory}`
+    : hasQuery
+      ? `Results for "${query}"`
+      : hasCategory
+        ? `Category: ${activeCategory}`
+        : "All Events";
+  const emptyContext = hasQuery && hasCategory
+    ? `"${query}" in "${activeCategory}"`
+    : hasQuery
+      ? `"${query}"`
+      : hasCategory
+        ? `"${activeCategory}"`
+        : null;
   const locationLine = locationSummaryLine(
     locationInput,
     useUserLocation,

@@ -89,9 +89,6 @@ function DiscoverPageContent() {
   const handleCategorySelect = (category: string) => {
     const next = draftCategory === category ? "" : category;
     setDraftCategory(next);
-    if (next) {
-      setInput("");
-    }
   };
 
   const handleLocationInputChange = (value: string) => {
@@ -146,17 +143,19 @@ function DiscoverPageContent() {
     void getEvents().then(setEvents);
   };
 
-  const filteredEvents = activeCategory
-    ? events.filter((event) => event.category === activeCategory)
-    : query
-      ? events.filter((e) => {
-          const q = query.toLowerCase();
-          return (
-            e.title.toLowerCase().includes(q) ||
-            (e.address ?? "").toLowerCase().includes(q)
-          );
-        })
-      : events;
+  const filteredEvents = events.filter((event) => {
+    const matchesCategory =
+      !activeCategory || event.category === activeCategory;
+    if (!matchesCategory) return false;
+
+    const q = query.trim().toLowerCase();
+    if (!q) return true;
+
+    return (
+      event.title.toLowerCase().includes(q) ||
+      (event.address ?? "").toLowerCase().includes(q)
+    );
+  });
 
   const hasDraftLocation = Boolean(
     draftLocationInput ||

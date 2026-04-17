@@ -9,8 +9,31 @@ import EventList from "@/components/map-view/EventList";
 import { getEvents } from "@/lib/eventsClient";
 import { APIProvider } from "@vis.gl/react-google-maps";
 
+type MapSearchQuery = {
+  location: string;
+  useUserLocation: boolean;
+  coordinates?: { lat: number; lng: number };
+  locationValid: boolean;
+  radius: number;
+  startDate: string;
+  endDate: string;
+  eventType: string;
+  regionBounds?: { north: number; south: number; east: number; west: number };
+};
+
+const DEFAULT_QUERY: MapSearchQuery = {
+  location: "United States",
+  useUserLocation: false,
+  locationValid: true,
+  radius: 10,
+  startDate: todayDateString(),
+  endDate: daysFromNowDateString(30),
+  eventType: "all",
+};
+
 function page() {
   const [events, setEvents] = useState<Event[]>([]);
+  const [appliedQuery, setAppliedQuery] = useState<MapSearchQuery>(DEFAULT_QUERY);
 
   // Map focus state — updated only when the form is submitted.
   const [mapLocation, setMapLocation] = useState("United States");
@@ -33,17 +56,7 @@ function page() {
     : `Events in ${mapLocation}`;
 
   // Fetches events on form submission. Map focus also updates here (submit-only).
-  const fetchEvents = async (formData: {
-    location: string;
-    useUserLocation: boolean;
-    coordinates?: { lat: number; lng: number };
-    locationValid: boolean;
-    radius: number;
-    startDate: string;
-    endDate: string;
-    eventType: string;
-    regionBounds?: { north: number; south: number; east: number; west: number };
-  }) => {
+  const fetchEvents = async (formData: MapSearchQuery) => {
     const newEvents = await getEvents({
       startDate: formData.startDate,
       endDate: formData.endDate,
@@ -59,6 +72,7 @@ function page() {
     setMapCoordinates(formData.coordinates);
     setMapLocationValid(formData.locationValid);
     setSearchUsingUserLocation(formData.useUserLocation);
+    setAppliedQuery(formData);
   };
 
   // Called when the user clicks an event card in the list.
@@ -80,13 +94,7 @@ function page() {
   // No regionBounds — the "United States" default shows all events (no location filter).
   useEffect(() => {
     fetchEvents({
-      location: "United States",
-      useUserLocation: false,
-      locationValid: true,
-      radius: 10,
-      startDate: todayDateString(),
-      endDate: daysFromNowDateString(30),
-      eventType: "all",
+      ...DEFAULT_QUERY,
     });
   }, []);
 
@@ -98,7 +106,7 @@ function page() {
         {/* Side panel — visible on desktop only.
           Contains the full filter form with an inline submit button. */}
         <div className="hidden md:flex flex-col p-4 gap-4 w-80 h-full border-r overflow-y-auto">
-          <Form fetchEvents={fetchEvents} />
+          <Form fetchEvents={fetchEvents} appliedQuery={appliedQuery} />
         </div>
 
         {/* Main content area — map + event list stacked vertically */}
@@ -106,7 +114,7 @@ function page() {
           {/* Mobile filter trigger — floating button in the top-left of the map.
             Opens a bottom drawer with the same form fields. */}
           <div className="absolute top-4 left-4 z-10 md:hidden">
-            <FiltersDrawer fetchEvents={fetchEvents} />
+            <FiltersDrawer fetchEvents={fetchEvents} appliedQuery={appliedQuery} />
           </div>
 
           {/* Map wrapper — ref used for scroll-to-map from event list clicks */}
