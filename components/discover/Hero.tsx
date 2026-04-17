@@ -27,6 +27,7 @@ function Hero({
   onToggleGeolocationOff,
   onActivateManualLocation,
   hasActiveFilters,
+  canSearch,
 }: {
   onFindIt: (keyword: string) => void;
   onCategorySelect: (category: string) => void;
@@ -46,6 +47,8 @@ function Hero({
   onActivateManualLocation: () => void;
   /** Keyword, category, or location filter applied — show clear control. */
   hasActiveFilters: boolean;
+  /** Enables submitting only when draft filters changed. */
+  canSearch: boolean;
 }) {
   const [locatingGps, setLocatingGps] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
@@ -122,6 +125,7 @@ function Hero({
   };
 
   const submit = () => {
+    if (!canSearch) return;
     onFindIt(input.trim());
   };
 
@@ -239,6 +243,7 @@ function Hero({
           type="button"
           variant="default"
           className="h-10 flex-1 sm:flex-initial"
+          disabled={!canSearch}
           onClick={submit}
         >
           <SearchIcon className="size-4" />
