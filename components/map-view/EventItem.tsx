@@ -1,13 +1,11 @@
-import React, { useState, useEffect } from "react";
-import { Event, Organization } from "@/lib/types";
+import React from "react";
+import { Event } from "@/lib/types";
 import { ArrowUpRight, Calendar, MapPin, Users } from "lucide-react";
 import { formatDateTime } from "@/lib/utils";
 import { getCategoryConfig } from "@/lib/categoryConfig";
 import { Progress } from "../ui/progress";
 import { Button } from "../ui/button";
 import Link from "next/link";
-import { getOrganizationById } from "@/lib/organizations";
-import { PostgrestError } from "@supabase/supabase-js";
 
 function EventItem({
   event,
@@ -21,23 +19,10 @@ function EventItem({
   const categoryLabel = event.category ?? "Uncategorized";
   const eventAddress = event.address ?? "Location TBD";
   const maxCapacity = event.max_capacity ?? 0;
+  const attendees = Number(event.rsvp_count ?? 0);
+  const safeAttendees = Number.isFinite(attendees) ? attendees : 0;
   const categoryConfig = getCategoryConfig(categoryLabel);
   const Icon = categoryConfig?.icon;
-  const [organization, setOrganization] = useState<Organization | null>(null);
-  useEffect(() => {
-    const fetchOrganization = async () => {
-      if (!event.organization_id) return;
-      const result = await getOrganizationById(event.organization_id);
-      if (result instanceof Error || result instanceof PostgrestError) {
-        console.error(result.message);
-        return;
-      }
-      if (result) {
-        setOrganization(result);
-      }
-    };
-    fetchOrganization();
-  }, []);
 
   return (
     <div
@@ -61,7 +46,7 @@ function EventItem({
 
           <Link href={`/organizations/${event.organization_id}`}>
             <p className="text-sm text-muted-foreground hover:underline">
-              {organization?.name}
+              {event.organization_name ?? "Organization"}
             </p>
           </Link>
 
@@ -94,12 +79,12 @@ function EventItem({
           <div className="flex items-center gap-1">
             <Users className="w-4 h-4 text-muted-foreground" />
             <p className="text-sm text-muted-foreground">
-              {50} / {maxCapacity} attendees
+              {safeAttendees} / {maxCapacity} attendees
             </p>
           </div>
           {/* Capacity bar */}
           <Progress
-            value={maxCapacity > 0 ? (50 / maxCapacity) * 100 : 0}
+            value={maxCapacity > 0 ? (safeAttendees / maxCapacity) * 100 : 0}
             max={maxCapacity}
             className="w-full"
             indicatorClassName="bg-primary"

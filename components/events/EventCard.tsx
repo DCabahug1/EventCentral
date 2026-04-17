@@ -74,11 +74,9 @@ function EventCard({
   const categoryLabel = event.category ?? "Uncategorized";
   const eventAddress = event.address ?? "Location TBD";
   const eventImageUrl = event.image_url ?? "/discover-page/Hero.jpg";
-  // Randomized attendee count used as a stand-in until real registration data exists
-  const [attendees, setAttendees] = useState(
-    Math.floor(Math.random() * Math.max(maxCapacity, 1)),
-  );
-  const pct = maxCapacity > 0 ? (attendees / maxCapacity) * 100 : 0;
+  const attendees = Number(event.rsvp_count ?? 0);
+  const safeAttendees = Number.isFinite(attendees) ? attendees : 0;
+  const pct = maxCapacity > 0 ? (safeAttendees / maxCapacity) * 100 : 0;
   const status = getEventStatus(event.start_time, event.end_time);
   const { label, className, dot } = statusConfig[status];
   const categoryConfig = getCategoryConfig(categoryLabel);
@@ -197,7 +195,7 @@ function EventCard({
                 <span className="text-white/40">·</span>
                 <span className="flex items-center gap-1">
                   <Users className="w-4 h-4" />
-                  {attendees}/{maxCapacity}
+                  {safeAttendees}/{maxCapacity}
                 </span>
               </div>
               {/* Progress bar */}
@@ -285,7 +283,7 @@ function EventCard({
             <div className="flex gap-2">
               <Users className="w-4 h-4 text-muted-foreground" />
               <p className="text-sm text-muted-foreground">
-                {attendees + " / " + maxCapacity + " attendees"}
+                {safeAttendees + " / " + maxCapacity + " attendees"}
               </p>
             </div>
 
