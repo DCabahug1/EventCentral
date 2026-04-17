@@ -169,37 +169,52 @@ function Hero({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut", delay: 0.15 }}
       >
-        {hasActiveFilters && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            
-            transition={{ duration: 0.6, ease: "easeOut", delay: 0.15 }}
-          >
-            <Button
-              type="button"
-              variant="outline"
-              size="icon"
-              onClick={onClearSearch}
-              className="h-10 w-10 shrink-0"
-              aria-label="Clear search"
-            >
-              <X className="size-4" />
-            </Button>
-          </motion.div>
-        )}
         <div className="flex w-full flex-1 flex-col gap-2 sm:flex-row sm:items-center">
-          <div className="relative w-full min-w-0 sm:max-w-md sm:flex-1">
-            <SearchIcon className="pointer-events-none absolute left-3 top-1/2 z-10 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Search events…"
-              value={input}
-              onChange={(e) => onInputChange(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && submit()}
-              className={heroInputClass}
-            />
+          <div className="flex w-full min-w-0 items-center gap-2 sm:flex-1">
+            {hasActiveFilters && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.6, ease: "easeOut", delay: 0.15 }}
+              >
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="icon"
+                  onClick={onClearSearch}
+                  className="h-10 w-10 shrink-0"
+                  aria-label="Clear search"
+                >
+                  <X className="size-4" />
+                </Button>
+              </motion.div>
+            )}
+            <div className="relative min-w-0 flex-1">
+              <SearchIcon className="pointer-events-none absolute left-3 top-1/2 z-10 size-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Search events…"
+                value={input}
+                onChange={(e) => onInputChange(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && submit()}
+                className={heroInputClass}
+              />
+            </div>
           </div>
           <div className="flex w-full min-w-0 items-center gap-2 sm:flex-1">
+            <Button
+              type="button"
+              variant={useUserLocation ? "default" : "outline"}
+              disabled={locatingGps}
+              className={`h-10 w-10 shrink-0 ${useUserLocation ? "" : " bg-card!"} opacity-100!`}
+              onClick={handleUseMyLocation}
+            >
+              {locatingGps ? (
+                <LoaderCircle className="size-4 animate-spin" />
+              ) : (
+                <Locate className="size-4" />
+              )}
+              {/* <span className="hidden md:inline">{useUserLocation ? "Stop using your location" : "Use my location"}</span> */}
+            </Button>
             <div className="relative min-w-0 flex-1">
               <MapPin className="pointer-events-none absolute left-3 top-1/2 z-10 size-4 -translate-y-1/2 text-muted-foreground" />
               <LocationInput
@@ -220,29 +235,12 @@ function Hero({
                 )}
               />
             </div>
-            <Button
-              type="button"
-              variant="default"
-              disabled={locatingGps}
-              className={`
-                h-10 shrink-0
-                ${useUserLocation ? "" : "opacity-50"}
-              `}
-              onClick={handleUseMyLocation}
-            >
-              {locatingGps ? (
-                <LoaderCircle className="size-4 animate-spin" />
-              ) : (
-                <Locate className="size-4" />
-              )}
-              {/* <span className="hidden md:inline">{useUserLocation ? "Stop using your location" : "Use my location"}</span> */}
-            </Button>
           </div>
         </div>
         <Button
           type="button"
           variant="default"
-          className="h-10 flex-1 sm:flex-initial"
+          className={`h-10 flex-1 sm:flex-initial bg-primary ${!canSearch ? "brightness-50" : ""} opacity-100!`}
           disabled={!canSearch}
           onClick={submit}
         >
@@ -260,20 +258,13 @@ function Hero({
         {CATEGORY_CONFIG.map(({ label, icon: Icon, colorClass }) => (
           <Badge
             key={label}
-            variant="outline"
+            variant={activeCategory === label ? "default" : "outline"}
             asChild
-            className={cn(
-              "cursor-pointer rounded-full border border-input bg-card px-3 py-1 text-xs shadow-xs backdrop-blur-lg transition-[color,box-shadow,background-color,border-color] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
-              activeCategory === label
-                ? "border-primary text-primary "
-                : "text-foreground/90 hover:bg-accent hover:text-accent-foreground",
-            )}
+            className={`cursor-pointer ${activeCategory === label ? "text-white" : "bg-card"}`}
           >
             <button type="button" onClick={() => onCategorySelect(label)}>
               <Icon
-                className={
-                  activeCategory === label ? "text-primary" : colorClass
-                }
+                className={activeCategory === label ? "text-white" : colorClass}
               />
               {label}
             </button>
