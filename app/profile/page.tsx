@@ -244,10 +244,6 @@ export default function ProfilePage() {
             profile={profile}
             phoneDisplay={phoneDisplay}
             onEdit={() => setEditOpen(true)}
-            onDelete={() => {
-              setDeleteError("");
-              setDeleteOpen(true);
-            }}
           />
 
           <OrganizationsSection
@@ -301,6 +297,11 @@ export default function ProfilePage() {
         onUsernameChange={setUsername}
         onDescriptionChange={setDescription}
         onPhoneChange={setPhone}
+        onRequestDelete={() => {
+          setEditOpen(false);
+          setDeleteError("");
+          setDeleteOpen(true);
+        }}
       />
     </>
   );

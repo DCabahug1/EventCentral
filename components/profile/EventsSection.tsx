@@ -40,38 +40,20 @@ export default function EventsSection({
       <div className="flex flex-col gap-1">
         <h2 className="text-xl font-semibold">Events</h2>
         <p className="text-sm text-muted-foreground">
-          Keep track of events you are attending and previously attended.
+        Track your upcoming events and attendance history.
         </p>
       </div>
 
       <Tabs defaultValue="upcoming" className="flex flex-col gap-4">
         <TabsList>
-          <TabsTrigger value="upcoming">
-            <span className="flex items-center gap-1.5">
-              Attending
-              {upcoming.length > 0 && (
-                <span className="rounded-full bg-primary/15 px-1.5 py-0.5 text-xs font-medium text-primary">
-                  {upcoming.length}
-                </span>
-              )}
-            </span>
-          </TabsTrigger>
-          <TabsTrigger value="past">
-            <span className="flex items-center gap-1.5">
-              Previously Attended
-              {past.length > 0 && (
-                <span className="rounded-full bg-primary/15 px-1.5 py-0.5 text-xs font-medium text-primary">
-                  {past.length}
-                </span>
-              )}
-            </span>
-          </TabsTrigger>
+          <TabsTrigger value="upcoming">Attending</TabsTrigger>
+          <TabsTrigger value="past">Previously Attended</TabsTrigger>
         </TabsList>
 
         <TabsContent value="upcoming" className="flex flex-col gap-4">
           {upcoming.length === 0 ? (
             <EmptyState
-              message="You have no upcoming events. Browse Discover to find something!"
+              message="You have no upcoming events."
               action={
                 <Button asChild variant="outline" size="sm">
                   <Link href="/">Discover Events</Link>

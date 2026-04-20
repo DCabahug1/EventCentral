@@ -13,7 +13,6 @@ import {
   MapPin,
   Pencil,
   Phone,
-  Trash2,
   Upload,
   Building2,
   Link as LinkIcon,
@@ -427,7 +426,7 @@ export default function OrganizationPage() {
       const result = await deleteOrganization(org.id);
       if (result === null) {
         setDeleteOpen(false);
-        router.push("/");
+        router.push("/profile");
         router.refresh();
         return;
       }
@@ -546,19 +545,6 @@ export default function OrganizationPage() {
                           <Pencil className="size-4" />
                           Edit
                         </Button>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          className="w-full border-destructive/50 text-destructive hover:bg-destructive/10 sm:w-auto"
-                          onClick={() => {
-                            setDeleteError("");
-                            setDeleteOpen(true);
-                          }}
-                        >
-                          <Trash2 className="size-4" />
-                          Delete
-                        </Button>
                       </>
                     ) : null}
                   </div>
@@ -613,7 +599,7 @@ export default function OrganizationPage() {
                 </span>
               </div>
               {upcoming.length === 0 ? (
-                <div className=" border border-dashed border-border bg-muted/30 px-6 py-12 text-center text-sm text-muted-foreground">
+                <div className="py-12 text-center text-sm text-muted-foreground">
                   No upcoming events scheduled yet.
                 </div>
               ) : (
@@ -633,7 +619,7 @@ export default function OrganizationPage() {
                 </span>
               </div>
               {past.length === 0 ? (
-                <div className=" border border-dashed border-border bg-muted/30 px-6 py-12 text-center text-sm text-muted-foreground">
+                <div className="py-12 text-center text-sm text-muted-foreground">
                   No past events yet.
                 </div>
               ) : (
@@ -937,6 +923,17 @@ export default function OrganizationPage() {
               </div>
               <DrawerFooter className="shrink-0 border-t bg-background pt-4">
                 <div className="flex w-full flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    onClick={() => {
+                      setEditOpen(false);
+                      setDeleteError("");
+                      setDeleteOpen(true);
+                    }}
+                  >
+                    Delete organization
+                  </Button>
                   <DrawerClose asChild>
                     <Button type="button" variant="outline">
                       Cancel

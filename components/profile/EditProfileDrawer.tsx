@@ -39,6 +39,7 @@ type Props = {
   onUsernameChange: (value: string) => void;
   onDescriptionChange: (value: string) => void;
   onPhoneChange: (value: string) => void;
+  onRequestDelete: () => void;
 };
 
 export default function EditProfileDrawer({
@@ -59,6 +60,7 @@ export default function EditProfileDrawer({
   onUsernameChange,
   onDescriptionChange,
   onPhoneChange,
+  onRequestDelete,
 }: Props) {
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
@@ -177,6 +179,13 @@ export default function EditProfileDrawer({
           </div>
           <DrawerFooter className="shrink-0 border-t bg-background pt-4">
             <div className="flex w-full flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={onRequestDelete}
+              >
+                Delete Account
+              </Button>
               <DrawerClose asChild>
                 <Button type="button" variant="outline">
                   Cancel

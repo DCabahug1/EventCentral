@@ -1,6 +1,6 @@
 "use client";
 
-import { Mail, Pencil, Phone, Trash2 } from "lucide-react";
+import { Mail, Pencil, Phone } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -10,14 +10,12 @@ type Props = {
   profile: Profile;
   phoneDisplay: string;
   onEdit: () => void;
-  onDelete: () => void;
 };
 
 export default function ProfileHeaderCard({
   profile,
   phoneDisplay,
   onEdit,
-  onDelete,
 }: Props) {
   return (
     <Card className="p-6">
@@ -56,15 +54,6 @@ export default function ProfileHeaderCard({
           <Button type="button" variant="secondary" onClick={onEdit}>
             <Pencil className="size-4" />
             Edit Profile
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            className="border-destructive/50 text-destructive hover:bg-destructive/10"
-            onClick={onDelete}
-          >
-            <Trash2 className="size-4" />
-            Delete Account
           </Button>
         </div>
       </div>
