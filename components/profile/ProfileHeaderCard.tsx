@@ -1,6 +1,7 @@
 "use client";
 
 import { Mail, Pencil, Phone } from "lucide-react";
+import { motion } from "motion/react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -18,8 +19,13 @@ export default function ProfileHeaderCard({
   onEdit,
 }: Props) {
   return (
-    <Card className="p-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
+    >
+      <Card className="p-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
           <Avatar className="size-20 shrink-0">
             <AvatarImage src={profile.avatar_url ?? ""} />
@@ -56,7 +62,8 @@ export default function ProfileHeaderCard({
             Edit Profile
           </Button>
         </div>
-      </div>
-    </Card>
+        </div>
+      </Card>
+    </motion.div>
   );
 }

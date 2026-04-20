@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Building2, Plus } from "lucide-react";
+import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
 import PaginationBar from "@/components/discover/PaginationBar";
 import type { Organization } from "@/lib/types";
@@ -26,7 +27,12 @@ export default function OrganizationsSection({
   onPageChange,
 }: Props) {
   return (
-    <section className="flex flex-col gap-4">
+    <motion.section
+      className="flex flex-col gap-4"
+      initial={{ opacity: 0, y: 14 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, ease: "easeOut", delay: 0.05 }}
+    >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col gap-1">
           <h2 className="text-xl font-semibold">Organizations</h2>
@@ -59,8 +65,15 @@ export default function OrganizationsSection({
       ) : (
         <div className="flex flex-col gap-4">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {paginatedOrganizations.map((org) => (
-              <OrgCard key={org.id} org={org} />
+            {paginatedOrganizations.map((org, index) => (
+              <motion.div
+                key={org.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.22, ease: "easeOut", delay: index * 0.04 }}
+              >
+                <OrgCard org={org} />
+              </motion.div>
             ))}
           </div>
           <PaginationBar
@@ -73,6 +86,6 @@ export default function OrganizationsSection({
           />
         </div>
       )}
-    </section>
+    </motion.section>
   );
 }

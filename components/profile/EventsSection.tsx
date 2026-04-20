@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { motion } from "motion/react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import PaginationBar from "@/components/discover/PaginationBar";
@@ -36,7 +37,12 @@ export default function EventsSection({
   onPastPageChange,
 }: Props) {
   return (
-    <section className="flex flex-col gap-4">
+    <motion.section
+      className="flex flex-col gap-4"
+      initial={{ opacity: 0, y: 14 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, ease: "easeOut", delay: 0.1 }}
+    >
       <div className="flex flex-col gap-1">
         <h2 className="text-xl font-semibold">Events</h2>
         <p className="text-sm text-muted-foreground">
@@ -62,11 +68,23 @@ export default function EventsSection({
             />
           ) : (
             <>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                {paginatedUpcoming.map((event) => (
-                  <EventCard key={event.id} event={event} />
+              <motion.div
+                className="grid grid-cols-1 gap-4 sm:grid-cols-2"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.25, ease: "easeOut" }}
+              >
+                {paginatedUpcoming.map((event, index) => (
+                  <motion.div
+                    key={event.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.2, ease: "easeOut", delay: index * 0.04 }}
+                  >
+                    <EventCard event={event} />
+                  </motion.div>
                 ))}
-              </div>
+              </motion.div>
               <PaginationBar
                 label="Attending events"
                 page={upcomingPage}
@@ -84,11 +102,23 @@ export default function EventsSection({
             <EmptyState message="No previously attended events to show." />
           ) : (
             <>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                {paginatedPast.map((event) => (
-                  <EventCard key={event.id} event={event} />
+              <motion.div
+                className="grid grid-cols-1 gap-4 sm:grid-cols-2"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.25, ease: "easeOut" }}
+              >
+                {paginatedPast.map((event, index) => (
+                  <motion.div
+                    key={event.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.2, ease: "easeOut", delay: index * 0.04 }}
+                  >
+                    <EventCard event={event} />
+                  </motion.div>
                 ))}
-              </div>
+              </motion.div>
               <PaginationBar
                 label="Previously attended events"
                 page={pastPage}
@@ -101,6 +131,6 @@ export default function EventsSection({
           )}
         </TabsContent>
       </Tabs>
-    </section>
+    </motion.section>
   );
 }
