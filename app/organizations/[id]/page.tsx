@@ -15,7 +15,6 @@ import {
   Phone,
   Trash2,
   Upload,
-  FileText,
   Building2,
   Link as LinkIcon,
 } from "lucide-react";
@@ -97,22 +96,22 @@ function isOrganization(value: unknown): value is Organization {
 
 function EventCardSkeleton() {
   return (
-    <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
-      <Skeleton className="h-48 w-full rounded-none" />
+    <div className="overflow-hidden  border border-border bg-card shadow-sm">
+      <Skeleton className="h-48 w-full " />
       <div className="flex flex-col gap-3 p-4">
         <Skeleton className="h-3 w-28" />
         <Skeleton className="h-7 w-4/5 max-w-xs" />
         <Skeleton className="h-3 w-20" />
         <div className="flex gap-2">
-          <Skeleton className="size-4 shrink-0 rounded-sm" />
+          <Skeleton className="size-4 shrink-0 " />
           <Skeleton className="h-4 flex-1" />
         </div>
         <div className="flex gap-2">
-          <Skeleton className="size-4 shrink-0 rounded-sm" />
+          <Skeleton className="size-4 shrink-0 " />
           <Skeleton className="h-4 w-40" />
         </div>
-        <Skeleton className="h-2 w-full rounded-full" />
-        <Skeleton className="h-9 w-full rounded-md" />
+        <Skeleton className="h-2 w-full" />
+        <Skeleton className="h-9 w-full" />
       </div>
     </div>
   );
@@ -123,17 +122,17 @@ function OrganizationPageSkeleton() {
     <div className="min-h-svh bg-background">
       <div className="mx-auto max-w-5xl px-4 pb-16 pt-6 sm:px-6 lg:px-8">
         <div className="mb-6 flex items-center gap-2">
-          <Skeleton className="size-4 shrink-0 rounded-sm" />
+          <Skeleton className="size-4 shrink-0 " />
           <Skeleton className="h-5 w-36" />
         </div>
 
-        <div className="relative overflow-hidden rounded-2xl border border-border bg-muted">
-          <Skeleton className="aspect-[21/9] w-full rounded-none sm:min-h-[180px]" />
+        <div className="relative overflow-hidden  border border-border bg-muted">
+          <Skeleton className="aspect-[21/9] w-full  sm:min-h-[180px]" />
         </div>
 
         <div className="relative z-10 -mt-12 sm:-mt-14 md:-mt-16">
-          <Card className="flex flex-col gap-4 rounded-2xl border-border/80 bg-card/95 shadow-sm backdrop-blur-sm sm:flex-row sm:items-center sm:gap-4 sm:px-6 sm:py-4">
-            <Skeleton className="size-24 shrink-0 rounded-2xl border-4 border-background sm:size-28 md:size-32" />
+          <Card className="flex flex-col gap-4  border-border/80 bg-card/95 shadow-sm backdrop-blur-sm sm:flex-row sm:items-center sm:gap-4 sm:px-6 sm:py-4">
+            <Skeleton className="size-24 shrink-0  border-4 border-background sm:size-28 md:size-32" />
             <CardContent className="w-full flex-1 space-y-4 p-5 sm:p-6">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <Skeleton className="h-9 w-full max-w-[min(100%,20rem)] sm:h-10" />
@@ -477,7 +476,7 @@ export default function OrganizationPage() {
             Back to Discover
           </Link>
 
-          <div className="relative overflow-hidden rounded-2xl border border-border bg-muted">
+          <div className="relative overflow-hidden  border border-border bg-muted">
             <div className="relative aspect-[21/9] w-full sm:min-h-[180px]">
               {bannerSrc ? (
                 <Image
@@ -498,7 +497,7 @@ export default function OrganizationPage() {
             <Card className="flex-1 sm:flex-row items-center gap-4 p-6">
               <div
                 className={cn(
-                  "relative size-48 sm:size-24 shrink-0 overflow-hidden rounded-2xl border-4 border-background bg-card shadow-lg sm:size-28 md:size-32",
+                  "relative size-48 sm:size-24 shrink-0 overflow-hidden  border-4 border-background bg-card shadow-lg sm:size-28 md:size-32",
                 )}
               >
                 {avatarSrc ? (
@@ -614,7 +613,7 @@ export default function OrganizationPage() {
                 </span>
               </div>
               {upcoming.length === 0 ? (
-                <div className="rounded-xl border border-dashed border-border bg-muted/30 px-6 py-12 text-center text-sm text-muted-foreground">
+                <div className=" border border-dashed border-border bg-muted/30 px-6 py-12 text-center text-sm text-muted-foreground">
                   No upcoming events scheduled yet.
                 </div>
               ) : (
@@ -634,7 +633,7 @@ export default function OrganizationPage() {
                 </span>
               </div>
               {past.length === 0 ? (
-                <div className="rounded-xl border border-dashed border-border bg-muted/30 px-6 py-12 text-center text-sm text-muted-foreground">
+                <div className=" border border-dashed border-border bg-muted/30 px-6 py-12 text-center text-sm text-muted-foreground">
                   No past events yet.
                 </div>
               ) : (
@@ -718,7 +717,7 @@ export default function OrganizationPage() {
                       <label
                         htmlFor={avatarInputId}
                         className={cn(
-                          "flex size-32 shrink-0 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-border transition-colors hover:border-muted-foreground",
+                          "flex size-32 shrink-0 cursor-pointer flex-col items-center justify-center overflow-hidden  border-2 border-dashed border-border transition-colors hover:border-muted-foreground",
                         )}
                       >
                         {avatarPreview ? (
@@ -771,7 +770,7 @@ export default function OrganizationPage() {
                       <label
                         htmlFor={bannerInputId}
                         className={cn(
-                          "flex h-48 w-full max-w-[600px] cursor-pointer flex-col items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-border transition-colors hover:border-muted-foreground",
+                          "flex h-48 w-full max-w-[600px] cursor-pointer flex-col items-center justify-center overflow-hidden  border-2 border-dashed border-border transition-colors hover:border-muted-foreground",
                         )}
                       >
                         {bannerPreview ? (
@@ -846,19 +845,13 @@ export default function OrganizationPage() {
                       Description
                     </FieldLabel>
                     <FieldContent>
-                      <div className="flex gap-2">
-                        <FileText
-                          className="text-muted-foreground mt-2.5 size-[18px] shrink-0"
-                          aria-hidden
-                        />
-                        <Textarea
-                          id="edit-description"
-                          className="min-h-24 resize-none"
-                          value={description}
-                          placeholder="Tell people about your organization..."
-                          onChange={(e) => setDescription(e.target.value)}
-                        />
-                      </div>
+                      <Textarea
+                        id="edit-description"
+                        className="min-h-24 resize-none"
+                        value={description}
+                        placeholder="Tell people about your organization..."
+                        onChange={(e) => setDescription(e.target.value)}
+                      />
                     </FieldContent>
                   </Field>
 
