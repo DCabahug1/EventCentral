@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import {
   Upload,
   Link as LinkIcon,
-  FileText,
   Building2,
   Mail,
   Phone,
@@ -338,20 +337,14 @@ export default function Page() {
                     Description
                   </FieldLabel>
                   <FieldContent>
-                    <div className="flex gap-2">
-                      <FileText
-                        className="text-muted-foreground mt-2.5 size-[18px] shrink-0"
-                        aria-hidden
-                      />
-                      <Textarea
-                        id="org-description"
-                        name="description"
-                        placeholder="Tell people about your organization..."
-                        className="min-h-24 resize-none"
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                      />
-                    </div>
+                    <Textarea
+                      id="org-description"
+                      name="description"
+                      placeholder="Tell people about your organization..."
+                      className="min-h-24 resize-none"
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                    />
                   </FieldContent>
                 </Field>
 

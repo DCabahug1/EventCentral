@@ -3,6 +3,37 @@ import { createClient } from "./supabase/server";
 import { Event } from "./types";
 import { PostgrestError } from "@supabase/supabase-js";
 
+/** All events the currently authenticated user has a confirmed RSVP for. */
+export async function getAttendingEvents(): Promise<Event[]> {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError || !user) return [];
+
+  const { data: rsvps, error: rsvpError } = await supabase
+    .from("rsvps")
+    .select("event_id")
+    .eq("user_id", user.id)
+    .eq("status", "CONFIRMED");
+
+  if (rsvpError || !rsvps || rsvps.length === 0) return [];
+
+  const ids = rsvps.map((r: { event_id: number }) => r.event_id);
+
+  const { data, error } = await supabase
+    .from("events")
+    .select("*")
+    .in("id", ids)
+    .order("start_time", { ascending: true });
+
+  if (error || !data) return [];
+  return data as Event[];
+}
+
 /** All events for an organization, ordered by start time (soonest first). */
 export async function getEventsByOrganizationId(
   organizationId: number,
