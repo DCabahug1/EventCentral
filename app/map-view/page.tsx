@@ -9,11 +9,36 @@ import EventList from "@/components/map-view/EventList";
 import { getEvents } from "@/lib/eventsClient";
 import { APIProvider } from "@vis.gl/react-google-maps";
 
+type MapSearchQuery = {
+  keyword: string;
+  location: string;
+  useUserLocation: boolean;
+  coordinates?: { lat: number; lng: number };
+  locationValid: boolean;
+  radius: number;
+  startDate: string;
+  endDate: string;
+  eventType: string;
+  regionBounds?: { north: number; south: number; east: number; west: number };
+};
+
+const DEFAULT_QUERY: MapSearchQuery = {
+  keyword: "",
+  location: "",
+  useUserLocation: false,
+  locationValid: true,
+  radius: 10,
+  startDate: todayDateString(),
+  endDate: daysFromNowDateString(30),
+  eventType: "all",
+};
+
 function page() {
   const [events, setEvents] = useState<Event[]>([]);
+  const [appliedQuery, setAppliedQuery] = useState<MapSearchQuery>(DEFAULT_QUERY);
 
   // Map focus state — updated only when the form is submitted.
-  const [mapLocation, setMapLocation] = useState("United States");
+  const [mapLocation, setMapLocation] = useState("");
   const [mapRadius, setMapRadius] = useState(10);
   const [mapCoordinates, setMapCoordinates] = useState<{ lat: number; lng: number } | undefined>(undefined);
   const [mapLocationValid, setMapLocationValid] = useState(true);
@@ -25,26 +50,36 @@ function page() {
   // Ref on the map wrapper div used to scroll it into view when a list card is clicked
   const mapRef = useRef<HTMLDivElement>(null);
 
-  // Derives the event list heading from the current location context
-  const eventsHeading = searchUsingUserLocation
-    ? "Events Near You"
-    : mapLocation === "United States"
-    ? "Events Across the US"
-    : `Events in ${mapLocation}`;
+  const appliedKeyword = appliedQuery.keyword.trim();
+  const hasKeyword = Boolean(appliedKeyword);
+  const hasCategory = appliedQuery.eventType !== "all";
+  const categoryLabel = appliedQuery.eventType;
+  const eventsHeading = hasKeyword && hasCategory
+    ? `Results for "${appliedKeyword}" in ${categoryLabel}`
+    : hasKeyword
+      ? `Results for "${appliedKeyword}"`
+      : hasCategory
+        ? `Category: ${categoryLabel}`
+        : "All Events";
+
+  const locationSummary = searchUsingUserLocation
+    ? mapLocation.trim()
+      ? `Within ${mapRadius} mi of ${mapLocation}`
+      : `Within ${mapRadius} mi of your location`
+    : !mapLocation.trim()
+      ? "All locations"
+      : `In ${mapLocation}`;
+
+  const dateSummary =
+    appliedQuery.startDate === appliedQuery.endDate
+      ? `On ${appliedQuery.startDate}`
+      : `${appliedQuery.startDate} to ${appliedQuery.endDate}`;
+  const eventsSubheading = `${locationSummary} • ${dateSummary}`;
 
   // Fetches events on form submission. Map focus also updates here (submit-only).
-  const fetchEvents = async (formData: {
-    location: string;
-    useUserLocation: boolean;
-    coordinates?: { lat: number; lng: number };
-    locationValid: boolean;
-    radius: number;
-    startDate: string;
-    endDate: string;
-    eventType: string;
-    regionBounds?: { north: number; south: number; east: number; west: number };
-  }) => {
+  const fetchEvents = async (formData: MapSearchQuery) => {
     const newEvents = await getEvents({
+      keyword: formData.keyword,
       startDate: formData.startDate,
       endDate: formData.endDate,
       eventType: formData.eventType,
@@ -59,6 +94,7 @@ function page() {
     setMapCoordinates(formData.coordinates);
     setMapLocationValid(formData.locationValid);
     setSearchUsingUserLocation(formData.useUserLocation);
+    setAppliedQuery(formData);
   };
 
   // Called when the user clicks an event card in the list.
@@ -77,16 +113,10 @@ function page() {
   };
 
   // Load an initial set of events on mount using the default form values.
-  // No regionBounds — the "United States" default shows all events (no location filter).
+  // No regionBounds — blank location shows all events (no location filter).
   useEffect(() => {
     fetchEvents({
-      location: "United States",
-      useUserLocation: false,
-      locationValid: true,
-      radius: 10,
-      startDate: todayDateString(),
-      endDate: daysFromNowDateString(30),
-      eventType: "all",
+      ...DEFAULT_QUERY,
     });
   }, []);
 
@@ -94,11 +124,11 @@ function page() {
     // APIProvider must wrap both the Form and MapView so that useMapsLibrary()
     // hooks inside Form (geocoding) and MapView (geocoding) share the same context
     <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!}>
-      <div className="h-svh flex flex-col md:flex-row">
+      <div className="h-[calc(100svh-64px)] flex flex-col md:flex-row">
         {/* Side panel — visible on desktop only.
           Contains the full filter form with an inline submit button. */}
         <div className="hidden md:flex flex-col p-4 gap-4 w-80 h-full border-r overflow-y-auto">
-          <Form fetchEvents={fetchEvents} />
+          <Form fetchEvents={fetchEvents} appliedQuery={appliedQuery} />
         </div>
 
         {/* Main content area — map + event list stacked vertically */}
@@ -106,7 +136,7 @@ function page() {
           {/* Mobile filter trigger — floating button in the top-left of the map.
             Opens a bottom drawer with the same form fields. */}
           <div className="absolute top-4 left-4 z-10 md:hidden">
-            <FiltersDrawer fetchEvents={fetchEvents} />
+            <FiltersDrawer fetchEvents={fetchEvents} appliedQuery={appliedQuery} />
           </div>
 
           {/* Map wrapper — ref used for scroll-to-map from event list clicks */}
@@ -126,6 +156,7 @@ function page() {
           <EventList
             events={events}
             heading={eventsHeading}
+            subheading={eventsSubheading}
             selectedEventId={selectedEventId}
             onEventSelect={handleEventSelect}
           />

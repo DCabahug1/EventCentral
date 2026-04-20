@@ -146,7 +146,7 @@ function page() {
             </form>
           </div>
           <Image
-            src="/AuthPages/AuthFormSideImage.jpg"
+            src="/auth-pages/AuthFormSideImage.jpg"
             alt="EventCentral"
             width={800}
             height={800}

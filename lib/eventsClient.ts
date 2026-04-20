@@ -4,6 +4,7 @@ import { distanceBetweenLocations } from "./utils";
 import { Event } from "./types";
 
 export const getEvents = async (filters?: {
+  keyword?: string;
   startDate?: string;
   endDate?: string;
   eventType?: string;
@@ -19,6 +20,7 @@ export const getEvents = async (filters?: {
   const {
     startDate,
     endDate,
+    keyword = "",
     eventType = "all",
     useUserLocation = false,
     coordinates,
@@ -54,9 +56,17 @@ export const getEvents = async (filters?: {
   }
 
   const events = data as Event[];
+  const normalizedKeyword = keyword.trim().toLowerCase();
 
   // 2. Apply client-side location filtering — two mutually exclusive modes.
   return events.filter((event) => {
+    if (normalizedKeyword) {
+      const matchesKeyword =
+        event.title.toLowerCase().includes(normalizedKeyword) ||
+        (event.address ?? "").toLowerCase().includes(normalizedKeyword);
+      if (!matchesKeyword) return false;
+    }
+
     if (useUserLocation && coordinates) {
       // Geolocation mode: include only events within the specified radius
       if (event.lat == null || event.lng == null) return false;
@@ -81,7 +91,7 @@ export const getEvents = async (filters?: {
         return false;
     }
     // If neither condition matches (no regionBounds, no coordinates), no location
-    // filter is applied — this covers the "United States" default which shows all events.
+    // filter is applied — blank location / no bounds shows all events.
 
     return true;
   });

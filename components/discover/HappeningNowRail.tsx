@@ -30,7 +30,7 @@ export default function HappeningNowRail({
         <div className="flex items-center gap-2">
           <div className="h-5 w-1 bg-primary" />
 
-          <h2 className="text-2xl font-bold">Happening Now</h2>
+          <h2 className="text-2xl ">Happening Now</h2>
         </div>
         <span className="text-sm text-muted-foreground">
           {totalCount} {totalCount === 1 ? "event" : "events"}

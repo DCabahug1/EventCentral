@@ -31,6 +31,8 @@ export type Event = {
   organization_id: number | null;
   /** Denormalized from organizations.name; avoids a separate org fetch when set. */
   organization_name: string | null;
+  /** Denormalized RSVP total maintained by DB trigger updates. */
+  rsvp_count: number | null;
   user_id: string;
   title: string;
   description: string | null;

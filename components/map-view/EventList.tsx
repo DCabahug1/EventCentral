@@ -12,11 +12,13 @@ const PAGE_SIZE = 8;
 function EventList({
   events,
   heading = "Events Across the US",
+  subheading,
   selectedEventId,
   onEventSelect,
 }: {
   events: Event[];
   heading?: string;
+  subheading?: string;
   selectedEventId?: number | null;
   onEventSelect?: (id: number) => void;
 }) {
@@ -41,8 +43,18 @@ function EventList({
 
   return (
     <div className="flex flex-col border-t">
-      <div className="p-4 sticky top-0 bg-background z-10 border-b flex items-center gap-3">
-        <h2 className="text-2xl font-bold">{heading}</h2>
+      <div className="p-4 sticky top-0 bg-background z-10 border-b flex flex-wrap items-start justify-between gap-3">
+        <div className="flex min-w-0 flex-1 flex-col gap-1">
+          <div className="flex items-center gap-2">
+            <div className="h-5 w-1 shrink-0 bg-primary" />
+            <h2 className="min-w-0 text-2xl font-bold">{heading}</h2>
+          </div>
+          {subheading && (
+            <p className="pl-3 text-sm font-normal text-muted-foreground">
+              {subheading}
+            </p>
+          )}
+        </div>
         <Badge variant="default" className="shrink-0">
           {events.length} {events.length === 1 ? "event" : "events"}
         </Badge>
