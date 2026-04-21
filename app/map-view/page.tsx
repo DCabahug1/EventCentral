@@ -35,6 +35,7 @@ const DEFAULT_QUERY: MapSearchQuery = {
 
 function page() {
   const [events, setEvents] = useState<Event[]>([]);
+  const [loadingEvents, setLoadingEvents] = useState(true);
   const [appliedQuery, setAppliedQuery] = useState<MapSearchQuery>(DEFAULT_QUERY);
 
   // Map focus state — updated only when the form is submitted.
@@ -78,23 +79,28 @@ function page() {
 
   // Fetches events on form submission. Map focus also updates here (submit-only).
   const fetchEvents = async (formData: MapSearchQuery) => {
-    const newEvents = await getEvents({
-      keyword: formData.keyword,
-      startDate: formData.startDate,
-      endDate: formData.endDate,
-      eventType: formData.eventType,
-      useUserLocation: formData.useUserLocation,
-      coordinates: formData.coordinates,
-      radius: formData.radius,
-      regionBounds: formData.regionBounds,
-    });
-    setEvents(newEvents);
-    setMapLocation(formData.location);
-    setMapRadius(formData.radius);
-    setMapCoordinates(formData.coordinates);
-    setMapLocationValid(formData.locationValid);
-    setSearchUsingUserLocation(formData.useUserLocation);
-    setAppliedQuery(formData);
+    setLoadingEvents(true);
+    try {
+      const newEvents = await getEvents({
+        keyword: formData.keyword,
+        startDate: formData.startDate,
+        endDate: formData.endDate,
+        eventType: formData.eventType,
+        useUserLocation: formData.useUserLocation,
+        coordinates: formData.coordinates,
+        radius: formData.radius,
+        regionBounds: formData.regionBounds,
+      });
+      setEvents(newEvents);
+      setMapLocation(formData.location);
+      setMapRadius(formData.radius);
+      setMapCoordinates(formData.coordinates);
+      setMapLocationValid(formData.locationValid);
+      setSearchUsingUserLocation(formData.useUserLocation);
+      setAppliedQuery(formData);
+    } finally {
+      setLoadingEvents(false);
+    }
   };
 
   // Called when the user clicks an event card in the list.
@@ -159,6 +165,7 @@ function page() {
             subheading={eventsSubheading}
             selectedEventId={selectedEventId}
             onEventSelect={handleEventSelect}
+            loading={loadingEvents}
           />
         </div>
       </div>

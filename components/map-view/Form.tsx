@@ -15,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { CATEGORY_CONFIG } from "@/lib/categoryConfig";
+import { SEARCH_CATEGORY_CONFIG } from "@/lib/categoryConfig";
 import { addOneYear, daysFromNowDateString, todayDateString } from "@/lib/utils";
 
 type RegionBounds = {
@@ -386,7 +386,7 @@ function Form({
                   <SelectItem value="all">
                     <LayoutGrid className="size-4" /> All
                   </SelectItem>
-                  {CATEGORY_CONFIG.map((category) => (
+                  {SEARCH_CATEGORY_CONFIG.map((category) => (
                     <SelectItem key={category.label} value={category.label}>
                       <category.icon className={category.colorClass} />
                       {category.label}

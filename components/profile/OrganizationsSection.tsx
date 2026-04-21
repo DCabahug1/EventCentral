@@ -58,7 +58,7 @@ export default function OrganizationsSection({
 
       {organizations.length === 0 ? (
         <EmptyState
-          message="Create an organization to host events and build a community."
+          message="No organizations found."
           action={
             <Button type="button" size="sm" onClick={onCreateOrganization}>
               <Building2 className="size-4" />

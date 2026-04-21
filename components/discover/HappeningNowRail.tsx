@@ -4,6 +4,7 @@ import React from "react";
 import { Event } from "@/lib/types";
 import EventCard from "@/components/events/EventCard";
 import PaginationBar from "./PaginationBar";
+import ListEmptyState from "@/components/ui/list-empty-state";
 
 type HappeningNowRailProps = {
   events: Event[];
@@ -37,13 +38,16 @@ export default function HappeningNowRail({
         </span>
       </div>
 
-      {totalCount === 0 ? 
-        <p className="text-muted-foreground text-sm py-8 text-center w-full ">
-          {emptyContext
-            ? `No live events match ${emptyContext}.`
-            : "No events are happening right now."}
-        </p>
-       : (
+      {totalCount === 0 ? (
+        <ListEmptyState
+          message={
+            emptyContext
+              ? `No live events found for ${emptyContext}.`
+              : "No live events found."
+          }
+          className="py-8"
+        />
+      ) : (
         <>
           <div className="flex gap-4 overflow-x-auto py-6 scroll-smooth snap-x snap-mandatory [-webkit-overflow-scrolling:touch]">
             {events.map((event) => (

@@ -9,9 +9,10 @@ import { motion, AnimatePresence } from "motion/react";
 interface DesktopNavProps {
   profile: Profile | null;
   pathname: string;
+  onHostEvent: () => void;
 }
 
-function DesktopNav({ profile, pathname }: DesktopNavProps) {
+function DesktopNav({ profile, pathname, onHostEvent }: DesktopNavProps) {
   return (
     <AnimatePresence mode="wait" initial={false}>
       {profile ? (
@@ -36,13 +37,12 @@ function DesktopNav({ profile, pathname }: DesktopNavProps) {
             </Link>
           </Button>
           <Button
+            type="button"
             variant={pathname.startsWith("/create-event") ? "default" : "ghost"}
-            asChild
+            onClick={onHostEvent}
           >
-            <Link href="/create-event">
               <Plus />
               Host an Event
-            </Link>
           </Button>
           <AvatarButton profile={profile} />
         </motion.div>

@@ -70,9 +70,9 @@ export default function EventsSection({
         <TabsContent value="upcoming" className="flex flex-col gap-4">
           {upcoming.length === 0 ? (
             <EmptyState
-              message="You have no upcoming events."
+              message="No upcoming events found."
               action={
-                <Button asChild variant="outline" size="sm">
+                <Button asChild size="sm">
                   <Link href="/">Discover Events</Link>
                 </Button>
               }
@@ -110,7 +110,14 @@ export default function EventsSection({
 
         <TabsContent value="past" className="flex flex-col gap-4">
           {past.length === 0 ? (
-            <EmptyState message="No previously attended events to show." />
+            <EmptyState
+              message="No past events found."
+              action={
+                <Button asChild size="sm">
+                  <Link href="/">Discover Events</Link>
+                </Button>
+              }
+            />
           ) : (
             <>
               <motion.div

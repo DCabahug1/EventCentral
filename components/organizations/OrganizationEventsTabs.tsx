@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PaginationBar from "@/components/discover/PaginationBar";
 import EventCard from "@/components/events/EventCard";
+import ListEmptyState from "@/components/ui/list-empty-state";
 import { ORG_EVENTS_PAGE_SIZE } from "@/lib/organizationPage";
 import type { Event, Organization } from "@/lib/types";
 
@@ -82,9 +83,7 @@ export default function OrganizationEventsTabs({
 
         <TabsContent value="upcoming" className="flex flex-col gap-4">
           {upcoming.length === 0 ? (
-            <div className="py-12 text-center text-sm text-muted-foreground">
-              No upcoming events scheduled yet.
-            </div>
+            <ListEmptyState message="No upcoming events found." />
           ) : (
             <>
               <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
@@ -111,9 +110,7 @@ export default function OrganizationEventsTabs({
 
         <TabsContent value="past" className="flex flex-col gap-4">
           {past.length === 0 ? (
-            <div className="py-12 text-center text-sm text-muted-foreground">
-              No past events yet.
-            </div>
+            <ListEmptyState message="No past events found." />
           ) : (
             <>
               <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">

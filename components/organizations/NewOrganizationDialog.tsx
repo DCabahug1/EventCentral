@@ -141,7 +141,7 @@ export default function NewOrganizationDialog({
                         <>
                           <Upload className="mb-2 size-5 text-muted-foreground" />
                           <span className="text-center text-xs text-muted-foreground">
-                            Square image
+                            Square avatar
                           </span>
                         </>
                       )}

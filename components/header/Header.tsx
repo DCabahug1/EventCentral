@@ -9,10 +9,12 @@ import { Profile } from "@/lib/types";
 import { AuthError } from "@supabase/supabase-js";
 import DesktopNav from "./DesktopNav";
 import MobileNav from "./MobileNav";
+import CreateEventGlobalDialog from "@/components/events/CreateEventGlobalDialog";
 
 function Header() {
   const pathname = usePathname();
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [createEventOpen, setCreateEventOpen] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -28,7 +30,6 @@ function Header() {
         }
 
         const profile = await getProfile(userResult.user.id);
-        console.log("Profile", profile);
 
         if (profile instanceof PostgrestError || profile instanceof AuthError) {
           console.error("Error getting profile", profile.message);
@@ -56,11 +57,26 @@ function Header() {
         </Link>
 
         {!pathname.startsWith("/auth") && (
-          <DesktopNav profile={profile} pathname={pathname} />
+          <DesktopNav
+            profile={profile}
+            pathname={pathname}
+            onHostEvent={() => setCreateEventOpen(true)}
+          />
         )}
 
-        {showNav && <MobileNav profile={profile} />}
+        {showNav && (
+          <MobileNav
+            profile={profile}
+            onHostEvent={() => setCreateEventOpen(true)}
+          />
+        )}
       </div>
+
+      <CreateEventGlobalDialog
+        open={createEventOpen}
+        onOpenChange={setCreateEventOpen}
+        profile={profile}
+      />
     </>
   );
 }

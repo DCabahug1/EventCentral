@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/header/Header";
 import { ThemeProvider } from "@/components/theme-provider";
 import Footer from "@/components/footer/Footer";
+import PageMount from "@/components/ui/page-mount";
 
 const fontSans = Alexandria({
   subsets: ["latin"],
@@ -38,7 +39,7 @@ export default function RootLayout({
       <body className={`${fontSans.variable} ${fontSerif.variable} antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="dark">
           <Header />
-          {children}
+          <PageMount>{children}</PageMount>
           <Footer />
         </ThemeProvider>
       </body>

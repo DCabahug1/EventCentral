@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { X, LoaderCircle, Locate, MapPin, SearchIcon } from "lucide-react";
-import { motion, useScroll, useTransform } from "motion/react";
-import { CATEGORY_CONFIG } from "@/lib/categoryConfig";
+import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
+import { SEARCH_CATEGORY_CONFIG } from "@/lib/categoryConfig";
 import { useMapsLibrary } from "@vis.gl/react-google-maps";
 import LocationInput from "@/components/map-view/LocationInput";
 import type { DiscoverRegionBounds } from "@/lib/discoverConstants";
@@ -50,10 +50,15 @@ function Hero({
   /** Enables submitting only when draft filters changed. */
   canSearch: boolean;
 }) {
+  const prefersReducedMotion = useReducedMotion();
   const [locatingGps, setLocatingGps] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
   const { scrollY } = useScroll();
-  const parallaxY = useTransform(scrollY, [0, 600], ["0%", "50%"]);
+  const parallaxY = useTransform(
+    scrollY,
+    [0, 600],
+    ["0%", prefersReducedMotion ? "8%" : "50%"],
+  );
 
   const geocodingLib = useMapsLibrary("geocoding");
   const [geocoder, setGeocoder] = useState<google.maps.Geocoder | null>(null);
@@ -141,7 +146,7 @@ function Hero({
         style={{ y: parallaxY }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 1, ease: "easeOut" }}
+        transition={{ duration: 0.9, ease: "easeOut" }}
       >
         <Image
           src="/discover-page/Hero.jpg"
@@ -157,17 +162,22 @@ function Hero({
         className="flex flex-col items-center gap-3 text-center"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
+        transition={{ duration: 0.55, ease: "easeOut" }}
       >
-        <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold leading-tight text-white">
+        <motion.h1
+          className="text-5xl sm:text-6xl md:text-7xl font-bold leading-tight text-white"
+          initial={{ letterSpacing: "-0.02em" }}
+          animate={{ letterSpacing: "-0.01em" }}
+          transition={{ duration: 0.45, ease: "easeOut", delay: 0.08 }}
+        >
           Discover <span className="text-primary">Events</span>
-        </h1>
+        </motion.h1>
       </motion.div>
       <motion.div
         className="flex w-full max-w-4xl flex-col gap-2 sm:flex-row sm:items-center"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut", delay: 0.15 }}
+        transition={{ duration: 0.55, ease: "easeOut", delay: 0.14 }}
       >
         <div className="flex w-full flex-1 flex-col gap-2 sm:flex-row sm:items-center">
           <div className="flex w-full min-w-0 items-center gap-2 sm:flex-1">
@@ -205,13 +215,13 @@ function Hero({
               type="button"
               variant={useUserLocation ? "default" : "outline"}
               disabled={locatingGps}
-              className={`h-10 w-10 shrink-0 ${useUserLocation ? "" : " bg-card!"} opacity-100! text-muted-foreground`}
+              className={`h-10 w-10 shrink-0 ${useUserLocation ? "text-white" : " bg-card!  text-muted-foreground"} opacity-100!`}
               onClick={handleUseMyLocation}
             >
               {locatingGps ? (
                 <LoaderCircle className="size-4 animate-spin" />
               ) : (
-                <Locate className="size-4" />
+                <Locate className="size-4 " />
               )}
               {/* <span className="hidden md:inline">{useUserLocation ? "Stop using your location" : "Use my location"}</span> */}
             </Button>
@@ -253,22 +263,33 @@ function Hero({
         className="flex max-w-full flex-wrap justify-center gap-1.5 px-1 sm:gap-2 sm:px-0"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut", delay: 0.3 }}
+        transition={{ duration: 0.5, ease: "easeOut", delay: 0.24 }}
       >
-        {CATEGORY_CONFIG.map(({ label, icon: Icon, colorClass }) => (
-          <Badge
+        {SEARCH_CATEGORY_CONFIG.map(({ label, icon: Icon, colorClass }, index) => (
+          <motion.div
             key={label}
-            variant={activeCategory === label ? "default" : "outline"}
-            asChild
-            className={`cursor-pointer ${activeCategory === label ? "text-white" : "bg-card"}`}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              duration: prefersReducedMotion ? 0.2 : 0.35,
+              ease: "easeOut",
+              delay: 0.26 + index * 0.03,
+            }}
+            whileHover={prefersReducedMotion ? undefined : { y: -1 }}
           >
-            <button type="button" onClick={() => onCategorySelect(label)}>
-              <Icon
-                className={activeCategory === label ? "text-white" : colorClass}
-              />
-              {label}
-            </button>
-          </Badge>
+            <Badge
+              variant={activeCategory === label ? "default" : "outline"}
+              asChild
+              className={`cursor-pointer ${activeCategory === label ? "text-white" : "bg-card"}`}
+            >
+              <button type="button" onClick={() => onCategorySelect(label)}>
+                <Icon
+                  className={activeCategory === label ? "text-white" : colorClass}
+                />
+                {label}
+              </button>
+            </Badge>
+          </motion.div>
         ))}
       </motion.div>
     </div>

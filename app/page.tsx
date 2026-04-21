@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { APIProvider } from "@vis.gl/react-google-maps";
 import EventsList from "@/components/discover/EventsList";
+import EventsListSkeleton from "@/components/discover/EventsListSkeleton";
 import Hero from "@/components/discover/Hero";
 import { getEvents } from "@/lib/eventsClient";
 import { Event } from "@/lib/types";
@@ -13,6 +14,7 @@ import {
 
 function DiscoverPageContent() {
   const [events, setEvents] = useState<Event[]>([]);
+  const [loadingEvents, setLoadingEvents] = useState(true);
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("");
   const [input, setInput] = useState("");
@@ -44,19 +46,24 @@ function DiscoverPageContent() {
     const nextUseUserLocation = filters?.useUserLocation ?? useUserLocation;
     const nextCoordinates = filters?.coordinates ?? coordinates;
     const nextRegionBounds = filters?.regionBounds ?? regionBounds;
-    let newEvents: Event[];
-    if (nextUseUserLocation && nextCoordinates) {
-      newEvents = await getEvents({
-        useUserLocation: true,
-        coordinates: nextCoordinates,
-        radius: DISCOVER_NEAR_ME_RADIUS_MILES,
-      });
-    } else if (nextRegionBounds && !nextUseUserLocation) {
-      newEvents = await getEvents({ regionBounds: nextRegionBounds });
-    } else {
-      newEvents = await getEvents();
+    setLoadingEvents(true);
+    try {
+      let newEvents: Event[];
+      if (nextUseUserLocation && nextCoordinates) {
+        newEvents = await getEvents({
+          useUserLocation: true,
+          coordinates: nextCoordinates,
+          radius: DISCOVER_NEAR_ME_RADIUS_MILES,
+        });
+      } else if (nextRegionBounds && !nextUseUserLocation) {
+        newEvents = await getEvents({ regionBounds: nextRegionBounds });
+      } else {
+        newEvents = await getEvents();
+      }
+      setEvents(newEvents);
+    } finally {
+      setLoadingEvents(false);
     }
-    setEvents(newEvents);
   }, [useUserLocation, coordinates, regionBounds]);
 
   useEffect(() => {
@@ -215,14 +222,18 @@ function DiscoverPageContent() {
         canSearch={canSearch}
       />
       <div ref={eventsListRef}>
-        <EventsList
-          events={filteredEvents}
-          query={query}
-          activeCategory={activeCategory}
-          locationInput={locationInput}
-          useUserLocation={useUserLocation}
-          hasRegionBounds={Boolean(regionBounds)}
-        />
+        {loadingEvents && events.length === 0 ? (
+          <EventsListSkeleton />
+        ) : (
+          <EventsList
+            events={filteredEvents}
+            query={query}
+            activeCategory={activeCategory}
+            locationInput={locationInput}
+            useUserLocation={useUserLocation}
+            hasRegionBounds={Boolean(regionBounds)}
+          />
+        )}
       </div>
     </div>
   );

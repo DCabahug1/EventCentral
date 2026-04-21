@@ -345,8 +345,7 @@ export default function OrganizationPage({ params }: OrganizationPageProps) {
 
   const handleEventCreated = useCallback(
     (event: Event) => {
-      router.push(`/events/${event.id}`);
-      router.refresh();
+      router.replace(`/events/${event.id}`);
     },
     [router],
   );

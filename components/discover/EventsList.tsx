@@ -11,6 +11,7 @@ import {
 } from "@/lib/discoverConstants";
 import { motion, AnimatePresence } from "motion/react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "../ui/tabs";
+import ListEmptyState from "../ui/list-empty-state";
 
 // Partition and sort helpers
 const now = () => new Date();
@@ -114,13 +115,9 @@ function EventGrid({
 
 function EmptyState({ message }: { message: string }) {
   return (
-    <motion.p
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="text-muted-foreground text-sm py-12 text-center"
-    >
-      {message}
-    </motion.p>
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+      <ListEmptyState message={message} />
+    </motion.div>
   );
 }
 
@@ -301,8 +298,8 @@ function EventsList({
                 <EmptyState
                   message={
                     emptyContext
-                      ? `No upcoming events match ${emptyContext}.`
-                      : "No upcoming events scheduled."
+                      ? `No upcoming events found for ${emptyContext}.`
+                      : "No upcoming events found."
                   }
                 />
               ) : (
@@ -325,8 +322,8 @@ function EventsList({
                 <EmptyState
                   message={
                     emptyContext
-                      ? `No past events match ${emptyContext}.`
-                      : "No past events to show."
+                      ? `No past events found for ${emptyContext}.`
+                      : "No past events found."
                   }
                 />
               ) : (

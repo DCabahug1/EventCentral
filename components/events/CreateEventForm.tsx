@@ -73,6 +73,10 @@ export type CreateEventFormProps = {
   onLocationCommitmentChange?: (ready: boolean) => void;
   /** Fires when an event image file is selected (required). */
   onImageCommitmentChange?: (ready: boolean) => void;
+  /** Optional organization selector rendered as part of the form. */
+  organizationOptions?: Organization[];
+  selectedOrganizationId?: number | null;
+  onOrganizationChange?: (organizationId: number) => void;
   className?: string;
   legendClassName?: string;
   bodyClassName?: string;
@@ -87,6 +91,9 @@ export default function CreateEventForm({
   layout = "dialog",
   onLocationCommitmentChange,
   onImageCommitmentChange,
+  organizationOptions,
+  selectedOrganizationId,
+  onOrganizationChange,
   className,
   legendClassName,
   bodyClassName,
@@ -164,6 +171,14 @@ export default function CreateEventForm({
     const cap = Number(maxCapacity);
     if (!title.trim()) {
       setFormError("Title is required.");
+      return;
+    }
+    if (
+      organizationOptions &&
+      organizationOptions.length > 1 &&
+      selectedOrganizationId == null
+    ) {
+      setFormError("Organization is required.");
       return;
     }
     if (!imageFile) {
@@ -298,6 +313,34 @@ export default function CreateEventForm({
       >
         <FormRequiredLegend className={cn("mb-5", legendClassName)} />
         <FieldGroup className="gap-5">
+          {organizationOptions && organizationOptions.length > 1 && onOrganizationChange ? (
+            <Field>
+              <FieldLabel className="text-muted-foreground">
+                Organization <RequiredMark />
+              </FieldLabel>
+              <FieldContent>
+                <Select
+                  value={selectedOrganizationId != null ? String(selectedOrganizationId) : ""}
+                  onValueChange={(value) => onOrganizationChange(Number(value))}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select organization" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {organizationOptions.map((organizationOption) => (
+                      <SelectItem
+                        key={organizationOption.id}
+                        value={String(organizationOption.id)}
+                      >
+                        {organizationOption.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FieldContent>
+            </Field>
+          ) : null}
+
           <Field>
             <FieldLabel
               htmlFor={imageInputId}

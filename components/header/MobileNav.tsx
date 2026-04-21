@@ -15,9 +15,10 @@ import AvatarButton from "./AvatarButton";
 
 interface MobileNavProps {
   profile: Profile | null;
+  onHostEvent: () => void;
 }
 
-function MobileNav({ profile }: MobileNavProps) {
+function MobileNav({ profile, onHostEvent }: MobileNavProps) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
@@ -52,18 +53,17 @@ function MobileNav({ profile }: MobileNavProps) {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem
-                asChild
-                className={
-                  pathname.startsWith("/create-event") ? "bg-accent" : ""
-                }
+                onSelect={(e) => {
+                  e.preventDefault();
+                  setOpen(false);
+                  onHostEvent();
+                }}
+                className={pathname.startsWith("/create-event") ? "bg-accent" : ""}
               >
-                <Link
-                  href="/create-event"
-                  className="flex cursor-pointer items-center gap-2"
-                >
+                <div className="flex cursor-pointer items-center gap-2">
                   <Plus className="size-4" />
                   Host an Event
-                </Link>
+                </div>
               </DropdownMenuItem>
             </>
           ) : (
