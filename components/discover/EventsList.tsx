@@ -262,7 +262,7 @@ function EventsList({
               <div className="flex min-w-0 flex-1 flex-col gap-1 text-left">
                 <div className="flex items-center gap-2 justify-start">
                   <div className="h-5 w-1 shrink-0 bg-primary" />
-                  <span className="min-w-0">{heading}</span>
+                  <span className="min-w-0 font-bold">{heading}</span>
                 </div>
                 <p className="pl-3 text-sm font-normal text-muted-foreground">
                   {locationLine}

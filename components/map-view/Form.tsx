@@ -266,8 +266,11 @@ function Form({
     <>
       {/* Header — desktop only (hidden inside the mobile drawer) */}
       <div className="hidden md:flex flex-col gap-1">
-        <h1 className="text-2xl font-bold">Map View</h1>
-        <h2 className="text-sm text-muted-foreground">
+        <div className="flex items-center gap-2">
+          <div className="h-5 w-1 shrink-0 bg-primary" aria-hidden />
+          <h1 className="text-2xl font-bold">Map View</h1>
+        </div>
+        <h2 className="pl-3 text-sm text-muted-foreground">
           Filter events on the map
         </h2>
       </div>

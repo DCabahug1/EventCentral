@@ -35,8 +35,11 @@ export default function OrganizationsSection({
     >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col gap-1">
-          <h2 className="text-xl font-semibold">Organizations</h2>
-          <p className="text-sm text-muted-foreground">
+          <div className="flex items-center gap-2">
+            <div className="h-5 w-1 shrink-0 bg-primary" />
+            <h2 className="text-xl font-bold">Organizations</h2>
+          </div>
+          <p className="pl-3 text-sm text-muted-foreground">
             {organizations.length === 0
               ? "You haven't created any organizations yet."
               : `${organizations.length} ${organizations.length === 1 ? "organization" : "organizations"}`}

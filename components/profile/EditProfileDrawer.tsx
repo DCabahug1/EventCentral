@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Phone, Upload, UserRound } from "lucide-react";
 import { cn, formatUsPhoneInput } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -86,11 +87,22 @@ export default function EditProfileDrawer({
                     )}
                   >
                     {avatarPreview ? (
-                      // eslint-disable-next-line @next/next/no-img-element -- blob preview
-                      <img src={avatarPreview} alt="" className="size-full object-cover" />
+                      <Image
+                        src={avatarPreview}
+                        alt=""
+                        width={128}
+                        height={128}
+                        unoptimized
+                        className="size-full border border-border object-cover"
+                      />
                     ) : profileAvatarUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element -- existing avatar preview
-                      <img src={profileAvatarUrl} alt="" className="size-full object-cover" />
+                      <Image
+                        src={profileAvatarUrl}
+                        alt=""
+                        width={128}
+                        height={128}
+                        className="size-full border border-border object-cover"
+                      />
                     ) : (
                       <span className="flex flex-col items-center gap-2">
                         <Upload className="size-5 text-muted-foreground" />

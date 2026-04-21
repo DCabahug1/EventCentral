@@ -44,8 +44,11 @@ export default function EventsSection({
       transition={{ duration: 0.3, ease: "easeOut", delay: 0.1 }}
     >
       <div className="flex flex-col gap-1">
-        <h2 className="text-xl font-semibold">Events</h2>
-        <p className="text-sm text-muted-foreground">
+        <div className="flex items-center gap-2">
+          <div className="h-5 w-1 shrink-0 bg-primary" />
+          <h2 className="text-xl font-bold">Events</h2>
+        </div>
+        <p className="pl-3 text-sm text-muted-foreground">
         Track your upcoming events and attendance history.
         </p>
       </div>

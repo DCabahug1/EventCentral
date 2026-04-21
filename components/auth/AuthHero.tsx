@@ -10,7 +10,7 @@ export function AuthMarketingHero() {
         src="/auth-pages/AuthFormSideImage.jpg"
         alt=""
         fill
-        className="object-cover"
+        className="border border-border object-cover"
         sizes="(max-width: 1024px) 100vw, 67vw"
         priority
       />

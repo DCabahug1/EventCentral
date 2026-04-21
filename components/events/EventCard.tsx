@@ -65,7 +65,7 @@ function EventCard({
 }: {
   event: Event;
   org?: Organization | null;
-  variant?: "default" | "featured";
+  variant?: "default" | "featured" | "organization";
 }) {
   const maxCapacity = event.max_capacity ?? 0;
   const [organization, setOrganization] = useState<Organization | null>(null);
@@ -117,6 +117,68 @@ function EventCard({
   const capacityBadge = getCapacityBadge(capacityPercentage);
   const statusBadgeClassName = `absolute top-3 left-3 z-20 backdrop-blur-sm ${statusClassName}`;
 
+  if (variant === "organization") {
+    return (
+      <div className="h-full w-full">
+        <Link href={`/events/${event.id}`}>
+          <Card className="h-full w-full cursor-pointer gap-0 overflow-hidden p-0 transition-all duration-300 dark:brightness-90 dark:hover:brightness-100">
+            <div className="relative overflow-hidden">
+              <Badge className={statusBadgeClassName}>{statusLabel}</Badge>
+
+              {hasImageLoadError ? (
+                <Skeleton className="h-48 w-full rounded-none bg-muted" />
+              ) : (
+                <Image
+                  src={eventImageSource}
+                  alt={event.title}
+                  width={500}
+                  height={500}
+                  className="h-48 w-full border border-border object-cover"
+                  onError={() => setHasImageLoadError(true)}
+                />
+              )}
+            </div>
+
+            <div className="flex flex-col gap-3 p-4">
+              <div className="flex flex-col gap-1">
+                <h2 className="text-sm text-muted-foreground">
+                  {organizationName ?? "Organization"}
+                </h2>
+                <h3 className="text-2xl font-bold">{event.title}</h3>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Badge variant="outline">
+                  {CategoryIcon && (
+                    <CategoryIcon className={categoryConfig?.colorClass} />
+                  )}
+                  {event.category ?? "Uncategorized"}
+                </Badge>
+              </div>
+              <div className="flex gap-2">
+                <MapPin className="h-4 w-4 shrink-0 text-muted-foreground" />
+                <p className="text-sm text-muted-foreground">
+                  {event.address ?? "Location TBD"}
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <Calendar className="h-4 w-4 shrink-0 text-muted-foreground" />
+                <p className="text-sm text-muted-foreground">
+                  {formatDateTime(event.start_time)}
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <Users className="h-4 w-4 shrink-0 text-muted-foreground" />
+                <p className="text-sm text-muted-foreground">
+                  {attendeeCount + " / " + maxCapacity + " attendees"}
+                </p>
+              </div>
+            </div>
+          </Card>
+        </Link>
+      </div>
+    );
+  }
+
   if (variant === "featured") {
     return (
       <div className="w-full h-full">
@@ -135,7 +197,7 @@ function EventCard({
                   src={eventImageSource}
                   alt={event.title}
                   fill
-                  className="object-cover"
+                  className="border border-border object-cover"
                   onError={() => setHasImageLoadError(true)}
                 />
               )}
@@ -242,7 +304,7 @@ function EventCard({
                 alt={event.title}
                 width={500}
                 height={500}
-                className="w-full object-cover h-48"
+                className="h-48 w-full border border-border object-cover"
                 onError={() => setHasImageLoadError(true)}
               />
             )}

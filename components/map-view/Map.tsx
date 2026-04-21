@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import {
   Map,
   useMap,
@@ -228,10 +229,12 @@ export default function MapView({
                   >
                     {/* Event image header */}
                     <div className="relative h-24 w-full">
-                      <img
+                      <Image
                         src={eventImageUrl}
                         alt={event.title}
-                        className="w-full h-full object-cover"
+                        fill
+                        className="border border-border object-cover"
+                        sizes="224px"
                       />
                       {/* Close button */}
                       <button
@@ -281,10 +284,12 @@ export default function MapView({
                       isActive ? "border-primary" : "border-white group-hover:border-primary"
                     }`}
                   >
-                    <img
+                    <Image
                       src={eventImageUrl}
                       alt={event.title}
-                      className="w-full h-full object-cover"
+                      width={44}
+                      height={44}
+                      className="h-full w-full border border-border object-cover"
                     />
                   </div>
                   {/* Triangle point — color matches the circle border */}

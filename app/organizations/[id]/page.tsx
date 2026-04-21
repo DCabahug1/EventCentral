@@ -1,51 +1,27 @@
 "use client";
 
-import { useCallback, useEffect, useId, useRef, useState } from "react";
-import Image from "next/image";
+import {
+  use,
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
-import {
-  ArrowLeft,
-  Calendar,
-  ExternalLink,
-  ImageIcon,
-  Mail,
-  MapPin,
-  Pencil,
-  Phone,
-  Upload,
-  Building2,
-  Link as LinkIcon,
-} from "lucide-react";
+import { useRouter } from "next/navigation";
 import { APIProvider } from "@vis.gl/react-google-maps";
-import { LocationInput } from "@/components/ui/location-input";
-import {
-  Field,
-  FieldContent,
-  FieldDescription,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer";
-import { Skeleton } from "@/components/ui/skeleton";
-import {
-  cn,
-  formatUsPhoneDisplay,
-  formatUsPhoneInput,
-  phoneDigitsForTel,
-} from "@/lib/utils";
+import { Separator } from "@/components/ui/separator";
+import OrganizationBackLink from "@/components/organizations/OrganizationBackLink";
+import OrganizationBanner from "@/components/organizations/OrganizationBanner";
+import DeleteOrganizationDialog from "@/components/organizations/DeleteOrganizationDialog";
+import EditOrganizationDrawer from "@/components/organizations/EditOrganizationDrawer";
+import OrganizationEventsTabs from "@/components/organizations/OrganizationEventsTabs";
+import OrganizationPageSkeleton from "@/components/organizations/OrganizationPageSkeleton";
+import OrganizationProfileHeader from "@/components/organizations/OrganizationProfileHeader";
+import { formatUsPhoneDisplay } from "@/lib/utils";
 import {
   deleteOrganization,
   getOrganizationById,
@@ -54,150 +30,30 @@ import {
 import { getEventsByOrganizationId } from "@/lib/eventsServer";
 import { uploadOrganizationAsset } from "@/lib/bucketHandler";
 import { createClient } from "@/lib/supabase/client";
-import type { Organization, Event } from "@/lib/types";
-import EventCard from "@/components/events/EventCard";
+import { PostgrestError } from "@supabase/supabase-js";
+import type { Organization, Event, Profile } from "@/lib/types";
+import { getProfile } from "@/lib/profiles";
+import {
+  isOrganization,
+  normalizeWebsite,
+  ORG_EVENTS_PAGE_SIZE,
+  partitionEvents,
+} from "@/lib/organizationPage";
 
-function normalizeWebsite(input: string): string | null {
-  const t = input.trim();
-  if (!t) return null;
-  if (!/^https?:\/\//i.test(t)) return `https://${t}`;
-  return t;
-}
+type OrganizationPageProps = {
+  params: Promise<{ id: string }>;
+};
 
-function partitionEvents(events: Event[]) {
-  const now = new Date();
-  const upcoming: Event[] = [];
-  const past: Event[] = [];
-  for (const e of events) {
-    if (new Date(e.end_time) >= now) upcoming.push(e);
-    else past.push(e);
-  }
-  upcoming.sort(
-    (a, b) =>
-      new Date(a.start_time).getTime() - new Date(b.start_time).getTime(),
-  );
-  past.sort(
-    (a, b) =>
-      new Date(b.start_time).getTime() - new Date(a.start_time).getTime(),
-  );
-  return { upcoming, past };
-}
-
-function isOrganization(value: unknown): value is Organization {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    "id" in value &&
-    typeof (value as Organization).id === "number" &&
-    "name" in value
-  );
-}
-
-function EventCardSkeleton() {
-  return (
-    <div className="overflow-hidden  border border-border bg-card shadow-sm">
-      <Skeleton className="h-48 w-full " />
-      <div className="flex flex-col gap-3 p-4">
-        <Skeleton className="h-3 w-28" />
-        <Skeleton className="h-7 w-4/5 max-w-xs" />
-        <Skeleton className="h-3 w-20" />
-        <div className="flex gap-2">
-          <Skeleton className="size-4 shrink-0 " />
-          <Skeleton className="h-4 flex-1" />
-        </div>
-        <div className="flex gap-2">
-          <Skeleton className="size-4 shrink-0 " />
-          <Skeleton className="h-4 w-40" />
-        </div>
-        <Skeleton className="h-2 w-full" />
-        <Skeleton className="h-9 w-full" />
-      </div>
-    </div>
-  );
-}
-
-function OrganizationPageSkeleton() {
-  return (
-    <div className="min-h-svh bg-background">
-      <div className="mx-auto max-w-5xl px-4 pb-16 pt-6 sm:px-6 lg:px-8">
-        <div className="mb-6 flex items-center gap-2">
-          <Skeleton className="size-4 shrink-0 " />
-          <Skeleton className="h-5 w-36" />
-        </div>
-
-        <div className="relative overflow-hidden  border border-border bg-muted">
-          <Skeleton className="aspect-[21/9] w-full  sm:min-h-[180px]" />
-        </div>
-
-        <div className="relative z-10 -mt-12 sm:-mt-14 md:-mt-16">
-          <Card className="flex flex-col gap-4  border-border/80 bg-card/95 shadow-sm backdrop-blur-sm sm:flex-row sm:items-center sm:gap-4 sm:px-6 sm:py-4">
-            <Skeleton className="size-24 shrink-0  border-4 border-background sm:size-28 md:size-32" />
-            <CardContent className="w-full flex-1 space-y-4 p-5 sm:p-6">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                <Skeleton className="h-9 w-full max-w-[min(100%,20rem)] sm:h-10" />
-                <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center sm:justify-end">
-                  <Skeleton className="h-9 w-full sm:h-9 sm:w-[148px]" />
-                  <Skeleton className="h-9 w-full sm:h-9 sm:w-[76px]" />
-                  <Skeleton className="h-9 w-full sm:h-9 sm:w-[92px]" />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-full max-w-2xl" />
-                <Skeleton className="h-4 max-w-xl w-4/5" />
-              </div>
-              <div className="flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:flex-wrap sm:gap-x-8 sm:gap-y-2">
-                <Skeleton className="h-4 w-44" />
-                <Skeleton className="h-4 w-32" />
-                <Skeleton className="h-4 w-48" />
-                <Skeleton className="h-4 w-36" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <section className="mt-12 space-y-10">
-          <div>
-            <div className="mb-4 flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
-              <Skeleton className="h-7 w-44" />
-              <Skeleton className="h-5 w-20" />
-            </div>
-            <div className="grid gap-6 sm:grid-cols-2">
-              <EventCardSkeleton />
-              <EventCardSkeleton />
-            </div>
-          </div>
-          <div>
-            <div className="mb-4 flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
-              <Skeleton className="h-7 w-36" />
-              <Skeleton className="h-5 w-20" />
-            </div>
-            <div className="grid gap-6 sm:grid-cols-2">
-              <EventCardSkeleton />
-              <EventCardSkeleton />
-            </div>
-          </div>
-        </section>
-      </div>
-    </div>
-  );
-}
-
-export default function OrganizationPage() {
-  const params = useParams();
+export default function OrganizationPage({ params }: OrganizationPageProps) {
+  const { id: idParam } = use(params);
   const router = useRouter();
-  const idParam = params.id;
-  const orgId =
-    typeof idParam === "string"
-      ? Number(idParam)
-      : Array.isArray(idParam)
-        ? Number(idParam[0])
-        : NaN;
+  const orgId = Number(idParam);
 
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [org, setOrg] = useState<Organization | null>(null);
   const [events, setEvents] = useState<Event[]>([]);
+  const [founderProfile, setFounderProfile] = useState<Profile | null>(null);
   const [isOwner, setIsOwner] = useState(false);
 
   const [editOpen, setEditOpen] = useState(false);
@@ -206,6 +62,8 @@ export default function OrganizationPage() {
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [formError, setFormError] = useState("");
+  const [upcomingPage, setUpcomingPage] = useState(1);
+  const [pastPage, setPastPage] = useState(1);
 
   const avatarInputId = useId();
   const bannerInputId = useId();
@@ -228,6 +86,7 @@ export default function OrganizationPage() {
       setNotFound(true);
       setLoading(false);
       setOrg(null);
+      setFounderProfile(null);
       return;
     }
 
@@ -245,8 +104,20 @@ export default function OrganizationPage() {
         setNotFound(true);
         setOrg(null);
         setEvents([]);
+        setFounderProfile(null);
         setIsOwner(false);
         return;
+      }
+
+      if (rawOrg.user_id) {
+        const founderResult = await getProfile(rawOrg.user_id);
+        if (founderResult && !(founderResult instanceof PostgrestError)) {
+          setFounderProfile(founderResult);
+        } else {
+          setFounderProfile(null);
+        }
+      } else {
+        setFounderProfile(null);
       }
 
       const {
@@ -316,9 +187,56 @@ export default function OrganizationPage() {
     const container = formScrollContainerRef.current;
     const error = formErrorRef.current;
     if (!container || !error) return;
-    const errorTop = error.getBoundingClientRect().top - container.getBoundingClientRect().top;
+    const errorTop =
+      error.getBoundingClientRect().top -
+      container.getBoundingClientRect().top;
     container.scrollBy({ top: errorTop, behavior: "smooth" });
   }, [formError]);
+
+  const { upcoming, past } = useMemo(
+    () => partitionEvents(events),
+    [events],
+  );
+
+  useEffect(() => {
+    setUpcomingPage(1);
+    setPastPage(1);
+  }, [orgId]);
+
+  useEffect(() => {
+    const maxUp = Math.max(
+      1,
+      Math.ceil(upcoming.length / ORG_EVENTS_PAGE_SIZE),
+    );
+    setUpcomingPage((p) => Math.min(p, maxUp));
+  }, [upcoming.length]);
+
+  useEffect(() => {
+    const maxPast = Math.max(
+      1,
+      Math.ceil(past.length / ORG_EVENTS_PAGE_SIZE),
+    );
+    setPastPage((p) => Math.min(p, maxPast));
+  }, [past.length]);
+
+  const paginatedUpcoming = useMemo(() => {
+    const start = (upcomingPage - 1) * ORG_EVENTS_PAGE_SIZE;
+    return upcoming.slice(start, start + ORG_EVENTS_PAGE_SIZE);
+  }, [upcoming, upcomingPage]);
+
+  const paginatedPast = useMemo(() => {
+    const start = (pastPage - 1) * ORG_EVENTS_PAGE_SIZE;
+    return past.slice(start, start + ORG_EVENTS_PAGE_SIZE);
+  }, [past, pastPage]);
+
+  const totalUpcomingPages = Math.max(
+    1,
+    Math.ceil(upcoming.length / ORG_EVENTS_PAGE_SIZE),
+  );
+  const totalPastPages = Math.max(
+    1,
+    Math.ceil(past.length / ORG_EVENTS_PAGE_SIZE),
+  );
 
   const handleEditSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -446,7 +364,7 @@ export default function OrganizationPage() {
 
   if (notFound || !org) {
     return (
-      <div className="min-h-svh flex flex-col items-center justify-center gap-4 bg-background px-4">
+      <div className="flex min-h-svh flex-col items-center justify-center gap-4 bg-background px-4">
         <h1 className="text-xl font-semibold">Organization not found</h1>
         <p className="text-center text-sm text-muted-foreground">
           This organization does not exist or you do not have access.
@@ -458,495 +376,82 @@ export default function OrganizationPage() {
     );
   }
 
-  const { upcoming, past } = partitionEvents(events);
-  const foundedYear = new Date(org.created_at).getFullYear();
-  const bannerSrc = org.banner_url;
-  const avatarSrc = org.avatar_url;
-
   return (
     <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!}>
-      <div className="min-h-svh bg-background">
-        <div className="mx-auto max-w-5xl px-4 pb-16 pt-6 sm:px-6 lg:px-8">
-          <Link
-            href="/"
-            className="mb-6 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-          >
-            <ArrowLeft className="size-4" />
-            Back to Discover
-          </Link>
+      <div className="min-h-svh overflow-x-hidden bg-muted/30">
+        <OrganizationBanner bannerUrl={org.banner_url} />
 
-          <div className="relative overflow-hidden  border border-border bg-muted">
-            <div className="relative aspect-[21/9] w-full sm:min-h-[180px]">
-              {bannerSrc ? (
-                <Image
-                  src={bannerSrc}
-                  alt=""
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 1280px) 100vw, 1024px"
-                  priority
-                />
-              ) : (
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-muted to-muted" />
-              )}
-            </div>
-          </div>
+        <div className="mx-auto flex max-w-5xl flex-col gap-8 px-4 pb-16 pt-6 sm:px-6 lg:px-8">
+          <OrganizationBackLink />
 
-          <div className="relative z-10 -mt-12 sm:-mt-14 md:-mt-16">
-            <Card className="flex-1 sm:flex-row items-center gap-4 p-6">
-              <div
-                className={cn(
-                  "relative size-48 sm:size-24 shrink-0 overflow-hidden  border-4 border-background bg-card shadow-lg sm:size-28 md:size-32",
-                )}
-              >
-                {avatarSrc ? (
-                  <Image
-                    src={avatarSrc}
-                    alt=""
-                    fill
-                    className="object-cover"
-                    sizes="128px"
-                  />
-                ) : (
-                  <div className="flex size-full items-center justify-center bg-primary/20 text-2xl font-bold text-primary sm:text-3xl">
-                    {org.name.slice(0, 1).toUpperCase()}
-                  </div>
-                )}
-              </div>
-              <CardContent className="space-y-4 ">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                  <div className="space-y-1">
-                    <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
-                      {org.name}
-                    </h1>
-                  </div>
-                  <div className="flex shrink-0 flex-col gap-2 sm:flex-row sm:items-center">
-                    {org.website ? (
-                      <Button asChild className="w-full sm:w-auto" size="sm">
-                        <a
-                          href={normalizeWebsite(org.website) ?? org.website}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          <ExternalLink className="size-4" />
-                          Visit website
-                        </a>
-                      </Button>
-                    ) : null}
-                    {isOwner ? (
-                      <>
-                        <Button
-                          type="button"
-                          variant="secondary"
-                          size="sm"
-                          className="w-full sm:w-auto"
-                          onClick={() => setEditOpen(true)}
-                        >
-                          <Pencil className="size-4" />
-                          Edit
-                        </Button>
-                      </>
-                    ) : null}
-                  </div>
-                </div>
+          <OrganizationProfileHeader
+            org={org}
+            founderProfile={founderProfile}
+            isOwner={isOwner}
+            onEdit={() => setEditOpen(true)}
+          />
 
-                {org.description ? (
-                  <p className="text-muted-foreground leading-relaxed">
-                    {org.description}
-                  </p>
-                ) : null}
+          <Separator />
 
-                <div className="flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:flex-wrap sm:gap-x-8 sm:gap-y-2">
-                  {org.location ? (
-                    <div className="flex items-start gap-2 text-sm">
-                      <MapPin className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
-                      <span>{org.location}</span>
-                    </div>
-                  ) : null}
-                  <div className="flex items-center gap-2 text-sm">
-                    <Calendar className="size-4 shrink-0 text-muted-foreground" />
-                    <span>Founded {foundedYear}</span>
-                  </div>
-                  {org.email ? (
-                    <a
-                      href={`mailto:${org.email}`}
-                      className="flex items-center gap-2 text-sm text-primary hover:underline"
-                    >
-                      <Mail className="size-4 shrink-0" />
-                      {org.email}
-                    </a>
-                  ) : null}
-                  {phoneDigitsForTel(org.phone) ? (
-                    <a
-                      href={`tel:${phoneDigitsForTel(org.phone)}`}
-                      className="flex items-center gap-2 text-sm text-primary hover:underline"
-                    >
-                      <Phone className="size-4 shrink-0" />
-                      {formatUsPhoneDisplay(org.phone)}
-                    </a>
-                  ) : null}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          <section className="mt-12 space-y-10">
-            <div>
-              <div className="mb-4 flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
-                <h2 className="text-xl font-semibold">Upcoming events</h2>
-                <span className="text-sm text-muted-foreground">
-                  {upcoming.length} {upcoming.length === 1 ? "event" : "events"}
-                </span>
-              </div>
-              {upcoming.length === 0 ? (
-                <div className="py-12 text-center text-sm text-muted-foreground">
-                  No upcoming events scheduled yet.
-                </div>
-              ) : (
-                <div className="grid gap-6 sm:grid-cols-2">
-                  {upcoming.map((ev) => (
-                    <EventCard key={ev.id} event={ev} org={org} />
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div>
-              <div className="mb-4 flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
-                <h2 className="text-xl font-semibold">Past events</h2>
-                <span className="text-sm text-muted-foreground">
-                  {past.length} {past.length === 1 ? "event" : "events"}
-                </span>
-              </div>
-              {past.length === 0 ? (
-                <div className="py-12 text-center text-sm text-muted-foreground">
-                  No past events yet.
-                </div>
-              ) : (
-                <div className="grid gap-6 sm:grid-cols-2">
-                  {past.map((ev) => (
-                    <EventCard key={ev.id} event={ev} org={org} />
-                  ))}
-                </div>
-              )}
-            </div>
-          </section>
+          <OrganizationEventsTabs
+            org={org}
+            upcoming={upcoming}
+            past={past}
+            paginatedUpcoming={paginatedUpcoming}
+            paginatedPast={paginatedPast}
+            upcomingPage={upcomingPage}
+            pastPage={pastPage}
+            totalUpcomingPages={totalUpcomingPages}
+            totalPastPages={totalPastPages}
+            onUpcomingPageChange={setUpcomingPage}
+            onPastPageChange={setPastPage}
+          />
         </div>
 
         {deleteOpen ? (
-          <div
-            className="fixed inset-0 z-100 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="delete-org-title"
-            onClick={(e) => {
-              if (e.target === e.currentTarget) setDeleteOpen(false);
-            }}
-          >
-            <Card className="w-full max-w-md border-border shadow-xl">
-              <CardContent className="space-y-4 p-6">
-                <h2 id="delete-org-title" className="text-lg font-semibold">
-                  Delete organization?
-                </h2>
-                <p className="text-sm text-muted-foreground">
-                  This will permanently remove{" "}
-                  <span className="font-medium text-foreground">
-                    {org.name}
-                  </span>
-                  . This cannot be undone.
-                </p>
-                {deleteError ? (
-                  <p className="text-sm text-destructive">{deleteError}</p>
-                ) : null}
-                <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setDeleteOpen(false)}
-                    disabled={deleting}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    onClick={handleDelete}
-                    disabled={deleting}
-                  >
-                    {deleting ? "Deleting…" : "Delete organization"}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          <DeleteOrganizationDialog
+            orgName={org.name}
+            deleteError={deleteError}
+            deleting={deleting}
+            onClose={() => setDeleteOpen(false)}
+            onConfirm={handleDelete}
+          />
         ) : null}
 
-        <Drawer open={editOpen} onOpenChange={setEditOpen}>
-          <DrawerContent className="flex max-h-[92vh] min-h-0 flex-col gap-0 overflow-hidden p-0">
-            <form
-              onSubmit={handleEditSubmit}
-              className="flex min-h-0 flex-1 flex-col"
-            >
-              <DrawerHeader className="shrink-0">
-                <DrawerTitle>Edit organization</DrawerTitle>
-              </DrawerHeader>
-              <div ref={formScrollContainerRef} className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-2 [-webkit-overflow-scrolling:touch]">
-                <FieldGroup className="gap-5">
-                  <Field>
-                    <FieldLabel
-                      htmlFor={avatarInputId}
-                      className="text-muted-foreground"
-                    >
-                      Avatar
-                    </FieldLabel>
-                    <FieldContent className="gap-2">
-                      <label
-                        htmlFor={avatarInputId}
-                        className={cn(
-                          "flex size-32 shrink-0 cursor-pointer flex-col items-center justify-center overflow-hidden  border-2 border-dashed border-border transition-colors hover:border-muted-foreground",
-                        )}
-                      >
-                        {avatarPreview ? (
-                          // eslint-disable-next-line @next/next/no-img-element -- blob preview
-                          <img
-                            src={avatarPreview}
-                            alt=""
-                            className="size-full object-cover"
-                          />
-                        ) : avatarSrc ? (
-                          <Image
-                            src={avatarSrc}
-                            alt=""
-                            width={128}
-                            height={128}
-                            className="size-full object-cover"
-                          />
-                        ) : (
-                          <>
-                            <Upload className="text-muted-foreground mb-2 size-5" />
-                            <span className="text-muted-foreground text-center text-xs">
-                              Square image
-                            </span>
-                          </>
-                        )}
-                        <Input
-                          id={avatarInputId}
-                          type="file"
-                          accept="image/jpeg,image/png,image/webp"
-                          className="hidden"
-                          onChange={(e) =>
-                            setAvatarFile(e.target.files?.[0] ?? null)
-                          }
-                        />
-                      </label>
-                    </FieldContent>
-                  </Field>
-
-                  <Field>
-                    <FieldLabel
-                      htmlFor={bannerInputId}
-                      className="text-muted-foreground"
-                    >
-                      Banner
-                    </FieldLabel>
-                    <FieldDescription className="text-xs text-muted-foreground">
-                      Wide image recommended.
-                    </FieldDescription>
-                    <FieldContent className="gap-2">
-                      <label
-                        htmlFor={bannerInputId}
-                        className={cn(
-                          "flex h-48 w-full max-w-[600px] cursor-pointer flex-col items-center justify-center overflow-hidden  border-2 border-dashed border-border transition-colors hover:border-muted-foreground",
-                        )}
-                      >
-                        {bannerPreview ? (
-                          // eslint-disable-next-line @next/next/no-img-element -- blob preview
-                          <img
-                            src={bannerPreview}
-                            alt=""
-                            className="h-full w-full object-cover"
-                          />
-                        ) : bannerSrc ? (
-                          <Image
-                            src={bannerSrc}
-                            alt=""
-                            width={800}
-                            height={200}
-                            className="h-full w-full object-cover"
-                          />
-                        ) : (
-                          <>
-                            <ImageIcon className="text-muted-foreground mb-2 size-5" />
-                            <span className="text-muted-foreground text-sm">
-                              Upload banner
-                            </span>
-                          </>
-                        )}
-                        <Input
-                          id={bannerInputId}
-                          type="file"
-                          accept="image/jpeg,image/png,image/webp"
-                          className="hidden"
-                          onChange={(e) =>
-                            setBannerFile(e.target.files?.[0] ?? null)
-                          }
-                        />
-                      </label>
-                    </FieldContent>
-                  </Field>
-
-                  <Field>
-                    <FieldLabel
-                      htmlFor="edit-name"
-                      className="text-muted-foreground"
-                    >
-                      Organization name{" "}
-                      <span className="text-destructive" aria-hidden>
-                        *
-                      </span>
-                    </FieldLabel>
-                    <FieldContent>
-                      <div className="relative">
-                        <Building2
-                          className="text-muted-foreground pointer-events-none absolute left-3 top-1/2 size-[18px] -translate-y-1/2"
-                          aria-hidden
-                        />
-                        <Input
-                          id="edit-name"
-                          placeholder="e.g. SoundWave Productions"
-                          required
-                          className="pl-10"
-                          value={name}
-                          onChange={(e) => setName(e.target.value)}
-                        />
-                      </div>
-                    </FieldContent>
-                  </Field>
-
-                  <Field>
-                    <FieldLabel
-                      htmlFor="edit-description"
-                      className="text-muted-foreground"
-                    >
-                      Description
-                    </FieldLabel>
-                    <FieldContent>
-                      <Textarea
-                        id="edit-description"
-                        className="min-h-24 resize-none"
-                        value={description}
-                        placeholder="Tell people about your organization..."
-                        onChange={(e) => setDescription(e.target.value)}
-                      />
-                    </FieldContent>
-                  </Field>
-
-                  <Field>
-                    <FieldLabel
-                      htmlFor="edit-location"
-                      className="text-muted-foreground"
-                    >
-                      Location
-                    </FieldLabel>
-                    <FieldContent>
-                      <LocationInput
-                        id="edit-location"
-                        placeholder="City, neighborhood, state, or country"
-                        value={location}
-                        onChange={setLocation}
-                        mapPinSide="left"
-                      />
-                    </FieldContent>
-                  </Field>
-
-                  <Field>
-                    <FieldLabel className="text-muted-foreground">
-                      Contact &amp; links
-                    </FieldLabel>
-                    <FieldContent className="gap-3">
-                      <div className="relative">
-                        <LinkIcon
-                          className="text-muted-foreground pointer-events-none absolute left-3 top-1/2 size-[18px] -translate-y-1/2"
-                          aria-hidden
-                        />
-                        <Input
-                          id="edit-website"
-                          type="url"
-                          inputMode="url"
-                          placeholder="Website URL"
-                          className="pl-10"
-                          value={website}
-                          onChange={(e) => setWebsite(e.target.value)}
-                        />
-                      </div>
-                      <div className="relative">
-                        <Mail
-                          className="text-muted-foreground pointer-events-none absolute left-3 top-1/2 size-[18px] -translate-y-1/2"
-                          aria-hidden
-                        />
-                        <Input
-                          id="edit-email"
-                          type="email"
-                          placeholder="Contact email"
-                          className="pl-10"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                        />
-                      </div>
-                      <div className="relative">
-                        <Phone
-                          className="text-muted-foreground pointer-events-none absolute left-3 top-1/2 size-[18px] -translate-y-1/2"
-                          aria-hidden
-                        />
-                        <Input
-                          id="edit-phone"
-                          type="tel"
-                          inputMode="numeric"
-                          autoComplete="tel"
-                          placeholder="Phone"
-                          className="pl-10"
-                          value={phone}
-                          onChange={(e) =>
-                            setPhone(formatUsPhoneInput(e.target.value))
-                          }
-                        />
-                      </div>
-                      {/* Error message */}
-                      {formError ? (
-                        <FieldError ref={formErrorRef} id="edit-org-error" className="mb-4">
-                          {formError}
-                        </FieldError>
-                      ) : null}
-                    </FieldContent>
-                  </Field>
-                </FieldGroup>
-              </div>
-              <DrawerFooter className="shrink-0 border-t bg-background pt-4">
-                <div className="flex w-full flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    onClick={() => {
-                      setEditOpen(false);
-                      setDeleteError("");
-                      setDeleteOpen(true);
-                    }}
-                  >
-                    Delete organization
-                  </Button>
-                  <DrawerClose asChild>
-                    <Button type="button" variant="outline">
-                      Cancel
-                    </Button>
-                  </DrawerClose>
-                  <Button type="submit" disabled={saving}>
-                    {saving ? "Saving…" : "Save changes"}
-                  </Button>
-                </div>
-              </DrawerFooter>
-            </form>
-          </DrawerContent>
-        </Drawer>
+        <EditOrganizationDrawer
+          open={editOpen}
+          onOpenChange={setEditOpen}
+          onSubmit={handleEditSubmit}
+          avatarInputId={avatarInputId}
+          bannerInputId={bannerInputId}
+          formScrollContainerRef={formScrollContainerRef}
+          formErrorRef={formErrorRef}
+          name={name}
+          onNameChange={setName}
+          description={description}
+          onDescriptionChange={setDescription}
+          location={location}
+          onLocationChange={setLocation}
+          website={website}
+          onWebsiteChange={setWebsite}
+          email={email}
+          onEmailChange={setEmail}
+          phone={phone}
+          onPhoneChange={setPhone}
+          avatarPreview={avatarPreview}
+          bannerPreview={bannerPreview}
+          avatarUrl={org.avatar_url}
+          bannerUrl={org.banner_url}
+          onAvatarFileChange={setAvatarFile}
+          onBannerFileChange={setBannerFile}
+          formError={formError}
+          saving={saving}
+          onRequestDelete={() => {
+            setEditOpen(false);
+            setDeleteError("");
+            setDeleteOpen(true);
+          }}
+        />
       </div>
     </APIProvider>
   );

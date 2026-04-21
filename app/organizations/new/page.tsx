@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
   Upload,
@@ -228,11 +229,13 @@ export default function Page() {
                       )}
                     >
                       {avatarPreview ? (
-                        // eslint-disable-next-line @next/next/no-img-element -- local blob preview
-                        <img
+                        <Image
                           src={avatarPreview}
                           alt=""
-                          className="size-full object-cover"
+                          width={128}
+                          height={128}
+                          unoptimized
+                          className="size-full border border-border object-cover"
                         />
                       ) : (
                         <>
@@ -273,11 +276,13 @@ export default function Page() {
                       )}
                     >
                       {bannerPreview ? (
-                        // eslint-disable-next-line @next/next/no-img-element -- local blob preview
-                        <img
+                        <Image
                           src={bannerPreview}
                           alt=""
-                          className="h-full w-full object-cover"
+                          width={800}
+                          height={112}
+                          unoptimized
+                          className="h-full w-full border border-border object-cover"
                         />
                       ) : (
                         <>

@@ -150,7 +150,7 @@ function page() {
             alt="EventCentral"
             width={800}
             height={800}
-            className="hidden sm:block h-full object-cover"
+            className="hidden sm:block h-full border border-border object-cover"
           />
         </Card>
       </div>
