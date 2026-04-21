@@ -41,9 +41,7 @@ export default function OrganizationsSection({
             <h2 className="text-2xl font-bold">Organizations</h2>
           </div>
           <p className="pl-3 text-sm text-muted-foreground">
-            {organizations.length === 0
-              ? "You haven't created any organizations yet."
-              : `${organizations.length} ${organizations.length === 1 ? "organization" : "organizations"}`}
+            Manage your organizations.
           </p>
         </div>
         <Button
