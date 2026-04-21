@@ -62,7 +62,7 @@ function page() {
         transition={{ duration: 0.35, ease: "easeOut" }}
       >
         <div className="w-full max-w-md">
-          <h1 className="text-3xl font-bold tracking-tight">Create an account</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Create an account</h1>
           <p className="text-sm text-muted-foreground">
             Join EventCentral to create and manage your events
           </p>

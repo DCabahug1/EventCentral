@@ -365,7 +365,7 @@ export default function OrganizationPage({ params }: OrganizationPageProps) {
   if (notFound || !org) {
     return (
       <div className="flex min-h-svh flex-col items-center justify-center gap-4 bg-background px-4">
-        <h1 className="text-3xl font-bold tracking-tight">Organization not found</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Organization not found</h1>
         <p className="text-center text-sm text-muted-foreground">
           This organization does not exist or you do not have access.
         </p>

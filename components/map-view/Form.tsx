@@ -268,7 +268,7 @@ function Form({
       <div className="hidden md:flex flex-col gap-1">
         <div className="flex items-center gap-2">
           <div className="h-5 w-1 shrink-0 bg-primary" aria-hidden />
-          <h1 className="text-3xl font-bold tracking-tight">Map View</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Map View</h1>
         </div>
         <h2 className="pl-3 text-sm text-muted-foreground">
           Filter events on the map

@@ -44,7 +44,7 @@ export default function OrganizationProfileHeader({
       </div>
       <div className="flex min-w-0 w-full flex-1 flex-col gap-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-          <h1 className="min-w-0 flex-1 text-3xl font-bold tracking-tight">
+          <h1 className="min-w-0 flex-1 text-2xl font-bold tracking-tight">
             {org.name}
           </h1>
           {org.website || isOwner ? (

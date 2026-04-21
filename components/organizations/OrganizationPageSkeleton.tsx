@@ -86,14 +86,8 @@ export default function OrganizationPageSkeleton() {
         {/* OrganizationEventsTabs */}
         <section className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-2">
-              <div
-                className="h-5 w-1 shrink-0 bg-primary"
-                aria-hidden
-              />
-              <Skeleton className="h-8 w-32" />
-            </div>
-            <Skeleton className="h-4 w-full max-w-md pl-3" />
+            <Skeleton className="h-8 w-32" />
+            <Skeleton className="h-4 w-full max-w-md" />
           </div>
 
           <div className="flex w-full max-w-md gap-2 sm:w-fit">
