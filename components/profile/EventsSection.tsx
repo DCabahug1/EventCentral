@@ -13,8 +13,8 @@ import EmptyState from "@/components/profile/EmptyState";
 type Props = {
   upcoming: Event[];
   past: Event[];
-  paginatedUpcoming: Event[];
-  paginatedPast: Event[];
+  upcomingCount: number;
+  pastCount: number;
   upcomingPage: number;
   totalUpcomingPages: number;
   pastPage: number;
@@ -27,8 +27,8 @@ type Props = {
 export default function EventsSection({
   upcoming,
   past,
-  paginatedUpcoming,
-  paginatedPast,
+  upcomingCount,
+  pastCount,
   upcomingPage,
   totalUpcomingPages,
   pastPage,
@@ -38,7 +38,7 @@ export default function EventsSection({
   onPastPageChange,
 }: Props) {
   const [tab, setTab] = useState<"upcoming" | "past">("upcoming");
-  const tabCount = tab === "upcoming" ? upcoming.length : past.length;
+  const tabCount = tab === "upcoming" ? upcomingCount : pastCount;
 
   return (
     <motion.section
@@ -68,7 +68,7 @@ export default function EventsSection({
         </TabsList>
 
         <TabsContent value="upcoming" className="flex flex-col gap-4">
-          {upcoming.length === 0 ? (
+          {upcomingCount === 0 ? (
             <EmptyState
               message="No upcoming events found."
               action={
@@ -85,7 +85,7 @@ export default function EventsSection({
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.25, ease: "easeOut" }}
               >
-                {paginatedUpcoming.map((event, index) => (
+                {upcoming.map((event, index) => (
                   <motion.div
                     key={event.id}
                     initial={{ opacity: 0, y: 10 }}
@@ -100,7 +100,7 @@ export default function EventsSection({
                 label="Attending events"
                 page={upcomingPage}
                 totalPages={totalUpcomingPages}
-                totalItems={upcoming.length}
+                totalItems={upcomingCount}
                 pageSize={eventsPageSize}
                 onPageChange={onUpcomingPageChange}
               />
@@ -109,7 +109,7 @@ export default function EventsSection({
         </TabsContent>
 
         <TabsContent value="past" className="flex flex-col gap-4">
-          {past.length === 0 ? (
+          {pastCount === 0 ? (
             <EmptyState
               message="No past events found."
               action={
@@ -126,7 +126,7 @@ export default function EventsSection({
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.25, ease: "easeOut" }}
               >
-                {paginatedPast.map((event, index) => (
+                {past.map((event, index) => (
                   <motion.div
                     key={event.id}
                     initial={{ opacity: 0, y: 10 }}
@@ -141,7 +141,7 @@ export default function EventsSection({
                 label="Previously attended events"
                 page={pastPage}
                 totalPages={totalPastPages}
-                totalItems={past.length}
+                totalItems={pastCount}
                 pageSize={eventsPageSize}
                 onPageChange={onPastPageChange}
               />

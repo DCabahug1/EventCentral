@@ -10,7 +10,7 @@ import OrgCard from "@/components/profile/OrgCard";
 
 type Props = {
   organizations: Organization[];
-  paginatedOrganizations: Organization[];
+  organizationsCount: number;
   organizationsPage: number;
   totalOrganizationPages: number;
   organizationsPageSize: number;
@@ -20,7 +20,7 @@ type Props = {
 
 export default function OrganizationsSection({
   organizations,
-  paginatedOrganizations,
+  organizationsCount,
   organizationsPage,
   totalOrganizationPages,
   organizationsPageSize,
@@ -41,8 +41,8 @@ export default function OrganizationsSection({
         </div>
         <div className="flex shrink-0 flex-wrap items-center justify-end gap-3">
           <span className="text-sm text-muted-foreground">
-            {organizations.length}{" "}
-            {organizations.length === 1 ? "organization" : "organizations"}
+            {organizationsCount}{" "}
+            {organizationsCount === 1 ? "organization" : "organizations"}
           </span>
           <Button
             type="button"
@@ -56,7 +56,7 @@ export default function OrganizationsSection({
         </div>
       </div>
 
-      {organizations.length === 0 ? (
+      {organizationsCount === 0 ? (
         <EmptyState
           message="No organizations found."
           action={
@@ -69,7 +69,7 @@ export default function OrganizationsSection({
       ) : (
         <div className="flex flex-col gap-4">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {paginatedOrganizations.map((org, index) => (
+            {organizations.map((org, index) => (
               <motion.div
                 key={org.id}
                 initial={{ opacity: 0, y: 10 }}
@@ -84,7 +84,7 @@ export default function OrganizationsSection({
             label="Organizations"
             page={organizationsPage}
             totalPages={totalOrganizationPages}
-            totalItems={organizations.length}
+            totalItems={organizationsCount}
             pageSize={organizationsPageSize}
             onPageChange={onPageChange}
           />
