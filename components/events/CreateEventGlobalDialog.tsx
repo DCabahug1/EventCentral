@@ -10,6 +10,7 @@ import { getOrganizationsByUserId } from "@/lib/organizations";
 import type { Organization, Profile } from "@/lib/types";
 import CreateEventForm from "@/components/events/CreateEventForm";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Dialog,
   DialogClose,
@@ -90,8 +91,24 @@ export default function CreateEventGlobalDialog({
               Sign in to host events.
             </div>
           ) : loading ? (
-            <div className="p-4 text-sm text-muted-foreground sm:p-6">
-              Loading…
+            <div className="flex flex-col gap-5 p-4 sm:p-6">
+              <div className="flex flex-col gap-2">
+                <Skeleton className="h-4 w-36" />
+                <Skeleton className="h-9 w-full" />
+              </div>
+              <Skeleton className="h-4 w-52" />
+              <div className="flex flex-col gap-2">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-48 w-full" />
+              </div>
+              <div className="flex flex-col gap-2">
+                <Skeleton className="h-4 w-20" />
+                <Skeleton className="h-9 w-full" />
+              </div>
+              <div className="flex flex-col gap-2">
+                <Skeleton className="h-4 w-28" />
+                <Skeleton className="h-9 w-full" />
+              </div>
             </div>
           ) : orgs.length === 0 ? (
             <div className="flex flex-col gap-5 p-4 sm:p-6">
