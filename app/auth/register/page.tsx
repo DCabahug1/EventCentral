@@ -11,6 +11,7 @@ import { signUpWithEmailAndPassword, signInWithGoogle } from "@/lib/auth";
 import { AuthError } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
 import { motion } from "motion/react";
+import { FormRequiredLegend, RequiredMark } from "@/components/ui/form-field-hints";
 
 function page() {
   const [showPassword, setShowPassword] = useState(false);
@@ -62,7 +63,7 @@ function page() {
         transition={{ duration: 0.35, ease: "easeOut" }}
       >
         <div className="w-full max-w-md">
-          <h1 className="text-2xl font-bold">Create an account</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Create an account</h1>
           <p className="text-sm text-muted-foreground">
             Join EventCentral to create and manage your events
           </p>
@@ -71,8 +72,11 @@ function page() {
           onSubmit={handleSubmit}
           className="flex w-full max-w-md flex-col gap-4"
         >
+          <FormRequiredLegend />
           <div className="flex flex-col gap-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">
+              Email <RequiredMark />
+            </Label>
             <Input
               type="email"
               id="email"
@@ -84,7 +88,9 @@ function page() {
             />
           </div>
           <div className="flex flex-col gap-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">
+              Password <RequiredMark />
+            </Label>
             <div className="flex items-center gap-2">
               <Input
                 type={showPassword ? "text" : "password"}
@@ -108,7 +114,9 @@ function page() {
             </div>
           </div>
           <div className="flex flex-col gap-2">
-            <Label htmlFor="confirmPassword">Confirm Password</Label>
+            <Label htmlFor="confirmPassword">
+              Confirm password <RequiredMark />
+            </Label>
             <Input
               type="password"
               id="confirmPassword"

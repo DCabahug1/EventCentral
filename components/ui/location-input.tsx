@@ -28,6 +28,8 @@ export function LocationInput({
   mapPinSide = "right",
   anchorClassName,
   inputClassName,
+  /** When false, an empty field is reported as invalid (required location flows). Default true (e.g. map filter “any location”). */
+  treatEmptyAsValid = true,
 }: {
   id?: string;
   value: string;
@@ -43,6 +45,7 @@ export function LocationInput({
   mapPinSide?: "left" | "right";
   anchorClassName?: string;
   inputClassName?: string;
+  treatEmptyAsValid?: boolean;
 }) {
   const placesLib = useMapsLibrary("places");
   const [autocompleteService, setAutocompleteService] =
@@ -91,8 +94,10 @@ export function LocationInput({
     if (readOnly) return;
     const val = e.target.value;
     onChange(val);
-    // Empty field = no region chosen; treat as valid for optional "all locations" search.
-    onValidityChange?.(val.trim() === "" ? true : false);
+    // Empty: valid only when treatEmptyAsValid (e.g. map filter). Otherwise invalid until a suggestion is chosen.
+    onValidityChange?.(
+      val.trim() === "" ? treatEmptyAsValid : false,
+    );
     setActiveIndex(-1);
     fetchSuggestions(val);
   };

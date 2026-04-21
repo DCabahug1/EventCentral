@@ -16,7 +16,7 @@ const suggestionItemClass =
 
 // Text input with Google Places region autocomplete.
 // Supports countries, states, cities, and neighborhoods.
-// Supports a read-only mode for when geolocation is active — clicking the input
+// Supports read only mode when geolocation is active. Clicking the input
 // in that state calls onActivate (which re-enables manual editing) instead of
 // opening the suggestions panel.
 export default function LocationInput({

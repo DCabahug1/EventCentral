@@ -14,16 +14,16 @@ export function todayDateString(): string {
 }
 
 export function daysFromNowDateString(days: number): string {
-  const d = new Date();
-  d.setDate(d.getDate() + days);
-  return toDateString(d);
+  const targetDate = new Date();
+  targetDate.setDate(targetDate.getDate() + days);
+  return toDateString(targetDate);
 }
 
 // Returns a YYYY-MM-DD string exactly one year after the given date string
 export function addOneYear(dateStr: string): string {
-  const d = new Date(dateStr);
-  d.setFullYear(d.getFullYear() + 1);
-  return toDateString(d);
+  const targetDate = new Date(dateStr);
+  targetDate.setFullYear(targetDate.getFullYear() + 1);
+  return toDateString(targetDate);
 }
 
 // Returns the distance in miles between two lat/lng coordinate pairs
@@ -33,16 +33,16 @@ export function distanceBetweenLocations(
   lat2: number,
   lng2: number
 ): number {
-  const R = 3958.8; // Earth's radius in miles
+  const earthRadiusMiles = 3958.8;
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
   const dLng = ((lng2 - lng1) * Math.PI) / 180;
-  const a =
+  const haversineFactor =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
     Math.cos((lat1 * Math.PI) / 180) *
       Math.cos((lat2 * Math.PI) / 180) *
       Math.sin(dLng / 2) *
       Math.sin(dLng / 2);
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return earthRadiusMiles * 2 * Math.atan2(Math.sqrt(haversineFactor), Math.sqrt(1 - haversineFactor));
 }
 
 // Formats an ISO date string to a readable "Month Day, Year at HH:MM AM/PM" label
@@ -60,9 +60,9 @@ export const formatDateTime = (date: string) => {
 export function phoneDigitsForTel(
   phone: string | number | null | undefined,
 ): string {
-  let d = String(phone ?? "").replace(/\D/g, "");
-  if (d.length === 11 && d.startsWith("1")) d = d.slice(1);
-  return d.slice(0, 10);
+  let digits = String(phone ?? "").replace(/\D/g, "");
+  if (digits.length === 11 && digits.startsWith("1")) digits = digits.slice(1);
+  return digits.slice(0, 10);
 }
 
 /** Display / stored value as (XXX) XXX-XXXX when 10 digits; partial groups while shorter. */

@@ -114,7 +114,7 @@ export const getRSVPsByUser = async (): Promise<RSVP[] | Error | PostgrestError 
 }
 
 // Cancels the currently authenticated user's RSVP for an event.
-// Soft delete — sets status to CANCELLED instead of removing the row.
+// Soft delete sets status to CANCELLED instead of deleting the row.
 // Returns null on success or an Error/PostgrestError on failure.
 export const cancelRSVP = async (
   event_id: number

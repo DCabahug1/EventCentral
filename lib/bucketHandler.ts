@@ -33,6 +33,8 @@ export const uploadImageToBucket = async (
 /** Public bucket for org avatar & banner images (create in Supabase if missing). */
 export const ORGANIZATIONS_BUCKET = "organizations";
 export const PROFILES_BUCKET = "profiles";
+/** Event cover images (landscape-friendly). Create bucket in Supabase if missing. */
+export const EVENTS_BUCKET = "events";
 
 export async function uploadOrganizationAsset(
   file: File,
@@ -53,4 +55,14 @@ export async function uploadProfileAvatar(
   const ext = extMatch ? extMatch[0].toLowerCase() : ".jpg";
   const path = `${userId}/avatar-${crypto.randomUUID()}${ext}`;
   return uploadImageToBucket(file, PROFILES_BUCKET, path);
+}
+
+export async function uploadEventImage(
+  file: File,
+  userId: string,
+): Promise<string> {
+  const extMatch = file.name.match(/\.(jpe?g|png|webp)$/i);
+  const ext = extMatch ? extMatch[0].toLowerCase() : ".jpg";
+  const path = `${userId}/event-${crypto.randomUUID()}${ext}`;
+  return uploadImageToBucket(file, EVENTS_BUCKET, path);
 }

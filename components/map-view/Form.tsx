@@ -15,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { CATEGORY_CONFIG } from "@/lib/categoryConfig";
+import { SEARCH_CATEGORY_CONFIG } from "@/lib/categoryConfig";
 import { addOneYear, daysFromNowDateString, todayDateString } from "@/lib/utils";
 
 type RegionBounds = {
@@ -30,7 +30,7 @@ type FormData = {
   location: string;
   // True while the browser geolocation API is active as the location source
   useUserLocation: boolean;
-  // Raw lat/lng — only present when useUserLocation is true (geolocation mode)
+  // Raw lat and lng only in geolocation mode.
   coordinates?: { lat: number; lng: number };
   // True when the location was set via autocomplete selection or geolocation.
   // False while the user is typing freely. Gates form submission.
@@ -39,7 +39,7 @@ type FormData = {
   startDate: string;
   endDate: string;
   eventType: string;
-  // Bounding box of the selected region — set when a place is chosen from
+  // Bounding box from selected autocomplete place.
   // autocomplete. Used for region-boundary filtering (events inside the region).
   // Not set in geolocation mode (which uses coordinates + radius instead).
   regionBounds?: RegionBounds;
@@ -56,7 +56,7 @@ const buildDefaultFormData = (): FormData => ({
   eventType: "all",
 });
 
-/** True when form matches the baseline "original" query (what Clear resets to). */
+/** True when form matches the default clear state. */
 function matchesOriginalDefaults(data: FormData): boolean {
   const orig = buildDefaultFormData();
   return (
@@ -76,12 +76,12 @@ function matchesOriginalDefaults(data: FormData): boolean {
 function Form({
   fetchEvents,
   appliedQuery,
-  // When true, the submit button is hidden (used inside the mobile drawer,
+  // When true the submit button is hidden. Used in the mobile filters dialog,
   // which provides its own "Find Events" button in the footer)
   hideSubmitButton,
-  // Called on every form data change — used by the map to update focus live
+  // Called on every form change so map focus can update live.
   onFormDataChange,
-  // Forwarded ref to the <form> element so the drawer can trigger submission
+  // Forwarded ref to the <form> element so the dialog can trigger submission
   // programmatically via formRef.current?.requestSubmit()
   formRef,
   // Emits whether the current form state can be submitted.
@@ -107,13 +107,13 @@ function Form({
     if (geocodingLib) setGeocoder(new geocodingLib.Geocoder());
   }, [geocodingLib]);
 
-  // Keep local form state aligned with the latest applied query.
-  // This ensures drawer reopen on mobile shows the last submitted values.
+  // Keep local form state aligned with latest applied query.
+  // This ensures dialog reopen on mobile shows the last submitted values.
   useEffect(() => {
     setFormData(appliedQuery);
   }, [appliedQuery]);
 
-  // Notify the parent (page.tsx) of any form data change so the map
+  // Notify parent on form changes so the map
   // can update its focus without waiting for form submission
   useEffect(() => {
     onFormDataChange?.(formData);
@@ -154,7 +154,7 @@ function Form({
   }, [canSubmit, onCanSubmitChange]);
 
   const handleUseMyLocation = () => {
-    // Toggle off: clear geolocation and region state, mark location as unvalidated
+    // Toggle off clears geolocation and region values.
     if (formData.useUserLocation) {
       setFormData({ ...formData, useUserLocation: false, coordinates: undefined, regionBounds: undefined, locationValid: false });
       return;
@@ -173,7 +173,7 @@ function Form({
           return;
         }
 
-        // Reverse geocode the coordinates to extract a human-readable city/state string
+        // Reverse geocode and build a city and state label.
         geocoder.geocode({ location: { lat, lng } }, (results, status) => {
           setLocating(false);
           if (status === "OK" && results && results[0]) {
@@ -195,7 +195,7 @@ function Form({
               locationValid: true,
             }));
           } else {
-            // Reverse geocode failed — still store coordinates, just no city name
+            // If reverse geocode fails keep the coordinates only.
             setFormData((prev) => ({ ...prev, useUserLocation: true, coordinates: { lat, lng }, locationValid: true }));
           }
         });
@@ -208,22 +208,22 @@ function Form({
     );
   };
 
-  // Called when the user selects a place from the autocomplete dropdown.
+  // Runs when user selects an autocomplete place.
   // Geocodes the placeId to extract the region's bounding box, which is stored
   // in regionBounds and used for region-boundary filtering on submit.
-  // Coordinates are cleared — region mode filters by bounds, not radius.
+  // Region mode uses bounds so clear coordinates.
   const handlePlaceSelect = (_description: string, placeId: string) => {
     if (!geocoder) return;
     geocoder.geocode({ placeId }, (results, status) => {
       if (status === "OK" && results && results[0]) {
         const geo = results[0].geometry;
-        // Prefer viewport (always a well-formed rectangle, no antimeridian wrapping).
+        // Prefer viewport because it is always a rectangle.
         // Fall back to bounds for types that may not carry a viewport.
         const src = geo.viewport ?? geo.bounds;
         if (src) {
           setFormData((prev) => ({
             ...prev,
-            coordinates: undefined, // region mode does not use center-point + radius
+            coordinates: undefined, // Region mode does not use center point radius.
             regionBounds: {
               north: src.getNorthEast().lat(),
               south: src.getSouthWest().lat(),
@@ -236,18 +236,18 @@ function Form({
     });
   };
 
-  // Updates startDate and clamps endDate to stay within the 1-year max window
+  // Updates start date and clamps end date to one year max.
   const handleStartDateChange = (value: string) => {
     const maxEnd = addOneYear(value);
     setFormData((prev) => ({
       ...prev,
       startDate: value,
-      // If current endDate exceeds the new 1-year ceiling, clamp it down
+      // Clamp end date if it goes outside the allowed range.
       endDate: prev.endDate > maxEnd ? maxEnd : prev.endDate < value ? value : prev.endDate,
     }));
   };
 
-  // Updates endDate, clamping it within [startDate, startDate + 1 year]
+  // Updates end date and keeps it in the allowed range.
   const handleEndDateChange = (value: string) => {
     const maxEnd = addOneYear(formData.startDate);
     const clamped = value > maxEnd ? maxEnd : value < formData.startDate ? formData.startDate : value;
@@ -264,18 +264,21 @@ function Form({
 
   return (
     <>
-      {/* Header — desktop only (hidden inside the mobile drawer) */}
+      {/* Header shown on desktop only */}
       <div className="hidden md:flex flex-col gap-1">
-        <h1 className="text-2xl font-bold">Map View</h1>
-        <h2 className="text-sm text-muted-foreground">
-          Filter events on the map
+        <div className="flex items-center gap-2">
+          <div className="h-5 w-1 shrink-0 bg-primary" aria-hidden />
+          <h1 className="text-2xl font-bold tracking-tight">Map View</h1>
+        </div>
+        <h2 className="pl-3 text-sm text-muted-foreground">
+          Filter events on the map.
         </h2>
       </div>
       <Separator className="hidden md:block" />
       <div className="flex flex-col gap-4">
         <form ref={formRef} onSubmit={handleSubmit}>
           <FieldGroup>
-            {/* Location — autocomplete input + geolocation toggle */}
+            {/* Location input plus geolocation toggle */}
             <Field>
               <FieldLabel className={labelClass}>Keyword</FieldLabel>
               <Input
@@ -301,7 +304,7 @@ function Form({
                 onValidityChange={(valid) => setFormData((prev) => ({ ...prev, locationValid: valid }))}
                 onPlaceSelect={handlePlaceSelect}
               />
-              {/* Geolocation toggle — shows a spinner while the browser resolves
+              {/* Geolocation toggle shows a spinner while browser resolves
                   the position and reverse geocodes it to a city name */}
               <Button
                 type="button"
@@ -323,7 +326,7 @@ function Form({
               </Button>
             </Field>
 
-            {/* Radius slider — only shown in geolocation mode.
+            {/* Radius slider shown only in geolocation mode.
                 Region searches use boundary matching instead of a distance radius. */}
             {formData.useUserLocation && (
               <Field>
@@ -347,7 +350,7 @@ function Form({
               </Field>
             )}
 
-            {/* Date range — end date is clamped to [startDate, startDate + 1 year] */}
+            {/* Date range with end date clamped to one year window */}
             <Field>
               <FieldLabel className={labelClass}>Start Date</FieldLabel>
               <Input
@@ -383,7 +386,7 @@ function Form({
                   <SelectItem value="all">
                     <LayoutGrid className="size-4" /> All
                   </SelectItem>
-                  {CATEGORY_CONFIG.map((category) => (
+                  {SEARCH_CATEGORY_CONFIG.map((category) => (
                     <SelectItem key={category.label} value={category.label}>
                       <category.icon className={category.colorClass} />
                       {category.label}
@@ -393,8 +396,8 @@ function Form({
               </Select>
             </Field>
 
-            {/* Submit — disabled until a valid location is confirmed.
-                Hidden when rendered inside the mobile drawer (drawer provides its own button). */}
+            {/* Submit disabled until location is valid.
+                Hidden when rendered inside the mobile filters dialog (dialog provides its own button). */}
             <div
               className={`flex w-full gap-2 ${hideSubmitButton && !showClearFilters ? "hidden" : ""} ${hideSubmitButton ? "justify-end" : ""}`}
             >

@@ -1,27 +1,34 @@
 "use client";
 
+import Image from "next/image";
 import { Phone, Upload, UserRound } from "lucide-react";
 import { cn, formatUsPhoneInput } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer";
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Field,
   FieldContent,
+  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field";
+import {
+  FormRequiredLegend,
+  OptionalFieldHint,
+  RequiredMark,
+} from "@/components/ui/form-field-hints";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
-type Props = {
+export type EditProfileDialogProps = {
   open: boolean;
   saving: boolean;
   formError: string;
@@ -42,7 +49,7 @@ type Props = {
   onRequestDelete: () => void;
 };
 
-export default function EditProfileDrawer({
+export default function EditProfileDialog({
   open,
   saving,
   formError,
@@ -61,41 +68,64 @@ export default function EditProfileDrawer({
   onDescriptionChange,
   onPhoneChange,
   onRequestDelete,
-}: Props) {
+}: EditProfileDialogProps) {
   return (
-    <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="flex max-h-[92vh] min-h-0 flex-col gap-0 overflow-hidden p-0">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent
+        showCloseButton={false}
+        className="flex max-h-[min(92vh,900px)] min-h-0 flex-col gap-0 overflow-hidden p-0 sm:max-w-lg"
+      >
         <form onSubmit={onSubmit} className="flex min-h-0 flex-1 flex-col">
-          <DrawerHeader className="shrink-0">
-            <DrawerTitle>Edit profile</DrawerTitle>
-          </DrawerHeader>
+          <DialogHeader className="shrink-0 px-4 py-4 sm:px-6">
+            <DialogTitle className="text-2xl font-bold tracking-tight">
+              Edit profile
+            </DialogTitle>
+          </DialogHeader>
           <div
             ref={formScrollContainerRef}
-            className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-2 [-webkit-overflow-scrolling:touch]"
+            className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 [-webkit-overflow-scrolling:touch] sm:p-6"
           >
             <FieldGroup className="gap-5">
+              <FormRequiredLegend className="mb-5" />
               <Field>
-                <FieldLabel htmlFor={avatarInputId} className="text-muted-foreground">
-                  Avatar
-                </FieldLabel>
-                <FieldContent className="gap-2">
+                <div className="flex w-full justify-center">
+                  <FieldLabel htmlFor={avatarInputId} className="text-muted-foreground">
+                    Avatar
+                    <OptionalFieldHint />
+                  </FieldLabel>
+                </div>
+                <FieldDescription className="text-center text-xs text-muted-foreground">
+                  Square image recommended. JPEG, PNG, or WebP.
+                </FieldDescription>
+                <FieldContent className="items-center gap-2">
                   <label
                     htmlFor={avatarInputId}
                     className={cn(
-                      "flex size-32 shrink-0 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-border transition-colors hover:border-muted-foreground",
+                      "flex size-32 shrink-0 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-full border border-border transition-colors hover:border-muted-foreground",
                     )}
                   >
                     {avatarPreview ? (
-                      // eslint-disable-next-line @next/next/no-img-element -- blob preview
-                      <img src={avatarPreview} alt="" className="size-full object-cover" />
+                      <Image
+                        src={avatarPreview}
+                        alt=""
+                        width={128}
+                        height={128}
+                        unoptimized
+                        className="size-full object-cover"
+                      />
                     ) : profileAvatarUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element -- existing avatar preview
-                      <img src={profileAvatarUrl} alt="" className="size-full object-cover" />
+                      <Image
+                        src={profileAvatarUrl}
+                        alt=""
+                        width={128}
+                        height={128}
+                        className="size-full object-cover"
+                      />
                     ) : (
                       <span className="flex flex-col items-center gap-2">
                         <Upload className="size-5 text-muted-foreground" />
                         <span className="text-center text-xs text-muted-foreground">
-                          Square image
+                          Click to upload
                         </span>
                       </span>
                     )}
@@ -112,7 +142,7 @@ export default function EditProfileDrawer({
 
               <Field>
                 <FieldLabel htmlFor="edit-username" className="text-muted-foreground">
-                  Username
+                  Username <RequiredMark />
                 </FieldLabel>
                 <FieldContent className="gap-2">
                   <div className="relative">
@@ -135,6 +165,7 @@ export default function EditProfileDrawer({
               <Field>
                 <FieldLabel htmlFor="edit-description" className="text-muted-foreground">
                   Description
+                  <OptionalFieldHint />
                 </FieldLabel>
                 <FieldContent>
                   <Textarea
@@ -150,6 +181,7 @@ export default function EditProfileDrawer({
               <Field>
                 <FieldLabel htmlFor="edit-phone" className="text-muted-foreground">
                   Phone
+                  <OptionalFieldHint />
                 </FieldLabel>
                 <FieldContent>
                   <div className="relative">
@@ -177,27 +209,25 @@ export default function EditProfileDrawer({
               </Field>
             </FieldGroup>
           </div>
-          <DrawerFooter className="shrink-0 border-t bg-background pt-4">
-            <div className="flex w-full flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-              <Button
-                type="button"
-                variant="destructive"
-                onClick={onRequestDelete}
-              >
-                Delete Account
+          <DialogFooter className="shrink-0 border-t bg-background px-4 py-4 sm:px-6">
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={onRequestDelete}
+            >
+              Delete Account
+            </Button>
+            <DialogClose asChild>
+              <Button type="button" variant="outline">
+                Cancel
               </Button>
-              <DrawerClose asChild>
-                <Button type="button" variant="outline">
-                  Cancel
-                </Button>
-              </DrawerClose>
-              <Button type="submit" disabled={saving}>
-                {saving ? "Saving…" : "Save changes"}
-              </Button>
-            </div>
-          </DrawerFooter>
+            </DialogClose>
+            <Button type="submit" disabled={saving}>
+              {saving ? "Saving…" : "Save changes"}
+            </Button>
+          </DialogFooter>
         </form>
-      </DrawerContent>
-    </Drawer>
+      </DialogContent>
+    </Dialog>
   );
 }

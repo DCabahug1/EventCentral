@@ -30,7 +30,7 @@ const getEventStatus = (start: string, end: string): EventStatus => {
   return "ended";
 };
 
-// Visual config for each status — controls badge label, styles, and whether to show a pulse dot
+// Style rules for each status badge.
 const statusConfig: Record<EventStatus, { label: string; className: string }> =
   {
     upcoming: {
@@ -65,7 +65,7 @@ function EventCard({
 }: {
   event: Event;
   org?: Organization | null;
-  variant?: "default" | "featured";
+  variant?: "default" | "featured" | "organization";
 }) {
   const maxCapacity = event.max_capacity ?? 0;
   const [organization, setOrganization] = useState<Organization | null>(null);
@@ -81,7 +81,7 @@ function EventCard({
   const organizationName =
     providedOrganization?.name ?? event.organization_name ?? organization?.name;
 
-  // For the hover effect
+  // Track hover state for overlays.
   const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
@@ -109,13 +109,75 @@ function EventCard({
     void fetchOrganization();
   }, [event.organization_id, event.organization_name, providedOrganization]);
 
-  // Reset image fallback when card data changes.
+  // Reset image fallback when event data changes.
   useEffect(() => {
     setHasImageLoadError(false);
   }, [event.id, eventImageSource]);
 
   const capacityBadge = getCapacityBadge(capacityPercentage);
   const statusBadgeClassName = `absolute top-3 left-3 z-20 backdrop-blur-sm ${statusClassName}`;
+
+  if (variant === "organization") {
+    return (
+      <div className="h-full w-full">
+        <Link href={`/events/${event.id}`}>
+          <Card className="h-full w-full cursor-pointer gap-0 overflow-hidden p-0 transition-all duration-300 dark:brightness-90 dark:hover:brightness-100">
+            <div className="relative overflow-hidden">
+              <Badge className={statusBadgeClassName}>{statusLabel}</Badge>
+
+              {hasImageLoadError ? (
+                <Skeleton className="h-48 w-full rounded-none bg-muted" />
+              ) : (
+                <Image
+                  src={eventImageSource}
+                  alt={event.title}
+                  width={500}
+                  height={500}
+                  className="h-48 w-full border border-border object-cover"
+                  onError={() => setHasImageLoadError(true)}
+                />
+              )}
+            </div>
+
+            <div className="flex flex-col gap-3 p-4">
+              <div className="flex flex-col gap-1">
+                <h2 className="text-sm text-muted-foreground">
+                  {organizationName ?? "Organization"}
+                </h2>
+                <h3 className="text-2xl font-bold">{event.title}</h3>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Badge variant="outline">
+                  {CategoryIcon && (
+                    <CategoryIcon className={categoryConfig?.colorClass} />
+                  )}
+                  {event.category ?? "Uncategorized"}
+                </Badge>
+              </div>
+              <div className="flex gap-2">
+                <MapPin className="h-4 w-4 shrink-0 text-muted-foreground" />
+                <p className="text-sm text-muted-foreground">
+                  {event.address ?? "Location TBD"}
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <Calendar className="h-4 w-4 shrink-0 text-muted-foreground" />
+                <p className="text-sm text-muted-foreground">
+                  {formatDateTime(event.start_time)}
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <Users className="h-4 w-4 shrink-0 text-muted-foreground" />
+                <p className="text-sm text-muted-foreground">
+                  {attendeeCount + " / " + maxCapacity + " attendees"}
+                </p>
+              </div>
+            </div>
+          </Card>
+        </Link>
+      </div>
+    );
+  }
 
   if (variant === "featured") {
     return (
@@ -135,7 +197,7 @@ function EventCard({
                   src={eventImageSource}
                   alt={event.title}
                   fill
-                  className="object-cover"
+                  className="border border-border object-cover"
                   onError={() => setHasImageLoadError(true)}
                 />
               )}
@@ -146,12 +208,12 @@ function EventCard({
               className={`absolute inset-0 bg-linear-to-t from-black/90 via-black/60 to-transparent z-10 ${isHovered ? "opacity-50" : "opacity-80"} transition-all duration-300`}
             />
 
-            {/* Status badge — top-left */}
+            {/* Status badge at top left */}
             <Badge className={statusBadgeClassName}>
               {statusLabel}
             </Badge>
 
-            {/* Capacity badge — top-right */}
+            {/* Capacity badge at top right */}
             {capacityBadge && (
               <div className="absolute top-3 right-3 z-20">
                 <Badge className={capacityBadge.className}>
@@ -160,7 +222,7 @@ function EventCard({
               </div>
             )}
 
-            {/* Bottom overlay — event details */}
+            {/* Bottom overlay with event details */}
             <div className="absolute inset-x-0 bottom-0 z-20 flex flex-col gap-2 px-4 pb-6">
               {/* Category + org */}
               <div className="flex items-center gap-2 flex-wrap">
@@ -229,7 +291,7 @@ function EventCard({
               className={`absolute inset-0 bg-linear-to-t from-black/70 dark:from-background to-transparent z-10 ${isHovered ? "opacity-70" : "opacity-80"} transition-all duration-300`}
             />
 
-            {/* Status badge — positioned over the image in the top-left */}
+            {/* Status badge shown over image at top left */}
             <Badge className={statusBadgeClassName}>
               {statusLabel}
             </Badge>
@@ -242,7 +304,7 @@ function EventCard({
                 alt={event.title}
                 width={500}
                 height={500}
-                className="w-full object-cover h-48"
+                className="h-48 w-full border border-border object-cover"
                 onError={() => setHasImageLoadError(true)}
               />
             )}

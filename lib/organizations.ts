@@ -59,12 +59,39 @@ export const getOrganizationsByUserId = async (
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("organizations")
-    .select("*")
+    .select(
+      "id,user_id,name,description,avatar_url,banner_url,website,email,phone,location,created_at,updated_at",
+    )
     .eq("user_id", user_id);
   if (error) {
     return error;
   }
   return data;
+};
+
+export const getOrganizationsByUserIdPage = async (
+  user_id: string,
+  page: number,
+  pageSize: number,
+): Promise<{ items: Organization[]; total: number } | PostgrestError> => {
+  const safePage = Math.max(1, page);
+  const safePageSize = Math.max(1, pageSize);
+  const from = (safePage - 1) * safePageSize;
+  const to = from + safePageSize - 1;
+
+  const supabase = await createClient();
+  const { data, count, error } = await supabase
+    .from("organizations")
+    .select(
+      "id,user_id,name,description,avatar_url,banner_url,website,email,phone,location,created_at,updated_at",
+      { count: "exact" },
+    )
+    .eq("user_id", user_id)
+    .order("created_at", { ascending: false })
+    .range(from, to);
+
+  if (error) return error;
+  return { items: (data ?? []) as Organization[], total: count ?? 0 };
 };
 
 export const getOrganizationById = async (
@@ -73,7 +100,9 @@ export const getOrganizationById = async (
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("organizations")
-    .select("*")
+    .select(
+      "id,user_id,name,description,avatar_url,banner_url,website,email,phone,location,created_at,updated_at",
+    )
     .eq("id", id)
     .single();
 

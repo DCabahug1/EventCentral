@@ -8,6 +8,11 @@ import Image from "next/image";
 import { createProfile } from "@/lib/profiles";
 import { AuthError } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
+import {
+  FormRequiredLegend,
+  OptionalFieldHint,
+  RequiredMark,
+} from "@/components/ui/form-field-hints";
 
 function formatPhoneNumber(value: string): string {
   const digits = value.replace(/\D/g, "").slice(0, 10);
@@ -22,8 +27,8 @@ function unformatPhoneNumber(value: string): string {
 
 function phoneDigitsToNumber(digits: string): number | null {
   if (!digits) return null;
-  const n = parseInt(digits, 10);
-  return Number.isNaN(n) ? null : n;
+  const parsedNumber = parseInt(digits, 10);
+  return Number.isNaN(parsedNumber) ? null : parsedNumber;
 }
 
 function page() {
@@ -80,7 +85,7 @@ function page() {
         <Card className="grid grid-cols-1 sm:grid-cols-2 gap-0 p-0 overflow-hidden w-full max-w-2xl">
           <div className="flex flex-col justify-center px-4 py-8 gap-4">
             <div>
-              <h1 className="text-2xl font-bold">Set up your profile</h1>
+              <h1 className="text-2xl font-bold tracking-tight">Set up your profile</h1>
               <p className="text-sm text-muted-foreground">
                 Tell us a bit about yourself to get started
               </p>
@@ -89,8 +94,11 @@ function page() {
               onSubmit={handleSubmit}
               className="w-full flex flex-col gap-4"
             >
+              <FormRequiredLegend />
               <div className="flex flex-col gap-2">
-                <Label htmlFor="username">Username</Label>
+                <Label htmlFor="username">
+                  Username <RequiredMark />
+                </Label>
                 <Input
                   type="text"
                   id="username"
@@ -103,10 +111,8 @@ function page() {
               </div>
               <div className="flex flex-col gap-2">
                 <Label htmlFor="phone_number">
-                  Phone Number{" "}
-                  <span className="text-xs text-muted-foreground">
-                    (Optional)
-                  </span>
+                  Phone number
+                  <OptionalFieldHint />
                 </Label>
                 <Input
                   type="tel"
@@ -123,10 +129,8 @@ function page() {
               </div>
               <div className="flex flex-col gap-2">
                 <Label htmlFor="description">
-                  Bio{" "}
-                  <span className="text-xs text-muted-foreground">
-                    (Optional)
-                  </span>
+                  Bio
+                  <OptionalFieldHint />
                 </Label>
                 <textarea
                   id="description"
@@ -150,7 +154,7 @@ function page() {
             alt="EventCentral"
             width={800}
             height={800}
-            className="hidden sm:block h-full object-cover"
+            className="hidden sm:block h-full border border-border object-cover"
           />
         </Card>
       </div>

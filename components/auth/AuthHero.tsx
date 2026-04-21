@@ -10,7 +10,7 @@ export function AuthMarketingHero() {
         src="/auth-pages/AuthFormSideImage.jpg"
         alt=""
         fill
-        className="object-cover"
+        className="border border-border object-cover"
         sizes="(max-width: 1024px) 100vw, 67vw"
         priority
       />
@@ -26,7 +26,7 @@ export function AuthMarketingHero() {
           transition={{ duration: 0.6, ease: "easeOut" }}
         >
           <motion.h2
-            className="text-balance text-3xl font-bold tracking-tight text-white drop-shadow-md md:text-5xl lg:text-6xl"
+            className="text-balance text-3xl font-bold tracking-tight text-white drop-shadow-md sm:text-4xl md:text-5xl lg:text-6xl"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1, duration: 0.5, ease: "easeOut" }}
@@ -34,7 +34,7 @@ export function AuthMarketingHero() {
             Your next experience<br />starts <span className="text-primary">here.</span>
           </motion.h2>
           <motion.p
-            className="mt-4 text-balance text-base text-white/90 drop-shadow md:text-2xl"
+            className="mt-4 text-balance text-sm text-white/90 drop-shadow sm:text-base md:text-lg lg:text-xl"
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.45, ease: "easeOut" }}

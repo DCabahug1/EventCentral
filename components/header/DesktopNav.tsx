@@ -2,16 +2,20 @@ import React from "react";
 import Link from "next/link";
 import { Profile } from "@/lib/types";
 import { Button } from "../ui/button";
-import { Compass, MapPin, Plus, User } from "lucide-react";
+import { Compass, MapPin, Moon, Plus, Sun, User } from "lucide-react";
 import AvatarButton from "./AvatarButton";
 import { motion, AnimatePresence } from "motion/react";
+import { useTheme } from "next-themes";
 
 interface DesktopNavProps {
   profile: Profile | null;
   pathname: string;
+  onHostEvent: () => void;
 }
 
-function DesktopNav({ profile, pathname }: DesktopNavProps) {
+function DesktopNav({ profile, pathname, onHostEvent }: DesktopNavProps) {
+  const { theme, setTheme } = useTheme();
+
   return (
     <AnimatePresence mode="wait" initial={false}>
       {profile ? (
@@ -36,20 +40,19 @@ function DesktopNav({ profile, pathname }: DesktopNavProps) {
             </Link>
           </Button>
           <Button
+            type="button"
             variant={pathname.startsWith("/create-event") ? "default" : "ghost"}
-            asChild
+            onClick={onHostEvent}
           >
-            <Link href="/create-event">
               <Plus />
               Host an Event
-            </Link>
           </Button>
           <AvatarButton profile={profile} />
         </motion.div>
       ) : !pathname.startsWith("/onboarding") ? (
         <motion.div
           key="unauthenticated"
-          className="hidden sm:flex"
+          className="hidden sm:flex items-center gap-2"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -60,6 +63,13 @@ function DesktopNav({ profile, pathname }: DesktopNavProps) {
               <User />
               Sign in
             </Link>
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+          >
+            {theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
           </Button>
         </motion.div>
       ) : null}

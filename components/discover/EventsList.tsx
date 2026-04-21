@@ -11,23 +11,24 @@ import {
 } from "@/lib/discoverConstants";
 import { motion, AnimatePresence } from "motion/react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "../ui/tabs";
+import ListEmptyState from "../ui/list-empty-state";
 
 // Partition and sort helpers
 const now = () => new Date();
 
 const partitionEvents = (events: Event[]) => {
-  const n = now();
+  const currentTime = now();
 
   const happening: Event[] = [];
   const upcoming: Event[] = [];
   const past: Event[] = [];
 
-  for (const e of events) {
-    const start = new Date(e.start_time);
-    const end = new Date(e.end_time);
-    if (n < start) upcoming.push(e);
-    else if (n <= end) happening.push(e);
-    else past.push(e);
+  for (const event of events) {
+    const start = new Date(event.start_time);
+    const end = new Date(event.end_time);
+    if (currentTime < start) upcoming.push(event);
+    else if (currentTime <= end) happening.push(event);
+    else past.push(event);
   }
 
   // Ending soonest first
@@ -114,13 +115,9 @@ function EventGrid({
 
 function EmptyState({ message }: { message: string }) {
   return (
-    <motion.p
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="text-muted-foreground text-sm py-12 text-center"
-    >
-      {message}
-    </motion.p>
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+      <ListEmptyState message={message} />
+    </motion.div>
   );
 }
 
@@ -165,11 +162,13 @@ function EventsList({
   const [happeningPage, setHappeningPage] = useState(1);
   const [upcomingPage, setUpcomingPage] = useState(1);
   const [pastPage, setPastPage] = useState(1);
+  const [eventsTab, setEventsTab] = useState<"upcoming" | "past">("upcoming");
 
   useEffect(() => {
     setHappeningPage(1);
     setUpcomingPage(1);
     setPastPage(1);
+    setEventsTab("upcoming");
   }, [
     query,
     activeCategory,
@@ -227,6 +226,9 @@ function EventsList({
     }
   }, [pastPage, pastSafePage]);
 
+  const listTabCount =
+    eventsTab === "upcoming" ? upcoming.length : past.length;
+
   return (
     <div className="flex flex-col gap-10 px-6 py-8 items-center w-full border-t">
       {(happening.length > 0 || emptyContext !== null) && (
@@ -257,20 +259,19 @@ function EventsList({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
-              className="flex w-full flex-wrap items-start justify-between gap-4 text-2xl lg:text-start"
+              className="flex w-full flex-wrap items-start justify-between gap-4 lg:text-start"
             >
               <div className="flex min-w-0 flex-1 flex-col gap-1 text-left">
                 <div className="flex items-center gap-2 justify-start">
                   <div className="h-5 w-1 shrink-0 bg-primary" />
-                  <span className="min-w-0">{heading}</span>
+                  <span className="min-w-0 text-2xl font-bold">{heading}</span>
                 </div>
                 <p className="pl-3 text-sm font-normal text-muted-foreground">
                   {locationLine}
                 </p>
               </div>
               <span className="text-sm font-normal text-muted-foreground shrink-0">
-                {upcoming.length + past.length}{" "}
-                {upcoming.length + past.length === 1 ? "event" : "events"}
+                {listTabCount} {listTabCount === 1 ? "event" : "events"}
               </span>
             </motion.div>
           )}
@@ -282,7 +283,11 @@ function EventsList({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, ease: "easeOut", delay: 0.1 }}
         >
-          <Tabs defaultValue="upcoming" className="w-full">
+          <Tabs
+            value={eventsTab}
+            onValueChange={(v) => setEventsTab(v as "upcoming" | "past")}
+            className="w-full"
+          >
             <TabsList className="lg:self-start self-center">
               <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
               <TabsTrigger value="past">Past</TabsTrigger>
@@ -293,8 +298,8 @@ function EventsList({
                 <EmptyState
                   message={
                     emptyContext
-                      ? `No upcoming events match ${emptyContext}.`
-                      : "No upcoming events scheduled."
+                      ? `No upcoming events found for ${emptyContext}.`
+                      : "No upcoming events found."
                   }
                 />
               ) : (
@@ -317,8 +322,8 @@ function EventsList({
                 <EmptyState
                   message={
                     emptyContext
-                      ? `No past events match ${emptyContext}.`
-                      : "No past events to show."
+                      ? `No past events found for ${emptyContext}.`
+                      : "No past events found."
                   }
                 />
               ) : (

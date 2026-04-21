@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { Building2, Plus } from "lucide-react";
 import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
@@ -11,20 +10,22 @@ import OrgCard from "@/components/profile/OrgCard";
 
 type Props = {
   organizations: Organization[];
-  paginatedOrganizations: Organization[];
+  organizationsCount: number;
   organizationsPage: number;
   totalOrganizationPages: number;
   organizationsPageSize: number;
   onPageChange: (page: number) => void;
+  onCreateOrganization: () => void;
 };
 
 export default function OrganizationsSection({
   organizations,
-  paginatedOrganizations,
+  organizationsCount,
   organizationsPage,
   totalOrganizationPages,
   organizationsPageSize,
   onPageChange,
+  onCreateOrganization,
 }: Props) {
   return (
     <motion.section
@@ -33,39 +34,42 @@ export default function OrganizationsSection({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: "easeOut", delay: 0.05 }}
     >
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-col gap-1">
-          <h2 className="text-xl font-semibold">Organizations</h2>
-          <p className="text-sm text-muted-foreground">
-            {organizations.length === 0
-              ? "You haven't created any organizations yet."
-              : `${organizations.length} ${organizations.length === 1 ? "organization" : "organizations"}`}
-          </p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-2">
+          <div className="h-5 w-1 shrink-0 bg-primary" />
+          <h2 className="text-2xl font-bold">Organizations</h2>
         </div>
-        <Button asChild variant="outline" size="sm">
-          <Link href="/organizations/new">
+        <div className="flex shrink-0 flex-wrap items-center justify-end gap-3">
+          <span className="text-sm text-muted-foreground">
+            {organizationsCount}{" "}
+            {organizationsCount === 1 ? "organization" : "organizations"}
+          </span>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={onCreateOrganization}
+          >
             <Plus className="size-4" />
             New Organization
-          </Link>
-        </Button>
+          </Button>
+        </div>
       </div>
 
-      {organizations.length === 0 ? (
+      {organizationsCount === 0 ? (
         <EmptyState
-          message="Create an organization to host events and build a community."
+          message="No organizations found."
           action={
-            <Button asChild size="sm">
-              <Link href="/organizations/new">
-                <Building2 className="size-4" />
-                Create Organization
-              </Link>
+            <Button type="button" size="sm" onClick={onCreateOrganization}>
+              <Building2 className="size-4" />
+              Create Organization
             </Button>
           }
         />
       ) : (
         <div className="flex flex-col gap-4">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {paginatedOrganizations.map((org, index) => (
+            {organizations.map((org, index) => (
               <motion.div
                 key={org.id}
                 initial={{ opacity: 0, y: 10 }}
@@ -80,7 +84,7 @@ export default function OrganizationsSection({
             label="Organizations"
             page={organizationsPage}
             totalPages={totalOrganizationPages}
-            totalItems={organizations.length}
+            totalItems={organizationsCount}
             pageSize={organizationsPageSize}
             onPageChange={onPageChange}
           />

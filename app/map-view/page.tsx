@@ -1,7 +1,7 @@
 "use client";
 import Form from "@/components/map-view/Form";
 import MapView from "@/components/map-view/Map";
-import FiltersDrawer from "@/components/map-view/FiltersDrawer";
+import FiltersDialog from "@/components/map-view/FiltersDialog";
 import React, { useRef, useState, useEffect } from "react";
 import { Event } from "@/lib/types";
 import { todayDateString, daysFromNowDateString } from "@/lib/utils";
@@ -35,20 +35,23 @@ const DEFAULT_QUERY: MapSearchQuery = {
 
 function page() {
   const [events, setEvents] = useState<Event[]>([]);
+  const [loadingEvents, setLoadingEvents] = useState(true);
   const [appliedQuery, setAppliedQuery] = useState<MapSearchQuery>(DEFAULT_QUERY);
 
-  // Map focus state — updated only when the form is submitted.
+  // Map focus state updates only after submit.
   const [mapLocation, setMapLocation] = useState("");
   const [mapRadius, setMapRadius] = useState(10);
   const [mapCoordinates, setMapCoordinates] = useState<{ lat: number; lng: number } | undefined>(undefined);
   const [mapLocationValid, setMapLocationValid] = useState(true);
   const [searchUsingUserLocation, setSearchUsingUserLocation] = useState(false);
 
-  // Tracks which event is selected — syncs the map popup and list highlight
+  // Selected event id keeps list and map in sync.
   const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
 
   // Ref on the map wrapper div used to scroll it into view when a list card is clicked
   const mapRef = useRef<HTMLDivElement>(null);
+  // Main scroll container on mobile/tablet (map + list column)
+  const contentScrollRef = useRef<HTMLDivElement>(null);
 
   const appliedKeyword = appliedQuery.keyword.trim();
   const hasKeyword = Boolean(appliedKeyword);
@@ -78,23 +81,28 @@ function page() {
 
   // Fetches events on form submission. Map focus also updates here (submit-only).
   const fetchEvents = async (formData: MapSearchQuery) => {
-    const newEvents = await getEvents({
-      keyword: formData.keyword,
-      startDate: formData.startDate,
-      endDate: formData.endDate,
-      eventType: formData.eventType,
-      useUserLocation: formData.useUserLocation,
-      coordinates: formData.coordinates,
-      radius: formData.radius,
-      regionBounds: formData.regionBounds,
-    });
-    setEvents(newEvents);
-    setMapLocation(formData.location);
-    setMapRadius(formData.radius);
-    setMapCoordinates(formData.coordinates);
-    setMapLocationValid(formData.locationValid);
-    setSearchUsingUserLocation(formData.useUserLocation);
-    setAppliedQuery(formData);
+    setLoadingEvents(true);
+    try {
+      const newEvents = await getEvents({
+        keyword: formData.keyword,
+        startDate: formData.startDate,
+        endDate: formData.endDate,
+        eventType: formData.eventType,
+        useUserLocation: formData.useUserLocation,
+        coordinates: formData.coordinates,
+        radius: formData.radius,
+        regionBounds: formData.regionBounds,
+      });
+      setEvents(newEvents);
+      setMapLocation(formData.location);
+      setMapRadius(formData.radius);
+      setMapCoordinates(formData.coordinates);
+      setMapLocationValid(formData.locationValid);
+      setSearchUsingUserLocation(formData.useUserLocation);
+      setAppliedQuery(formData);
+    } finally {
+      setLoadingEvents(false);
+    }
   };
 
   // Called when the user clicks an event card in the list.
@@ -108,12 +116,41 @@ function page() {
   // Highlights the event card and scrolls the page down to it.
   const handleScrollToEvent = (id: number) => {
     setSelectedEventId(id);
-    const card = document.querySelector(`[data-event-id="${id}"]`);
-    card?.scrollIntoView({ behavior: "smooth", block: "center" });
+    const scrollToCard = (remainingTries: number) => {
+      const card = document.querySelector(
+        `[data-event-id="${id}"]`,
+      ) as HTMLElement | null;
+
+      // Card may not exist yet while EventList updates pagination.
+      if (!card) {
+        if (remainingTries <= 0) return;
+        requestAnimationFrame(() => {
+          window.setTimeout(() => scrollToCard(remainingTries - 1), 40);
+        });
+        return;
+      }
+
+      const scroller = contentScrollRef.current;
+      if (scroller) {
+        // Safari is more reliable with explicit scrollTop on nested containers.
+        const scrollerRect = scroller.getBoundingClientRect();
+        const cardRect = card.getBoundingClientRect();
+        const targetTop = Math.max(
+          0,
+          cardRect.top - scrollerRect.top + scroller.scrollTop - 24,
+        );
+        scroller.scrollTo({ top: targetTop, behavior: "smooth" });
+        return;
+      }
+
+      card.scrollIntoView({ behavior: "smooth", block: "center" });
+    };
+
+    scrollToCard(12);
   };
 
   // Load an initial set of events on mount using the default form values.
-  // No regionBounds — blank location shows all events (no location filter).
+  // No region bounds means show all events.
   useEffect(() => {
     fetchEvents({
       ...DEFAULT_QUERY,
@@ -125,21 +162,21 @@ function page() {
     // hooks inside Form (geocoding) and MapView (geocoding) share the same context
     <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!}>
       <div className="h-[calc(100svh-64px)] flex flex-col md:flex-row">
-        {/* Side panel — visible on desktop only.
+        {/* Side panel visible on desktop only.
           Contains the full filter form with an inline submit button. */}
         <div className="hidden md:flex flex-col p-4 gap-4 w-80 h-full border-r overflow-y-auto">
           <Form fetchEvents={fetchEvents} appliedQuery={appliedQuery} />
         </div>
 
-        {/* Main content area — map + event list stacked vertically */}
-        <div className="flex-1 flex flex-col overflow-y-auto relative">
-          {/* Mobile filter trigger — floating button in the top-left of the map.
-            Opens a bottom drawer with the same form fields. */}
+        {/* Main content area with map and list stacked */}
+        <div ref={contentScrollRef} className="flex-1 flex flex-col overflow-y-auto relative">
+          {/* Mobile filter trigger in the top left of the map.
+            Opens a dialog with the same form fields. */}
           <div className="absolute top-4 left-4 z-10 md:hidden">
-            <FiltersDrawer fetchEvents={fetchEvents} appliedQuery={appliedQuery} />
+            <FiltersDialog fetchEvents={fetchEvents} appliedQuery={appliedQuery} />
           </div>
 
-          {/* Map wrapper — ref used for scroll-to-map from event list clicks */}
+          {/* Map wrapper ref for scroll back to map from list */}
           <div ref={mapRef}>
             <MapView
               location={mapLocation}
@@ -159,6 +196,7 @@ function page() {
             subheading={eventsSubheading}
             selectedEventId={selectedEventId}
             onEventSelect={handleEventSelect}
+            loading={loadingEvents}
           />
         </div>
       </div>

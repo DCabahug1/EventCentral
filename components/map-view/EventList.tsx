@@ -3,9 +3,10 @@
 import React, { useEffect, useState } from "react";
 import { Event } from "@/lib/types";
 import EventItem from "./EventItem";
-import { Badge } from "../ui/badge";
 import { motion } from "motion/react";
 import PaginationBar from "@/components/discover/PaginationBar";
+import ListEmptyState from "@/components/ui/list-empty-state";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const PAGE_SIZE = 8;
 
@@ -15,12 +16,14 @@ function EventList({
   subheading,
   selectedEventId,
   onEventSelect,
+  loading = false,
 }: {
   events: Event[];
   heading?: string;
   subheading?: string;
   selectedEventId?: number | null;
   onEventSelect?: (id: number) => void;
+  loading?: boolean;
 }) {
   const [page, setPage] = useState(1);
 
@@ -55,25 +58,35 @@ function EventList({
             </p>
           )}
         </div>
-        <Badge variant="default" className="shrink-0">
+        <span className="shrink-0 text-sm font-normal text-muted-foreground">
           {events.length} {events.length === 1 ? "event" : "events"}
-        </Badge>
+        </span>
       </div>
       <div className="flex flex-col">
-        {pageSlice.map((event) => (
-          <motion.div
-            key={event.id}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <EventItem
-              event={event}
-              selected={event.id === selectedEventId}
-              onSelect={onEventSelect}
-            />
-          </motion.div>
-        ))}
+        {loading ? (
+          <div className="flex flex-col gap-3 p-4">
+            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-24 w-full" />
+          </div>
+        ) : events.length === 0 ? (
+          <ListEmptyState message="No events found." />
+        ) : (
+          pageSlice.map((event) => (
+            <motion.div
+              key={event.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <EventItem
+                event={event}
+                selected={event.id === selectedEventId}
+                onSelect={onEventSelect}
+              />
+            </motion.div>
+          ))
+        )}
       </div>
       <div className="px-4 py-3">
         <PaginationBar

@@ -55,7 +55,7 @@ export async function updateSession(request: NextRequest) {
     return supabaseResponse;
   }
 
-  // User is authenticated — safe to fetch profile
+  // User is authenticated so profile fetch is allowed.
   let profile: Profile | null = null;
 
   try {
@@ -79,7 +79,7 @@ export async function updateSession(request: NextRequest) {
     return supabaseResponse;
   }
 
-  // User has a profile — block auth and onboarding pages
+  // User has a profile so block auth and onboarding pages.
   if (pathname.startsWith("/auth") || pathname.startsWith("/onboarding")) {
     const url = request.nextUrl.clone();
     url.pathname = "/";

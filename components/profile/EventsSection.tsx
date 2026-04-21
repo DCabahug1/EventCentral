@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { motion } from "motion/react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -12,8 +13,8 @@ import EmptyState from "@/components/profile/EmptyState";
 type Props = {
   upcoming: Event[];
   past: Event[];
-  paginatedUpcoming: Event[];
-  paginatedPast: Event[];
+  upcomingCount: number;
+  pastCount: number;
   upcomingPage: number;
   totalUpcomingPages: number;
   pastPage: number;
@@ -26,8 +27,8 @@ type Props = {
 export default function EventsSection({
   upcoming,
   past,
-  paginatedUpcoming,
-  paginatedPast,
+  upcomingCount,
+  pastCount,
   upcomingPage,
   totalUpcomingPages,
   pastPage,
@@ -36,6 +37,9 @@ export default function EventsSection({
   onUpcomingPageChange,
   onPastPageChange,
 }: Props) {
+  const [tab, setTab] = useState<"upcoming" | "past">("upcoming");
+  const tabCount = tab === "upcoming" ? upcomingCount : pastCount;
+
   return (
     <motion.section
       className="flex flex-col gap-4"
@@ -43,25 +47,32 @@ export default function EventsSection({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: "easeOut", delay: 0.1 }}
     >
-      <div className="flex flex-col gap-1">
-        <h2 className="text-xl font-semibold">Events</h2>
-        <p className="text-sm text-muted-foreground">
-        Track your upcoming events and attendance history.
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-2">
+          <div className="h-5 w-1 shrink-0 bg-primary" />
+          <h2 className="text-2xl font-bold">Events</h2>
+        </div>
+        <p className="shrink-0 text-sm text-muted-foreground">
+          {tabCount} {tabCount === 1 ? "event" : "events"}
         </p>
       </div>
 
-      <Tabs defaultValue="upcoming" className="flex flex-col gap-4">
+      <Tabs
+        value={tab}
+        onValueChange={(v) => setTab(v as "upcoming" | "past")}
+        className="flex flex-col gap-4"
+      >
         <TabsList>
           <TabsTrigger value="upcoming">Attending</TabsTrigger>
           <TabsTrigger value="past">Previously Attended</TabsTrigger>
         </TabsList>
 
         <TabsContent value="upcoming" className="flex flex-col gap-4">
-          {upcoming.length === 0 ? (
+          {upcomingCount === 0 ? (
             <EmptyState
-              message="You have no upcoming events."
+              message="No upcoming events found."
               action={
-                <Button asChild variant="outline" size="sm">
+                <Button asChild size="sm">
                   <Link href="/">Discover Events</Link>
                 </Button>
               }
@@ -74,7 +85,7 @@ export default function EventsSection({
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.25, ease: "easeOut" }}
               >
-                {paginatedUpcoming.map((event, index) => (
+                {upcoming.map((event, index) => (
                   <motion.div
                     key={event.id}
                     initial={{ opacity: 0, y: 10 }}
@@ -89,7 +100,7 @@ export default function EventsSection({
                 label="Attending events"
                 page={upcomingPage}
                 totalPages={totalUpcomingPages}
-                totalItems={upcoming.length}
+                totalItems={upcomingCount}
                 pageSize={eventsPageSize}
                 onPageChange={onUpcomingPageChange}
               />
@@ -98,8 +109,15 @@ export default function EventsSection({
         </TabsContent>
 
         <TabsContent value="past" className="flex flex-col gap-4">
-          {past.length === 0 ? (
-            <EmptyState message="No previously attended events to show." />
+          {pastCount === 0 ? (
+            <EmptyState
+              message="No past events found."
+              action={
+                <Button asChild size="sm">
+                  <Link href="/">Discover Events</Link>
+                </Button>
+              }
+            />
           ) : (
             <>
               <motion.div
@@ -108,7 +126,7 @@ export default function EventsSection({
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.25, ease: "easeOut" }}
               >
-                {paginatedPast.map((event, index) => (
+                {past.map((event, index) => (
                   <motion.div
                     key={event.id}
                     initial={{ opacity: 0, y: 10 }}
@@ -123,7 +141,7 @@ export default function EventsSection({
                 label="Previously attended events"
                 page={pastPage}
                 totalPages={totalPastPages}
-                totalItems={past.length}
+                totalItems={pastCount}
                 pageSize={eventsPageSize}
                 onPageChange={onPastPageChange}
               />
