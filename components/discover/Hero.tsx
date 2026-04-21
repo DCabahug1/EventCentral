@@ -152,7 +152,7 @@ function Hero({
           src="/discover-page/Hero.jpg"
           alt="EventCentral"
           fill
-          className="border border-border object-cover object-[center_40%]"
+          className=" object-cover object-[center_40%]"
         />
       </motion.div>
 
