@@ -3,7 +3,7 @@ import { createClient } from "./supabase/server";
 import { Event } from "./types";
 import { PostgrestError } from "@supabase/supabase-js";
 
-/** All events the currently authenticated user has a confirmed RSVP for. */
+/** Returns confirmed RSVP events for one user. */
 export async function getAttendingEvents(userId?: string): Promise<Event[]> {
   const supabase = await createClient();
 
@@ -40,6 +40,7 @@ export async function getAttendingEventsPage(
   page: number,
   pageSize: number,
 ): Promise<{ items: Event[]; total: number }> {
+  // Keep paging safe even if the caller passes bad values.
   const safePage = Math.max(1, page);
   const safePageSize = Math.max(1, pageSize);
   const from = (safePage - 1) * safePageSize;
@@ -55,6 +56,7 @@ export async function getAttendingEventsPage(
 
   if (rsvpError || !rsvps || rsvps.length === 0) return { items: [], total: 0 };
 
+  // Use RSVP ids first so we only query events the user joined.
   const ids = rsvps.map((row) => row.event_id);
   const nowIso = new Date().toISOString();
 
@@ -78,7 +80,7 @@ export async function getAttendingEventsPage(
   return { items: data as Event[], total: count ?? 0 };
 }
 
-/** All events for an organization, ordered by start time (soonest first). */
+/** Returns events for one organization by start time. */
 export async function getEventsByOrganizationId(
   organizationId: number,
 ): Promise<Event[]> {

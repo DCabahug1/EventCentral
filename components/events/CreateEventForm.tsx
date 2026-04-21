@@ -40,17 +40,17 @@ import {
 import { PostgrestError } from "@supabase/supabase-js";
 
 function defaultStartLocal(): string {
-  const d = new Date();
-  d.setMinutes(0, 0, 0);
-  d.setHours(d.getHours() + 1);
-  return toLocalInput(d);
+  const startDate = new Date();
+  startDate.setMinutes(0, 0, 0);
+  startDate.setHours(startDate.getHours() + 1);
+  return toLocalInput(startDate);
 }
 
 function defaultEndLocal(): string {
-  const d = new Date();
-  d.setMinutes(0, 0, 0);
-  d.setHours(d.getHours() + 3);
-  return toLocalInput(d);
+  const endDate = new Date();
+  endDate.setMinutes(0, 0, 0);
+  endDate.setHours(endDate.getHours() + 3);
+  return toLocalInput(endDate);
 }
 
 function toLocalInput(d: Date): string {

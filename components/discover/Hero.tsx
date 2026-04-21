@@ -45,7 +45,7 @@ function Hero({
   ) => void;
   onToggleGeolocationOff: () => void;
   onActivateManualLocation: () => void;
-  /** Keyword, category, or location filter applied — show clear control. */
+  /** Show clear control when keyword category or location is active. */
   hasActiveFilters: boolean;
   /** Enables submitting only when draft filters changed. */
   canSearch: boolean;

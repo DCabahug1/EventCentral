@@ -27,8 +27,8 @@ function unformatPhoneNumber(value: string): string {
 
 function phoneDigitsToNumber(digits: string): number | null {
   if (!digits) return null;
-  const n = parseInt(digits, 10);
-  return Number.isNaN(n) ? null : n;
+  const parsedNumber = parseInt(digits, 10);
+  return Number.isNaN(parsedNumber) ? null : parsedNumber;
 }
 
 function page() {

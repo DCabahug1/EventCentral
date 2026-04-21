@@ -30,7 +30,7 @@ const getEventStatus = (start: string, end: string): EventStatus => {
   return "ended";
 };
 
-// Visual config for each status — controls badge label, styles, and whether to show a pulse dot
+// Style rules for each status badge.
 const statusConfig: Record<EventStatus, { label: string; className: string }> =
   {
     upcoming: {
@@ -81,7 +81,7 @@ function EventCard({
   const organizationName =
     providedOrganization?.name ?? event.organization_name ?? organization?.name;
 
-  // For the hover effect
+  // Track hover state for overlays.
   const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
@@ -109,7 +109,7 @@ function EventCard({
     void fetchOrganization();
   }, [event.organization_id, event.organization_name, providedOrganization]);
 
-  // Reset image fallback when card data changes.
+  // Reset image fallback when event data changes.
   useEffect(() => {
     setHasImageLoadError(false);
   }, [event.id, eventImageSource]);
@@ -208,12 +208,12 @@ function EventCard({
               className={`absolute inset-0 bg-linear-to-t from-black/90 via-black/60 to-transparent z-10 ${isHovered ? "opacity-50" : "opacity-80"} transition-all duration-300`}
             />
 
-            {/* Status badge — top-left */}
+            {/* Status badge at top left */}
             <Badge className={statusBadgeClassName}>
               {statusLabel}
             </Badge>
 
-            {/* Capacity badge — top-right */}
+            {/* Capacity badge at top right */}
             {capacityBadge && (
               <div className="absolute top-3 right-3 z-20">
                 <Badge className={capacityBadge.className}>
@@ -222,7 +222,7 @@ function EventCard({
               </div>
             )}
 
-            {/* Bottom overlay — event details */}
+            {/* Bottom overlay with event details */}
             <div className="absolute inset-x-0 bottom-0 z-20 flex flex-col gap-2 px-4 pb-6">
               {/* Category + org */}
               <div className="flex items-center gap-2 flex-wrap">
@@ -291,7 +291,7 @@ function EventCard({
               className={`absolute inset-0 bg-linear-to-t from-black/70 dark:from-background to-transparent z-10 ${isHovered ? "opacity-70" : "opacity-80"} transition-all duration-300`}
             />
 
-            {/* Status badge — positioned over the image in the top-left */}
+            {/* Status badge shown over image at top left */}
             <Badge className={statusBadgeClassName}>
               {statusLabel}
             </Badge>

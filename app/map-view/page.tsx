@@ -38,14 +38,14 @@ function page() {
   const [loadingEvents, setLoadingEvents] = useState(true);
   const [appliedQuery, setAppliedQuery] = useState<MapSearchQuery>(DEFAULT_QUERY);
 
-  // Map focus state — updated only when the form is submitted.
+  // Map focus state updates only after submit.
   const [mapLocation, setMapLocation] = useState("");
   const [mapRadius, setMapRadius] = useState(10);
   const [mapCoordinates, setMapCoordinates] = useState<{ lat: number; lng: number } | undefined>(undefined);
   const [mapLocationValid, setMapLocationValid] = useState(true);
   const [searchUsingUserLocation, setSearchUsingUserLocation] = useState(false);
 
-  // Tracks which event is selected — syncs the map popup and list highlight
+  // Selected event id keeps list and map in sync.
   const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
 
   // Ref on the map wrapper div used to scroll it into view when a list card is clicked
@@ -150,7 +150,7 @@ function page() {
   };
 
   // Load an initial set of events on mount using the default form values.
-  // No regionBounds — blank location shows all events (no location filter).
+  // No region bounds means show all events.
   useEffect(() => {
     fetchEvents({
       ...DEFAULT_QUERY,
@@ -162,21 +162,21 @@ function page() {
     // hooks inside Form (geocoding) and MapView (geocoding) share the same context
     <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!}>
       <div className="h-[calc(100svh-64px)] flex flex-col md:flex-row">
-        {/* Side panel — visible on desktop only.
+        {/* Side panel visible on desktop only.
           Contains the full filter form with an inline submit button. */}
         <div className="hidden md:flex flex-col p-4 gap-4 w-80 h-full border-r overflow-y-auto">
           <Form fetchEvents={fetchEvents} appliedQuery={appliedQuery} />
         </div>
 
-        {/* Main content area — map + event list stacked vertically */}
+        {/* Main content area with map and list stacked */}
         <div ref={contentScrollRef} className="flex-1 flex flex-col overflow-y-auto relative">
-          {/* Mobile filter trigger — floating button in the top-left of the map.
+          {/* Mobile filter trigger in the top left of the map.
             Opens a dialog with the same form fields. */}
           <div className="absolute top-4 left-4 z-10 md:hidden">
             <FiltersDialog fetchEvents={fetchEvents} appliedQuery={appliedQuery} />
           </div>
 
-          {/* Map wrapper — ref used for scroll-to-map from event list clicks */}
+          {/* Map wrapper ref for scroll back to map from list */}
           <div ref={mapRef}>
             <MapView
               location={mapLocation}

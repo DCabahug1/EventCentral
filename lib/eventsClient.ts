@@ -8,13 +8,13 @@ export const getEvents = async (filters?: {
   startDate?: string;
   endDate?: string;
   eventType?: string;
-  // True when searching from the user's GPS location — applies radius distance check
+  // True when searching from user GPS location.
   useUserLocation?: boolean;
-  // Exact GPS coordinates — only set in geolocation mode
+  // Exact GPS coordinates only in geolocation mode.
   coordinates?: { lat: number; lng: number };
-  // Radius in miles — only used in geolocation mode
+  // Radius in miles only in geolocation mode.
   radius?: number;
-  // Bounding box of a selected region — only set in region mode
+  // Bounding box of selected region only in region mode.
   regionBounds?: { north: number; south: number; east: number; west: number };
 }): Promise<Event[]> => {
   const {
@@ -58,7 +58,7 @@ export const getEvents = async (filters?: {
   const events = data as Event[];
   const normalizedKeyword = keyword.trim().toLowerCase();
 
-  // 2. Apply client-side location filtering — two mutually exclusive modes.
+  // 2. Apply client side location filtering with two modes.
   return events.filter((event) => {
     if (normalizedKeyword) {
       const matchesKeyword =
@@ -90,8 +90,7 @@ export const getEvents = async (filters?: {
       )
         return false;
     }
-    // If neither condition matches (no regionBounds, no coordinates), no location
-    // filter is applied — blank location / no bounds shows all events.
+    // If region bounds and coordinates are both missing then keep all events.
 
     return true;
   });

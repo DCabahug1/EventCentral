@@ -3,19 +3,19 @@ import type { Event, Organization } from "@/lib/types";
 export const ORG_EVENTS_PAGE_SIZE = 8;
 
 export function normalizeWebsite(input: string): string | null {
-  const t = input.trim();
-  if (!t) return null;
-  if (!/^https?:\/\//i.test(t)) return `https://${t}`;
-  return t;
+  const trimmedInput = input.trim();
+  if (!trimmedInput) return null;
+  if (!/^https?:\/\//i.test(trimmedInput)) return `https://${trimmedInput}`;
+  return trimmedInput;
 }
 
 export function partitionEvents(events: Event[]) {
   const now = new Date();
   const upcoming: Event[] = [];
   const past: Event[] = [];
-  for (const e of events) {
-    if (new Date(e.end_time) >= now) upcoming.push(e);
-    else past.push(e);
+  for (const event of events) {
+    if (new Date(event.end_time) >= now) upcoming.push(event);
+    else past.push(event);
   }
   upcoming.sort(
     (a, b) =>
@@ -40,8 +40,8 @@ export function isOrganization(value: unknown): value is Organization {
   if (typeof row.name !== "string") return false;
   if (typeof row.id === "number" && Number.isFinite(row.id)) return true;
   if (typeof row.id === "string" && row.id !== "") {
-    const n = Number(row.id);
-    return Number.isFinite(n);
+    const parsedId = Number(row.id);
+    return Number.isFinite(parsedId);
   }
   return false;
 }

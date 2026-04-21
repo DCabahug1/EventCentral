@@ -22,14 +22,14 @@ function radiusToZoom(radiusMiles: number): number {
   return Math.max(8, Math.min(12, Math.round(14 - Math.log2(radiusMiles))));
 }
 
-// Default map view — centered on the continental US at a country-wide zoom.
+// Default map view centered on the continental US.
 // Used as the fallback when no valid location is set or geocoding fails.
 const DEFAULT_CENTER = { lat: 39.5, lng: -98.35 };
 const DEFAULT_ZOOM = 4;
 
 // MapViewInner must be rendered as a child of <Map> so it can access the map
 // instance via useMap() and lazily load the Geocoding API via useMapsLibrary().
-// It has no visual output — it only drives imperative pan/zoom side effects.
+// This renders no UI and only controls map pan and zoom.
 function MapViewInner({
   location,
   radius,
@@ -39,7 +39,7 @@ function MapViewInner({
 }: {
   location?: string;
   radius?: number;
-  // Raw lat/lng from geolocation — skips geocoding when present
+  // Raw lat and lng from geolocation skips geocoding.
   coordinates?: { lat: number; lng: number };
   // Whether the current location string came from a validated source
   locationValid?: boolean;
@@ -91,7 +91,7 @@ function MapViewInner({
             map.setZoom(radiusToZoom(radius ?? 10));
           }
         } else {
-          // Unrecognized location — reset to default view
+          // Unrecognized location resets to default view.
           map.panTo(DEFAULT_CENTER);
           map.setZoom(DEFAULT_ZOOM);
         }
@@ -143,11 +143,11 @@ export default function MapView({
   coordinates?: { lat: number; lng: number };
   locationValid?: boolean;
   events?: Event[];
-  // ID of the event selected from the list — triggers map pan
+  // Id of selected event from list triggers map pan.
   selectedEventId?: number | null;
-  // Callback when a marker is clicked — syncs selection back to the list
+  // Callback when marker is clicked to sync list selection.
   onEventSelect?: (id: number) => void;
-  // Callback for the "View in list" button inside the popup — scrolls to the event card
+  // Callback for view in list button to scroll to event card.
   onScrollToEvent?: (id: number) => void;
 }) {
   const { resolvedTheme } = useTheme();
@@ -180,7 +180,7 @@ export default function MapView({
         colorScheme={colorScheme}
         className="w-full h-[60svh]"
       >
-        {/* Handles all imperative pan/zoom logic — renders no DOM output */}
+        {/* Handles map pan and zoom logic with no DOM output */}
         <MapViewInner
           location={location}
           radius={radius}
@@ -189,7 +189,7 @@ export default function MapView({
           selectedEvent={selectedEvent}
         />
 
-        {/* User location marker — shown only when geolocation is active.
+        {/* User location marker shown only when geolocation is active.
             Uses a pulsing blue dot to match the Google Maps "your location" convention. */}
         {coordinates && (
           <AdvancedMarker position={coordinates}>
@@ -200,7 +200,7 @@ export default function MapView({
           </AdvancedMarker>
         )}
 
-        {/* Event markers — one per event, with an inline custom popup when active */}
+        {/* Event markers one per event with inline popup when active */}
         {events
           .filter(
             (event): event is MappableEvent =>
@@ -220,7 +220,7 @@ export default function MapView({
               {/* Wrapper keeps the popup and marker aligned on a shared center axis.
                   The popup is absolute so it doesn't shift the AdvancedMarker anchor point. */}
               <div className="relative flex flex-col items-center">
-                {/* Custom popup — rendered above the marker when active.
+                {/* Custom popup rendered above marker when active.
                     Uses bottom-full + mb-3 to float just above the circle. */}
                 {isActive && (
                   <div
@@ -275,7 +275,7 @@ export default function MapView({
                   </div>
                 )}
 
-                {/* Map pin — circle with image + triangular point at the bottom.
+                {/* Map pin with circle image and triangular point at bottom.
                     Uses Tailwind group so hover on the container drives both
                     the circle border and triangle color simultaneously. */}
                 <div className={`group flex flex-col items-center transition-all duration-200 cursor-pointer drop-shadow-lg ${isActive ? "scale-125" : "hover:scale-110"}`}>
@@ -292,7 +292,7 @@ export default function MapView({
                       className="h-full w-full border border-border object-cover"
                     />
                   </div>
-                  {/* Triangle point — color matches the circle border */}
+                  {/* Triangle point color matches the circle border */}
                   <div
                     className={`w-0 h-0 border-x-10 border-x-transparent border-t-12 -mt-[2px] transition-colors duration-200 ${
                       isActive ? "border-t-primary" : "border-t-white group-hover:border-t-primary"

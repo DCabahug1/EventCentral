@@ -39,6 +39,7 @@ export default function ProfilePageClient({
   initialUpcoming,
   initialPast,
 }: Props) {
+  // Seed state with server fetched data so the first paint is ready.
   const router = useRouter();
   const [profile, setProfile] = useState<Profile>(initialProfile);
   const [organizations, setOrganizations] = useState<Organization[]>(
@@ -94,6 +95,7 @@ export default function ProfilePageClient({
   const [newOrgFormError, setNewOrgFormError] = useState("");
   const [newOrgSaving, setNewOrgSaving] = useState(false);
 
+  // Reset the create org dialog every time it closes.
   const resetNewOrganizationForm = () => {
     setNewOrgName("");
     setNewOrgDescription("");
@@ -134,6 +136,7 @@ export default function ProfilePageClient({
   }, [avatarFile]);
 
   useEffect(() => {
+    // Scroll dialog to the error if submit validation fails.
     if (!formError) return;
     const container = formScrollContainerRef.current;
     const error = formErrorRef.current;
@@ -184,6 +187,7 @@ export default function ProfilePageClient({
   const totalPastPages = Math.max(1, Math.ceil(pastTotal / PROFILE_EVENTS_PAGE_SIZE));
 
   useEffect(() => {
+    // Keep org list page in sync with server data.
     void getOrganizationsByUserIdPage(
       userId,
       organizationsPage,
@@ -196,6 +200,7 @@ export default function ProfilePageClient({
   }, [organizationsPage, userId]);
 
   useEffect(() => {
+    // Load only the selected upcoming page.
     void getAttendingEventsPage(
       userId,
       "upcoming",
@@ -208,6 +213,7 @@ export default function ProfilePageClient({
   }, [upcomingPage, userId]);
 
   useEffect(() => {
+    // Load only the selected past page.
     void getAttendingEventsPage(
       userId,
       "past",

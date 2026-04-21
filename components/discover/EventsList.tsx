@@ -17,18 +17,18 @@ import ListEmptyState from "../ui/list-empty-state";
 const now = () => new Date();
 
 const partitionEvents = (events: Event[]) => {
-  const n = now();
+  const currentTime = now();
 
   const happening: Event[] = [];
   const upcoming: Event[] = [];
   const past: Event[] = [];
 
-  for (const e of events) {
-    const start = new Date(e.start_time);
-    const end = new Date(e.end_time);
-    if (n < start) upcoming.push(e);
-    else if (n <= end) happening.push(e);
-    else past.push(e);
+  for (const event of events) {
+    const start = new Date(event.start_time);
+    const end = new Date(event.end_time);
+    if (currentTime < start) upcoming.push(event);
+    else if (currentTime <= end) happening.push(event);
+    else past.push(event);
   }
 
   // Ending soonest first

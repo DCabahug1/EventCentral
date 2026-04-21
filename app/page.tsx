@@ -155,12 +155,12 @@ function DiscoverPageContent() {
       !activeCategory || event.category === activeCategory;
     if (!matchesCategory) return false;
 
-    const q = query.trim().toLowerCase();
-    if (!q) return true;
+    const normalizedQuery = query.trim().toLowerCase();
+    if (!normalizedQuery) return true;
 
     return (
-      event.title.toLowerCase().includes(q) ||
-      (event.address ?? "").toLowerCase().includes(q)
+      event.title.toLowerCase().includes(normalizedQuery) ||
+      (event.address ?? "").toLowerCase().includes(normalizedQuery)
     );
   });
 
