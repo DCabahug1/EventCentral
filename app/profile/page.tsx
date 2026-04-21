@@ -307,6 +307,11 @@ export default function ProfilePage() {
         return;
       }
 
+      if (!newOrgAvatarFile || !newOrgBannerFile) {
+        setNewOrgFormError("Avatar and banner images are required.");
+        return;
+      }
+
       let avatarUrl: string | null = null;
       let bannerUrl: string | null = null;
 
@@ -346,10 +351,12 @@ export default function ProfilePage() {
       );
 
       if (isOrganization(result)) {
-        router.push(`/organizations/${result.id}`);
-        router.refresh();
+        const orgId =
+          typeof result.id === "number" ? result.id : Number(result.id);
+        setNewOrgSaving(false);
         setNewOrgOpen(false);
         resetNewOrganizationForm();
+        router.push(`/organizations/${orgId}`);
         return;
       }
 

@@ -19,6 +19,11 @@ import {
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field";
+import {
+  FormRequiredLegend,
+  OptionalFieldHint,
+  RequiredMark,
+} from "@/components/ui/form-field-hints";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -80,10 +85,12 @@ export default function EditProfileDialog({
             className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 [-webkit-overflow-scrolling:touch] sm:p-6"
           >
             <FieldGroup className="gap-5">
+              <FormRequiredLegend className="mb-1" />
               <Field>
                 <div className="flex w-full justify-center">
                   <FieldLabel htmlFor={avatarInputId} className="text-muted-foreground">
                     Avatar
+                    <OptionalFieldHint />
                   </FieldLabel>
                 </div>
                 <FieldContent className="items-center gap-2">
@@ -131,7 +138,7 @@ export default function EditProfileDialog({
 
               <Field>
                 <FieldLabel htmlFor="edit-username" className="text-muted-foreground">
-                  Username
+                  Username <RequiredMark />
                 </FieldLabel>
                 <FieldContent className="gap-2">
                   <div className="relative">
@@ -154,6 +161,7 @@ export default function EditProfileDialog({
               <Field>
                 <FieldLabel htmlFor="edit-description" className="text-muted-foreground">
                   Description
+                  <OptionalFieldHint />
                 </FieldLabel>
                 <FieldContent>
                   <Textarea
@@ -169,6 +177,7 @@ export default function EditProfileDialog({
               <Field>
                 <FieldLabel htmlFor="edit-phone" className="text-muted-foreground">
                   Phone
+                  <OptionalFieldHint />
                 </FieldLabel>
                 <FieldContent>
                   <div className="relative">

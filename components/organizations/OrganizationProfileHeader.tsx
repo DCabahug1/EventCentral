@@ -37,7 +37,10 @@ export default function OrganizationProfileHeader({
             sizes="(max-width: 768px) 96px, 112px"
           />
         ) : (
-          <div className="flex size-full items-center justify-center border border-border bg-primary/20 text-xl font-bold text-primary md:text-2xl">
+          <div
+            className="flex size-full items-center justify-center border border-border text-4xl font-medium text-muted-foreground md:text-5xl"
+            aria-hidden
+          >
             {org.name.slice(0, 1).toUpperCase()}
           </div>
         )}

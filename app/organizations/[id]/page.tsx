@@ -18,6 +18,7 @@ import OrganizationBackLink from "@/components/organizations/OrganizationBackLin
 import OrganizationBanner from "@/components/organizations/OrganizationBanner";
 import DeleteOrganizationDialog from "@/components/organizations/DeleteOrganizationDialog";
 import EditOrganizationDialog from "@/components/organizations/EditOrganizationDialog";
+import CreateEventDialog from "@/components/organizations/CreateEventDialog";
 import OrganizationEventsTabs from "@/components/organizations/OrganizationEventsTabs";
 import OrganizationPageSkeleton from "@/components/organizations/OrganizationPageSkeleton";
 import OrganizationProfileHeader from "@/components/organizations/OrganizationProfileHeader";
@@ -64,6 +65,7 @@ export default function OrganizationPage({ params }: OrganizationPageProps) {
   const [formError, setFormError] = useState("");
   const [upcomingPage, setUpcomingPage] = useState(1);
   const [pastPage, setPastPage] = useState(1);
+  const [createEventOpen, setCreateEventOpen] = useState(false);
 
   const avatarInputId = useId();
   const bannerInputId = useId();
@@ -280,6 +282,11 @@ export default function OrganizationPage({ params }: OrganizationPageProps) {
         return;
       }
 
+      if (!avatarUrl || !bannerUrl) {
+        setFormError("Avatar and banner images are required.");
+        return;
+      }
+
       const result = await updateOrganization(
         org.id,
         name.trim(),
@@ -336,6 +343,14 @@ export default function OrganizationPage({ params }: OrganizationPageProps) {
     }
   };
 
+  const handleEventCreated = useCallback(
+    (event: Event) => {
+      router.push(`/events/${event.id}`);
+      router.refresh();
+    },
+    [router],
+  );
+
   const handleDelete = async () => {
     if (!org) return;
     setDeleteError("");
@@ -344,8 +359,8 @@ export default function OrganizationPage({ params }: OrganizationPageProps) {
       const result = await deleteOrganization(org.id);
       if (result === null) {
         setDeleteOpen(false);
-        router.push("/profile");
-        router.refresh();
+        // Replace (no refresh) so we don't re-trigger load() on this route and get stuck on the skeleton.
+        router.replace("/");
         return;
       }
       const msg =
@@ -405,8 +420,19 @@ export default function OrganizationPage({ params }: OrganizationPageProps) {
             totalPastPages={totalPastPages}
             onUpcomingPageChange={setUpcomingPage}
             onPastPageChange={setPastPage}
+            isOwner={isOwner}
+            onCreateEvent={
+              isOwner ? () => setCreateEventOpen(true) : undefined
+            }
           />
         </div>
+
+        <CreateEventDialog
+          open={createEventOpen}
+          onOpenChange={setCreateEventOpen}
+          org={org}
+          onCreated={handleEventCreated}
+        />
 
         <DeleteOrganizationDialog
           open={deleteOpen}

@@ -31,6 +31,11 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { cn, formatUsPhoneInput } from "@/lib/utils";
+import {
+  FormRequiredLegend,
+  OptionalFieldHint,
+  RequiredMark,
+} from "@/components/ui/form-field-hints";
 
 export type EditOrganizationDialogProps = {
   open: boolean;
@@ -109,6 +114,7 @@ export default function EditOrganizationDialog({
             ref={formScrollContainerRef}
             className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 [-webkit-overflow-scrolling:touch] sm:p-6"
           >
+            <FormRequiredLegend className="mb-5" />
             <FieldGroup className="gap-5">
               <Field>
                 <div className="flex w-full justify-center">
@@ -116,7 +122,7 @@ export default function EditOrganizationDialog({
                     htmlFor={avatarInputId}
                     className="text-muted-foreground"
                   >
-                    Avatar
+                    Avatar <RequiredMark />
                   </FieldLabel>
                 </div>
                 <FieldContent className="items-center gap-2">
@@ -169,10 +175,10 @@ export default function EditOrganizationDialog({
                   htmlFor={bannerInputId}
                   className="text-muted-foreground"
                 >
-                  Banner
+                  Banner <RequiredMark />
                 </FieldLabel>
                 <FieldDescription className="text-xs text-muted-foreground">
-                  Wide image recommended.
+                  Wide image recommended. JPEG, PNG, or WebP.
                 </FieldDescription>
                 <FieldContent className="items-center gap-2">
                   <label
@@ -224,10 +230,7 @@ export default function EditOrganizationDialog({
                   htmlFor="edit-name"
                   className="text-muted-foreground"
                 >
-                  Organization name{" "}
-                  <span className="text-destructive" aria-hidden>
-                    *
-                  </span>
+                  Organization name <RequiredMark />
                 </FieldLabel>
                 <FieldContent>
                   <div className="relative">
@@ -253,6 +256,7 @@ export default function EditOrganizationDialog({
                   className="text-muted-foreground"
                 >
                   Description
+                  <OptionalFieldHint />
                 </FieldLabel>
                 <FieldContent>
                   <Textarea
@@ -271,6 +275,7 @@ export default function EditOrganizationDialog({
                   className="text-muted-foreground"
                 >
                   Location
+                  <OptionalFieldHint />
                 </FieldLabel>
                 <FieldContent>
                   <LocationInput
@@ -286,6 +291,7 @@ export default function EditOrganizationDialog({
               <Field>
                 <FieldLabel className="text-muted-foreground">
                   Contact &amp; links
+                  <OptionalFieldHint />
                 </FieldLabel>
                 <FieldContent className="gap-3">
                   <div className="relative">

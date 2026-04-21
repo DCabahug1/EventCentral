@@ -271,7 +271,7 @@ function Form({
           <h1 className="text-2xl font-bold tracking-tight">Map View</h1>
         </div>
         <h2 className="pl-3 text-sm text-muted-foreground">
-          Filter events on the map
+          Filter events on the map.
         </h2>
       </div>
       <Separator className="hidden md:block" />

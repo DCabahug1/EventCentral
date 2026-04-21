@@ -51,6 +51,20 @@ export async function getEventsByOrganizationId(
   return data as Event[];
 }
 
+export async function getEventById(
+  id: number,
+): Promise<Event | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("events")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (error || !data) return null;
+  return data as Event;
+}
+
 type EventInput = Omit<Event, "id" | "user_id" | "created_at" | "updated_at">;
 type EventUpdate = Partial<EventInput>;
 

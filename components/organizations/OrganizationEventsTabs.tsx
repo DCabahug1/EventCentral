@@ -1,3 +1,8 @@
+"use client";
+
+import { useState } from "react";
+import { Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PaginationBar from "@/components/discover/PaginationBar";
 import EventCard from "@/components/events/EventCard";
@@ -16,6 +21,8 @@ type Props = {
   totalPastPages: number;
   onUpcomingPageChange: (page: number) => void;
   onPastPageChange: (page: number) => void;
+  isOwner?: boolean;
+  onCreateEvent?: () => void;
 };
 
 export default function OrganizationEventsTabs({
@@ -30,22 +37,44 @@ export default function OrganizationEventsTabs({
   totalPastPages,
   onUpcomingPageChange,
   onPastPageChange,
+  isOwner = false,
+  onCreateEvent,
 }: Props) {
+  const [tab, setTab] = useState<"upcoming" | "past">("upcoming");
+  const tabCount = tab === "upcoming" ? upcoming.length : past.length;
+
   return (
     <section className="flex flex-col gap-4" aria-labelledby="org-events-heading">
-      <div className="flex flex-col gap-1">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-2">
           <div className="h-5 w-1 shrink-0 bg-primary" aria-hidden />
           <h2 id="org-events-heading" className="text-2xl font-bold">
             Events
           </h2>
         </div>
-        <p className="pl-3 text-sm text-muted-foreground">
-          Upcoming and past events from this organization.
-        </p>
+        <div className="flex shrink-0 flex-wrap items-center justify-end gap-3">
+          <p className="text-sm text-muted-foreground">
+            {tabCount} {tabCount === 1 ? "event" : "events"}
+          </p>
+          {isOwner && onCreateEvent ? (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={onCreateEvent}
+            >
+              <Plus className="size-4" />
+              Create event
+            </Button>
+          ) : null}
+        </div>
       </div>
 
-      <Tabs defaultValue="upcoming" className="flex flex-col gap-4">
+      <Tabs
+        value={tab}
+        onValueChange={(v) => setTab(v as "upcoming" | "past")}
+        className="flex flex-col gap-4"
+      >
         <TabsList className="w-full max-w-md sm:w-fit">
           <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
           <TabsTrigger value="past">Past</TabsTrigger>

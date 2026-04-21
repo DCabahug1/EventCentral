@@ -165,11 +165,13 @@ function EventsList({
   const [happeningPage, setHappeningPage] = useState(1);
   const [upcomingPage, setUpcomingPage] = useState(1);
   const [pastPage, setPastPage] = useState(1);
+  const [eventsTab, setEventsTab] = useState<"upcoming" | "past">("upcoming");
 
   useEffect(() => {
     setHappeningPage(1);
     setUpcomingPage(1);
     setPastPage(1);
+    setEventsTab("upcoming");
   }, [
     query,
     activeCategory,
@@ -227,6 +229,9 @@ function EventsList({
     }
   }, [pastPage, pastSafePage]);
 
+  const listTabCount =
+    eventsTab === "upcoming" ? upcoming.length : past.length;
+
   return (
     <div className="flex flex-col gap-10 px-6 py-8 items-center w-full border-t">
       {(happening.length > 0 || emptyContext !== null) && (
@@ -269,8 +274,7 @@ function EventsList({
                 </p>
               </div>
               <span className="text-sm font-normal text-muted-foreground shrink-0">
-                {upcoming.length + past.length}{" "}
-                {upcoming.length + past.length === 1 ? "event" : "events"}
+                {listTabCount} {listTabCount === 1 ? "event" : "events"}
               </span>
             </motion.div>
           )}
@@ -282,7 +286,11 @@ function EventsList({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, ease: "easeOut", delay: 0.1 }}
         >
-          <Tabs defaultValue="upcoming" className="w-full">
+          <Tabs
+            value={eventsTab}
+            onValueChange={(v) => setEventsTab(v as "upcoming" | "past")}
+            className="w-full"
+          >
             <TabsList className="lg:self-start self-center">
               <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
               <TabsTrigger value="past">Past</TabsTrigger>

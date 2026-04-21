@@ -7,6 +7,7 @@ import {
   Paintbrush,
   Leaf,
   LucideIcon,
+  CircleOff,
 } from "lucide-react";
 
 export type CategoryConfig = {
@@ -15,7 +16,15 @@ export type CategoryConfig = {
   colorClass: string;
 };
 
+/** Default category for new events (create form). */
+export const DEFAULT_EVENT_CATEGORY = "None / Other";
+
 export const CATEGORY_CONFIG: CategoryConfig[] = [
+  {
+    label: DEFAULT_EVENT_CATEGORY,
+    icon: CircleOff,
+    colorClass: "text-muted-foreground",
+  },
   { label: "Music",       icon: Music,        colorClass: "text-purple-500" },
   { label: "Parties",     icon: PartyPopper,  colorClass: "text-pink-500"   },
   { label: "Tech",        icon: Code,         colorClass: "text-blue-500"   },

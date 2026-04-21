@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 import { Event } from "@/lib/types";
 import EventItem from "./EventItem";
-import { Badge } from "../ui/badge";
 import { motion } from "motion/react";
 import PaginationBar from "@/components/discover/PaginationBar";
 
@@ -55,9 +54,9 @@ function EventList({
             </p>
           )}
         </div>
-        <Badge variant="default" className="shrink-0">
+        <span className="shrink-0 text-sm font-normal text-muted-foreground">
           {events.length} {events.length === 1 ? "event" : "events"}
-        </Badge>
+        </span>
       </div>
       <div className="flex flex-col">
         {pageSlice.map((event) => (

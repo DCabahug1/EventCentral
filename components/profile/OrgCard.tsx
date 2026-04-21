@@ -10,17 +10,20 @@ export default function OrgCard({ org }: { org: Organization }) {
   return (
     <Link href={`/organizations/${org.id}`} className="group block">
       <Card className="flex flex-row items-center gap-4 p-4 transition-colors group-hover:bg-muted/50">
-        <div className="relative flex size-14 shrink-0 items-center justify-center self-center overflow-hidden rounded-none bg-primary/10">
+        <div className="relative flex size-14 shrink-0 items-center justify-center self-center overflow-hidden rounded-none border border-border bg-muted">
           {org.avatar_url ? (
             <Image
               src={org.avatar_url}
               alt=""
               width={56}
               height={56}
-              className="size-full border border-border object-cover"
+              className="size-full object-cover"
             />
           ) : (
-            <span className="text-lg font-bold text-primary">
+            <span
+              className="flex size-full items-center justify-center text-xl font-medium text-muted-foreground"
+              aria-hidden
+            >
               {org.name.slice(0, 1).toUpperCase()}
             </span>
           )}

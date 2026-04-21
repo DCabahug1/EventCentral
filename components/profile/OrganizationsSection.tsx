@@ -34,25 +34,26 @@ export default function OrganizationsSection({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: "easeOut", delay: 0.05 }}
     >
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2">
-            <div className="h-5 w-1 shrink-0 bg-primary" />
-            <h2 className="text-2xl font-bold">Organizations</h2>
-          </div>
-          <p className="pl-3 text-sm text-muted-foreground">
-            Manage your organizations.
-          </p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-2">
+          <div className="h-5 w-1 shrink-0 bg-primary" />
+          <h2 className="text-2xl font-bold">Organizations</h2>
         </div>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={onCreateOrganization}
-        >
-          <Plus className="size-4" />
-          New Organization
-        </Button>
+        <div className="flex shrink-0 flex-wrap items-center justify-end gap-3">
+          <span className="text-sm text-muted-foreground">
+            {organizations.length}{" "}
+            {organizations.length === 1 ? "organization" : "organizations"}
+          </span>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={onCreateOrganization}
+          >
+            <Plus className="size-4" />
+            New Organization
+          </Button>
+        </div>
       </div>
 
       {organizations.length === 0 ? (

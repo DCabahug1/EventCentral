@@ -50,20 +50,25 @@ export default function FiltersDialog({
         showCloseButton={false}
         className="flex max-h-[85svh] min-h-0 flex-col gap-0 overflow-hidden p-0 sm:max-w-lg"
       >
-        <div className="relative flex shrink-0 items-center justify-center border-b border-border px-4 py-4 sm:px-6">
-          <DialogTitle className="text-center text-2xl font-bold tracking-tight">
-            Filters
-          </DialogTitle>
+        <div className="relative shrink-0 border-b border-border px-4 py-4 sm:px-6">
           <DialogClose asChild>
             <Button
               variant="ghost"
               size="icon"
-              className="absolute right-4 top-1/2 -translate-y-1/2 shrink-0"
+              className="absolute right-4 top-4 shrink-0"
               aria-label="Close"
             >
               <X className="size-4" />
             </Button>
           </DialogClose>
+          <div className="flex flex-col gap-1 pr-10 text-center sm:pr-12">
+            <DialogTitle className="text-2xl font-bold tracking-tight">
+              Filters
+            </DialogTitle>
+            <p className="text-xs text-muted-foreground">
+              All fields are optional.
+            </p>
+          </div>
         </div>
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden p-4 sm:p-6">
           <div className="min-h-0 flex-1 overflow-y-auto">

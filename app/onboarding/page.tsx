@@ -8,6 +8,11 @@ import Image from "next/image";
 import { createProfile } from "@/lib/profiles";
 import { AuthError } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
+import {
+  FormRequiredLegend,
+  OptionalFieldHint,
+  RequiredMark,
+} from "@/components/ui/form-field-hints";
 
 function formatPhoneNumber(value: string): string {
   const digits = value.replace(/\D/g, "").slice(0, 10);
@@ -89,8 +94,11 @@ function page() {
               onSubmit={handleSubmit}
               className="w-full flex flex-col gap-4"
             >
+              <FormRequiredLegend />
               <div className="flex flex-col gap-2">
-                <Label htmlFor="username">Username</Label>
+                <Label htmlFor="username">
+                  Username <RequiredMark />
+                </Label>
                 <Input
                   type="text"
                   id="username"
@@ -103,10 +111,8 @@ function page() {
               </div>
               <div className="flex flex-col gap-2">
                 <Label htmlFor="phone_number">
-                  Phone Number{" "}
-                  <span className="text-xs text-muted-foreground">
-                    (Optional)
-                  </span>
+                  Phone number
+                  <OptionalFieldHint />
                 </Label>
                 <Input
                   type="tel"
@@ -123,10 +129,8 @@ function page() {
               </div>
               <div className="flex flex-col gap-2">
                 <Label htmlFor="description">
-                  Bio{" "}
-                  <span className="text-xs text-muted-foreground">
-                    (Optional)
-                  </span>
+                  Bio
+                  <OptionalFieldHint />
                 </Label>
                 <textarea
                   id="description"

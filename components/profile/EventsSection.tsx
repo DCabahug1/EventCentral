@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { motion } from "motion/react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -36,6 +37,9 @@ export default function EventsSection({
   onUpcomingPageChange,
   onPastPageChange,
 }: Props) {
+  const [tab, setTab] = useState<"upcoming" | "past">("upcoming");
+  const tabCount = tab === "upcoming" ? upcoming.length : past.length;
+
   return (
     <motion.section
       className="flex flex-col gap-4"
@@ -43,17 +47,21 @@ export default function EventsSection({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: "easeOut", delay: 0.1 }}
     >
-      <div className="flex flex-col gap-1">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-2">
           <div className="h-5 w-1 shrink-0 bg-primary" />
           <h2 className="text-2xl font-bold">Events</h2>
         </div>
-        <p className="pl-3 text-sm text-muted-foreground">
-        Track your upcoming events and attendance history.
+        <p className="shrink-0 text-sm text-muted-foreground">
+          {tabCount} {tabCount === 1 ? "event" : "events"}
         </p>
       </div>
 
-      <Tabs defaultValue="upcoming" className="flex flex-col gap-4">
+      <Tabs
+        value={tab}
+        onValueChange={(v) => setTab(v as "upcoming" | "past")}
+        className="flex flex-col gap-4"
+      >
         <TabsList>
           <TabsTrigger value="upcoming">Attending</TabsTrigger>
           <TabsTrigger value="past">Previously Attended</TabsTrigger>
