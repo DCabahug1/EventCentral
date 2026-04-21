@@ -15,6 +15,7 @@ import {
 import {
   Field,
   FieldContent,
+  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
@@ -85,7 +86,7 @@ export default function EditProfileDialog({
             className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 [-webkit-overflow-scrolling:touch] sm:p-6"
           >
             <FieldGroup className="gap-5">
-              <FormRequiredLegend className="mb-1" />
+              <FormRequiredLegend className="mb-5" />
               <Field>
                 <div className="flex w-full justify-center">
                   <FieldLabel htmlFor={avatarInputId} className="text-muted-foreground">
@@ -93,6 +94,9 @@ export default function EditProfileDialog({
                     <OptionalFieldHint />
                   </FieldLabel>
                 </div>
+                <FieldDescription className="text-center text-xs text-muted-foreground">
+                  Square image recommended. JPEG, PNG, or WebP.
+                </FieldDescription>
                 <FieldContent className="items-center gap-2">
                   <label
                     htmlFor={avatarInputId}

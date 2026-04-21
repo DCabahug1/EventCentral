@@ -125,6 +125,9 @@ export default function EditOrganizationDialog({
                     Avatar <RequiredMark />
                   </FieldLabel>
                 </div>
+                <FieldDescription className="text-center text-xs text-muted-foreground">
+                  Square image recommended. JPEG, PNG, or WebP.
+                </FieldDescription>
                 <FieldContent className="items-center gap-2">
                   <label
                     htmlFor={avatarInputId}
