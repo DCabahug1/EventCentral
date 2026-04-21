@@ -2,6 +2,8 @@
 import React, { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { Moon, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
 import { getCurrentUser } from "@/lib/user";
 import { getProfile } from "@/lib/profiles";
 import { PostgrestError } from "@supabase/supabase-js";
@@ -10,9 +12,11 @@ import { AuthError } from "@supabase/supabase-js";
 import DesktopNav from "./DesktopNav";
 import MobileNav from "./MobileNav";
 import CreateEventGlobalDialog from "@/components/events/CreateEventGlobalDialog";
+import { Button } from "@/components/ui/button";
 
 function Header() {
   const pathname = usePathname();
+  const { theme, setTheme } = useTheme();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [createEventOpen, setCreateEventOpen] = useState(false);
 
@@ -56,7 +60,15 @@ function Header() {
           </div>
         </Link>
 
-        {!pathname.startsWith("/auth") && (
+        {pathname.startsWith("/auth") ? (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+          >
+            {theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
+          </Button>
+        ) : (
           <DesktopNav
             profile={profile}
             pathname={pathname}
