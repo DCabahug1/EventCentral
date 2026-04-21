@@ -50,6 +50,8 @@ function page() {
 
   // Ref on the map wrapper div used to scroll it into view when a list card is clicked
   const mapRef = useRef<HTMLDivElement>(null);
+  // Main scroll container on mobile/tablet (map + list column)
+  const contentScrollRef = useRef<HTMLDivElement>(null);
 
   const appliedKeyword = appliedQuery.keyword.trim();
   const hasKeyword = Boolean(appliedKeyword);
@@ -114,8 +116,37 @@ function page() {
   // Highlights the event card and scrolls the page down to it.
   const handleScrollToEvent = (id: number) => {
     setSelectedEventId(id);
-    const card = document.querySelector(`[data-event-id="${id}"]`);
-    card?.scrollIntoView({ behavior: "smooth", block: "center" });
+    const scrollToCard = (remainingTries: number) => {
+      const card = document.querySelector(
+        `[data-event-id="${id}"]`,
+      ) as HTMLElement | null;
+
+      // Card may not exist yet while EventList updates pagination.
+      if (!card) {
+        if (remainingTries <= 0) return;
+        requestAnimationFrame(() => {
+          window.setTimeout(() => scrollToCard(remainingTries - 1), 40);
+        });
+        return;
+      }
+
+      const scroller = contentScrollRef.current;
+      if (scroller) {
+        // Safari is more reliable with explicit scrollTop on nested containers.
+        const scrollerRect = scroller.getBoundingClientRect();
+        const cardRect = card.getBoundingClientRect();
+        const targetTop = Math.max(
+          0,
+          cardRect.top - scrollerRect.top + scroller.scrollTop - 24,
+        );
+        scroller.scrollTo({ top: targetTop, behavior: "smooth" });
+        return;
+      }
+
+      card.scrollIntoView({ behavior: "smooth", block: "center" });
+    };
+
+    scrollToCard(12);
   };
 
   // Load an initial set of events on mount using the default form values.
@@ -138,7 +169,7 @@ function page() {
         </div>
 
         {/* Main content area — map + event list stacked vertically */}
-        <div className="flex-1 flex flex-col overflow-y-auto relative">
+        <div ref={contentScrollRef} className="flex-1 flex flex-col overflow-y-auto relative">
           {/* Mobile filter trigger — floating button in the top-left of the map.
             Opens a dialog with the same form fields. */}
           <div className="absolute top-4 left-4 z-10 md:hidden">
