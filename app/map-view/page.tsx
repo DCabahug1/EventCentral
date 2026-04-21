@@ -1,7 +1,7 @@
 "use client";
 import Form from "@/components/map-view/Form";
 import MapView from "@/components/map-view/Map";
-import FiltersDrawer from "@/components/map-view/FiltersDrawer";
+import FiltersDialog from "@/components/map-view/FiltersDialog";
 import React, { useRef, useState, useEffect } from "react";
 import { Event } from "@/lib/types";
 import { todayDateString, daysFromNowDateString } from "@/lib/utils";
@@ -134,9 +134,9 @@ function page() {
         {/* Main content area — map + event list stacked vertically */}
         <div className="flex-1 flex flex-col overflow-y-auto relative">
           {/* Mobile filter trigger — floating button in the top-left of the map.
-            Opens a bottom drawer with the same form fields. */}
+            Opens a dialog with the same form fields. */}
           <div className="absolute top-4 left-4 z-10 md:hidden">
-            <FiltersDrawer fetchEvents={fetchEvents} appliedQuery={appliedQuery} />
+            <FiltersDialog fetchEvents={fetchEvents} appliedQuery={appliedQuery} />
           </div>
 
           {/* Map wrapper — ref used for scroll-to-map from event list clicks */}

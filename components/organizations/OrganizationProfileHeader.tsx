@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { Globe, Mail, MapPin, Pencil, Phone, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ExpandableDescription } from "@/components/ui/expandable-description";
 import { cn, formatUsPhoneDisplay, phoneDigitsForTel } from "@/lib/utils";
 import { normalizeWebsite } from "@/lib/organizationPage";
 import type { Organization, Profile } from "@/lib/types";
@@ -43,7 +44,7 @@ export default function OrganizationProfileHeader({
       </div>
       <div className="flex min-w-0 w-full flex-1 flex-col gap-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-          <h1 className="min-w-0 flex-1 text-2xl font-bold tracking-tight sm:text-3xl">
+          <h1 className="min-w-0 flex-1 text-3xl font-bold tracking-tight">
             {org.name}
           </h1>
           {org.website || isOwner ? (
@@ -113,9 +114,12 @@ export default function OrganizationProfileHeader({
         </div>
 
         {org.description ? (
-          <p className="text-muted-foreground leading-relaxed">
-            {org.description}
-          </p>
+          <ExpandableDescription
+            text={org.description}
+            dialogTitle="About"
+            align="start"
+            previewClassName="text-base leading-relaxed"
+          />
         ) : null}
       </div>
     </div>

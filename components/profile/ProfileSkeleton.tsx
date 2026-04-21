@@ -35,7 +35,7 @@ export default function ProfileSkeleton() {
         <Card className="p-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-              <Skeleton className="size-20 shrink-0 rounded-full" />
+              <Skeleton className="size-20 shrink-0 rounded-full border border-border" />
               <div className="flex flex-col gap-2">
                 <Skeleton className="h-7 w-40" />
                 <Skeleton className="h-4 w-56" />

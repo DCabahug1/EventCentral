@@ -76,12 +76,12 @@ function matchesOriginalDefaults(data: FormData): boolean {
 function Form({
   fetchEvents,
   appliedQuery,
-  // When true, the submit button is hidden (used inside the mobile drawer,
+  // When true, the submit button is hidden (used inside the mobile filters dialog,
   // which provides its own "Find Events" button in the footer)
   hideSubmitButton,
   // Called on every form data change — used by the map to update focus live
   onFormDataChange,
-  // Forwarded ref to the <form> element so the drawer can trigger submission
+  // Forwarded ref to the <form> element so the dialog can trigger submission
   // programmatically via formRef.current?.requestSubmit()
   formRef,
   // Emits whether the current form state can be submitted.
@@ -108,7 +108,7 @@ function Form({
   }, [geocodingLib]);
 
   // Keep local form state aligned with the latest applied query.
-  // This ensures drawer reopen on mobile shows the last submitted values.
+  // This ensures dialog reopen on mobile shows the last submitted values.
   useEffect(() => {
     setFormData(appliedQuery);
   }, [appliedQuery]);
@@ -264,11 +264,11 @@ function Form({
 
   return (
     <>
-      {/* Header — desktop only (hidden inside the mobile drawer) */}
+      {/* Header — desktop only (hidden inside the mobile filters dialog) */}
       <div className="hidden md:flex flex-col gap-1">
         <div className="flex items-center gap-2">
           <div className="h-5 w-1 shrink-0 bg-primary" aria-hidden />
-          <h1 className="text-2xl font-bold">Map View</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Map View</h1>
         </div>
         <h2 className="pl-3 text-sm text-muted-foreground">
           Filter events on the map
@@ -397,7 +397,7 @@ function Form({
             </Field>
 
             {/* Submit — disabled until a valid location is confirmed.
-                Hidden when rendered inside the mobile drawer (drawer provides its own button). */}
+                Hidden when rendered inside the mobile filters dialog (dialog provides its own button). */}
             <div
               className={`flex w-full gap-2 ${hideSubmitButton && !showClearFilters ? "hidden" : ""} ${hideSubmitButton ? "justify-end" : ""}`}
             >

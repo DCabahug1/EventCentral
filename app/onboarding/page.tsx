@@ -80,7 +80,7 @@ function page() {
         <Card className="grid grid-cols-1 sm:grid-cols-2 gap-0 p-0 overflow-hidden w-full max-w-2xl">
           <div className="flex flex-col justify-center px-4 py-8 gap-4">
             <div>
-              <h1 className="text-2xl font-bold">Set up your profile</h1>
+              <h1 className="text-3xl font-bold tracking-tight">Set up your profile</h1>
               <p className="text-sm text-muted-foreground">
                 Tell us a bit about yourself to get started
               </p>

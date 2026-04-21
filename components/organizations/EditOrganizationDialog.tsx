@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import type { RefObject } from "react";
 import {
@@ -21,16 +23,16 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer";
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { cn, formatUsPhoneInput } from "@/lib/utils";
 
-export type EditOrganizationDrawerProps = {
+export type EditOrganizationDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (e: React.FormEvent) => void;
@@ -61,7 +63,7 @@ export type EditOrganizationDrawerProps = {
   onRequestDelete: () => void;
 };
 
-export default function EditOrganizationDrawer({
+export default function EditOrganizationDialog({
   open,
   onOpenChange,
   onSubmit,
@@ -90,31 +92,38 @@ export default function EditOrganizationDrawer({
   formError,
   saving,
   onRequestDelete,
-}: EditOrganizationDrawerProps) {
+}: EditOrganizationDialogProps) {
   return (
-    <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="flex max-h-[92vh] min-h-0 flex-col gap-0 overflow-hidden p-0">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent
+        showCloseButton={false}
+        className="flex max-h-[min(92vh,900px)] min-h-0 flex-col gap-0 overflow-hidden p-0 sm:max-w-2xl"
+      >
         <form onSubmit={onSubmit} className="flex min-h-0 flex-1 flex-col">
-          <DrawerHeader className="shrink-0">
-            <DrawerTitle>Edit organization</DrawerTitle>
-          </DrawerHeader>
+          <DialogHeader className="shrink-0 px-4 py-4 sm:px-6">
+            <DialogTitle className="text-2xl font-bold tracking-tight">
+              Edit organization
+            </DialogTitle>
+          </DialogHeader>
           <div
             ref={formScrollContainerRef}
-            className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-2 [-webkit-overflow-scrolling:touch]"
+            className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 [-webkit-overflow-scrolling:touch] sm:p-6"
           >
             <FieldGroup className="gap-5">
               <Field>
-                <FieldLabel
-                  htmlFor={avatarInputId}
-                  className="text-muted-foreground"
-                >
-                  Avatar
-                </FieldLabel>
-                <FieldContent className="gap-2">
+                <div className="flex w-full justify-center">
+                  <FieldLabel
+                    htmlFor={avatarInputId}
+                    className="text-muted-foreground"
+                  >
+                    Avatar
+                  </FieldLabel>
+                </div>
+                <FieldContent className="items-center gap-2">
                   <label
                     htmlFor={avatarInputId}
                     className={cn(
-                      "flex size-32 shrink-0 cursor-pointer flex-col items-center justify-center overflow-hidden border-2 border-dashed border-border transition-colors hover:border-muted-foreground",
+                      "flex size-32 shrink-0 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-none border border-border transition-colors hover:border-muted-foreground",
                     )}
                   >
                     {avatarPreview ? (
@@ -165,11 +174,11 @@ export default function EditOrganizationDrawer({
                 <FieldDescription className="text-xs text-muted-foreground">
                   Wide image recommended.
                 </FieldDescription>
-                <FieldContent className="gap-2">
+                <FieldContent className="items-center gap-2">
                   <label
                     htmlFor={bannerInputId}
                     className={cn(
-                      "flex h-48 w-full max-w-[600px] cursor-pointer flex-col items-center justify-center overflow-hidden border-2 border-dashed border-border transition-colors hover:border-muted-foreground",
+                      "mx-auto flex h-48 w-full max-w-[600px] cursor-pointer flex-col items-center justify-center overflow-hidden rounded-none border border-border transition-colors hover:border-muted-foreground",
                     )}
                   >
                     {bannerPreview ? (
@@ -339,27 +348,25 @@ export default function EditOrganizationDrawer({
               </Field>
             </FieldGroup>
           </div>
-          <DrawerFooter className="shrink-0 border-t bg-background pt-4">
-            <div className="flex w-full flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-              <Button
-                type="button"
-                variant="destructive"
-                onClick={onRequestDelete}
-              >
-                Delete organization
+          <DialogFooter className="shrink-0 border-t bg-background px-4 py-4 sm:px-6">
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={onRequestDelete}
+            >
+              Delete organization
+            </Button>
+            <DialogClose asChild>
+              <Button type="button" variant="outline">
+                Cancel
               </Button>
-              <DrawerClose asChild>
-                <Button type="button" variant="outline">
-                  Cancel
-                </Button>
-              </DrawerClose>
-              <Button type="submit" disabled={saving}>
-                {saving ? "Saving…" : "Save changes"}
-              </Button>
-            </div>
-          </DrawerFooter>
+            </DialogClose>
+            <Button type="submit" disabled={saving}>
+              {saving ? "Saving…" : "Save changes"}
+            </Button>
+          </DialogFooter>
         </form>
-      </DrawerContent>
-    </Drawer>
+      </DialogContent>
+    </Dialog>
   );
 }

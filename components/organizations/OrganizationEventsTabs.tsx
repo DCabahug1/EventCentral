@@ -36,7 +36,7 @@ export default function OrganizationEventsTabs({
       <div className="flex flex-col gap-1">
         <div className="flex items-center gap-2">
           <div className="h-5 w-1 shrink-0 bg-primary" aria-hidden />
-          <h2 id="org-events-heading" className="text-xl font-bold">
+          <h2 id="org-events-heading" className="text-2xl font-bold">
             Events
           </h2>
         </div>

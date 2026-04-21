@@ -1,14 +1,18 @@
 import { Separator } from "@/components/ui/separator";
+import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
-function EventCardSkeleton() {
+/** Mirrors `EventCard` `variant="organization"` (image + body, no extra footer). */
+function OrgEventCardSkeleton() {
   return (
-    <div className="overflow-hidden border border-border bg-card shadow-sm">
-      <Skeleton className="h-48 w-full" />
+    <Card className="h-full w-full gap-0 overflow-hidden p-0 shadow-sm">
+      <Skeleton className="h-48 w-full rounded-none" />
       <div className="flex flex-col gap-3 p-4">
-        <Skeleton className="h-3 w-28" />
-        <Skeleton className="h-7 w-4/5 max-w-xs" />
-        <Skeleton className="h-3 w-20" />
+        <div className="flex flex-col gap-1">
+          <Skeleton className="h-4 w-32" />
+          <Skeleton className="h-8 w-4/5 max-w-xs" />
+        </div>
+        <Skeleton className="h-6 w-28 rounded-full" />
         <div className="flex gap-2">
           <Skeleton className="size-4 shrink-0" />
           <Skeleton className="h-4 flex-1" />
@@ -17,28 +21,35 @@ function EventCardSkeleton() {
           <Skeleton className="size-4 shrink-0" />
           <Skeleton className="h-4 w-40" />
         </div>
-        <Skeleton className="h-2 w-full" />
-        <Skeleton className="h-9 w-full" />
+        <div className="flex gap-2">
+          <Skeleton className="size-4 shrink-0" />
+          <Skeleton className="h-4 w-36" />
+        </div>
       </div>
-    </div>
+    </Card>
   );
 }
 
 export default function OrganizationPageSkeleton() {
   return (
     <div className="min-h-svh overflow-x-hidden bg-muted/30">
+      {/* Matches OrganizationBanner: full-bleed + responsive height */}
       <div className="relative left-1/2 w-screen max-w-[100vw] -translate-x-1/2 border-b border-border bg-muted">
-        <Skeleton className="h-40 w-full sm:h-44 md:h-48 lg:h-52" />
+        <div className="relative w-full sm:h-64 md:h-72 lg:h-80">
+          <Skeleton className="absolute inset-0 size-full rounded-none" />
+        </div>
       </div>
 
       <div className="mx-auto flex max-w-5xl flex-col gap-8 px-4 pb-16 pt-6 sm:px-6 lg:px-8">
+        {/* OrganizationBackLink */}
         <div className="inline-flex w-fit items-center gap-2">
-          <Skeleton className="size-4 shrink-0" />
+          <Skeleton className="size-4 shrink-0 rounded-sm" />
           <Skeleton className="h-5 w-36" />
         </div>
 
+        {/* OrganizationProfileHeader */}
         <div className="flex flex-col gap-6 md:flex-row md:items-center md:gap-8">
-          <Skeleton className="size-40 shrink-0 self-center rounded-sm border border-border" />
+          <Skeleton className="size-40 shrink-0 self-center rounded-sm" />
           <div className="flex min-w-0 w-full flex-1 flex-col gap-4">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
               <Skeleton className="h-10 w-full max-w-[min(100%,24rem)] sm:h-11" />
@@ -54,47 +65,62 @@ export default function OrganizationPageSkeleton() {
               </div>
               <div className="flex min-w-0 max-w-full items-center gap-2">
                 <Skeleton className="size-4 shrink-0 rounded-sm" />
-                <Skeleton className="h-4 w-20" />
                 <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-4 w-28" />
               </div>
               <div className="flex min-w-0 max-w-full items-center gap-2">
                 <Skeleton className="size-4 shrink-0 rounded-sm" />
                 <Skeleton className="h-4 w-48" />
               </div>
-              <div className="flex items-center gap-2">
-                <Skeleton className="size-4 shrink-0 rounded-sm" />
-                <Skeleton className="h-4 w-32" />
-              </div>
             </div>
             <div className="flex flex-col gap-2">
-              <Skeleton className="h-4 w-full" />
               <Skeleton className="h-4 w-full max-w-2xl" />
-              <Skeleton className="h-4 w-4/5 max-w-xl" />
+              <Skeleton className="h-4 w-full max-w-xl" />
+              <Skeleton className="h-4 w-3/5 max-w-lg" />
             </div>
           </div>
         </div>
 
         <Separator />
 
-        <div className="flex flex-col gap-4">
+        {/* OrganizationEventsTabs */}
+        <section className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
-            <Skeleton className="h-7 w-24" />
-            <Skeleton className="h-4 w-full max-w-md" />
+            <div className="flex items-center gap-2">
+              <div
+                className="h-5 w-1 shrink-0 bg-primary"
+                aria-hidden
+              />
+              <Skeleton className="h-8 w-32" />
+            </div>
+            <Skeleton className="h-4 w-full max-w-md pl-3" />
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
-            <EventCardSkeleton />
-            <EventCardSkeleton />
+          <div className="flex w-full max-w-md gap-2 sm:w-fit">
+            <Skeleton className="h-9 flex-1 rounded-md sm:w-28" />
+            <Skeleton className="h-9 flex-1 rounded-md sm:w-24" />
           </div>
-          <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-between">
-            <Skeleton className="h-4 w-48" />
-            <div className="flex items-center gap-2">
-              <Skeleton className="h-9 w-20" />
-              <Skeleton className="h-4 w-14" />
-              <Skeleton className="h-9 w-16" />
+
+          <div className="flex flex-col gap-4">
+            <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
+              <OrgEventCardSkeleton />
+              <OrgEventCardSkeleton />
+              <OrgEventCardSkeleton />
+              <OrgEventCardSkeleton />
             </div>
+            <nav
+              className="flex flex-col items-center gap-3 sm:flex-row sm:justify-between sm:gap-4 w-full"
+              aria-hidden
+            >
+              <Skeleton className="h-4 w-48 order-2 sm:order-1" />
+              <div className="flex items-center gap-2 order-1 sm:order-2">
+                <Skeleton className="h-9 w-18" />
+                <Skeleton className="h-4 w-16" />
+                <Skeleton className="h-9 w-18" />
+              </div>
+            </nav>
           </div>
-        </div>
+        </section>
       </div>
     </div>
   );

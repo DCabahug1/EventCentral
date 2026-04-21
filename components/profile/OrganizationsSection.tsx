@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { Building2, Plus } from "lucide-react";
 import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
@@ -16,6 +15,7 @@ type Props = {
   totalOrganizationPages: number;
   organizationsPageSize: number;
   onPageChange: (page: number) => void;
+  onCreateOrganization: () => void;
 };
 
 export default function OrganizationsSection({
@@ -25,6 +25,7 @@ export default function OrganizationsSection({
   totalOrganizationPages,
   organizationsPageSize,
   onPageChange,
+  onCreateOrganization,
 }: Props) {
   return (
     <motion.section
@@ -37,7 +38,7 @@ export default function OrganizationsSection({
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
             <div className="h-5 w-1 shrink-0 bg-primary" />
-            <h2 className="text-xl font-bold">Organizations</h2>
+            <h2 className="text-2xl font-bold">Organizations</h2>
           </div>
           <p className="pl-3 text-sm text-muted-foreground">
             {organizations.length === 0
@@ -45,11 +46,14 @@ export default function OrganizationsSection({
               : `${organizations.length} ${organizations.length === 1 ? "organization" : "organizations"}`}
           </p>
         </div>
-        <Button asChild variant="outline" size="sm">
-          <Link href="/organizations/new">
-            <Plus className="size-4" />
-            New Organization
-          </Link>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={onCreateOrganization}
+        >
+          <Plus className="size-4" />
+          New Organization
         </Button>
       </div>
 
@@ -57,11 +61,9 @@ export default function OrganizationsSection({
         <EmptyState
           message="Create an organization to host events and build a community."
           action={
-            <Button asChild size="sm">
-              <Link href="/organizations/new">
-                <Building2 className="size-4" />
-                Create Organization
-              </Link>
+            <Button type="button" size="sm" onClick={onCreateOrganization}>
+              <Building2 className="size-4" />
+              Create Organization
             </Button>
           }
         />

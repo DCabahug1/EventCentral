@@ -1,12 +1,17 @@
 "use client";
 
 import React, { useEffect, useId, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { getProfile, updateProfile } from "@/lib/profiles";
-import { getOrganizationsByUserId } from "@/lib/organizations";
+import {
+  createOrganization,
+  getOrganizationsByUserId,
+} from "@/lib/organizations";
 import { getAttendingEvents } from "@/lib/eventsServer";
 import { getCurrentUser } from "@/lib/user";
 import { createClient } from "@/lib/supabase/client";
-import { uploadProfileAvatar } from "@/lib/bucketHandler";
+import { uploadOrganizationAsset, uploadProfileAvatar } from "@/lib/bucketHandler";
+import { isOrganization, normalizeWebsite } from "@/lib/organizationPage";
 import { formatUsPhoneDisplay, phoneDigitsForTel } from "@/lib/utils";
 import { Profile, Organization, Event } from "@/lib/types";
 import { AuthError, PostgrestError } from "@supabase/supabase-js";
@@ -15,7 +20,8 @@ import ProfileHeaderCard from "@/components/profile/ProfileHeaderCard";
 import OrganizationsSection from "@/components/profile/OrganizationsSection";
 import EventsSection from "@/components/profile/EventsSection";
 import DeleteAccountDialog from "@/components/profile/DeleteAccountDialog";
-import EditProfileDrawer from "@/components/profile/EditProfileDrawer";
+import EditProfileDialog from "@/components/profile/EditProfileDialog";
+import NewOrganizationDialog from "@/components/organizations/NewOrganizationDialog";
 
 const PROFILE_ORGS_PAGE_SIZE = 4;
 const PROFILE_EVENTS_PAGE_SIZE = 8;
@@ -39,6 +45,7 @@ function partitionEvents(events: Event[]) {
 
 
 export default function ProfilePage() {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [organizations, setOrganizations] = useState<Organization[]>([]);
@@ -62,6 +69,47 @@ export default function ProfilePage() {
   const [organizationsPage, setOrganizationsPage] = useState(1);
   const [upcomingPage, setUpcomingPage] = useState(1);
   const [pastPage, setPastPage] = useState(1);
+
+  const [newOrgOpen, setNewOrgOpen] = useState(false);
+  const newOrgAvatarInputId = useId();
+  const newOrgBannerInputId = useId();
+  const newOrgFormErrorRef = useRef<HTMLDivElement>(null);
+  const newOrgFormScrollContainerRef = useRef<HTMLDivElement>(null);
+  const [newOrgName, setNewOrgName] = useState("");
+  const [newOrgDescription, setNewOrgDescription] = useState("");
+  const [newOrgLocation, setNewOrgLocation] = useState("");
+  const [newOrgWebsite, setNewOrgWebsite] = useState("");
+  const [newOrgEmail, setNewOrgEmail] = useState("");
+  const [newOrgPhone, setNewOrgPhone] = useState("");
+  const [newOrgAvatarFile, setNewOrgAvatarFile] = useState<File | null>(null);
+  const [newOrgBannerFile, setNewOrgBannerFile] = useState<File | null>(null);
+  const [newOrgAvatarPreview, setNewOrgAvatarPreview] = useState<string | null>(
+    null,
+  );
+  const [newOrgBannerPreview, setNewOrgBannerPreview] = useState<string | null>(
+    null,
+  );
+  const [newOrgFormError, setNewOrgFormError] = useState("");
+  const [newOrgSaving, setNewOrgSaving] = useState(false);
+
+  const resetNewOrganizationForm = () => {
+    setNewOrgName("");
+    setNewOrgDescription("");
+    setNewOrgLocation("");
+    setNewOrgWebsite("");
+    setNewOrgEmail("");
+    setNewOrgPhone("");
+    setNewOrgAvatarFile(null);
+    setNewOrgBannerFile(null);
+    setNewOrgAvatarPreview(null);
+    setNewOrgBannerPreview(null);
+    setNewOrgFormError("");
+  };
+
+  const handleNewOrgOpenChange = (open: boolean) => {
+    setNewOrgOpen(open);
+    if (!open) resetNewOrganizationForm();
+  };
 
   useEffect(() => {
     const load = async () => {
@@ -117,6 +165,36 @@ export default function ProfilePage() {
       error.getBoundingClientRect().top - container.getBoundingClientRect().top;
     container.scrollBy({ top: errorTop, behavior: "smooth" });
   }, [formError]);
+
+  useEffect(() => {
+    if (!newOrgAvatarFile) {
+      setNewOrgAvatarPreview(null);
+      return;
+    }
+    const url = URL.createObjectURL(newOrgAvatarFile);
+    setNewOrgAvatarPreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [newOrgAvatarFile]);
+
+  useEffect(() => {
+    if (!newOrgBannerFile) {
+      setNewOrgBannerPreview(null);
+      return;
+    }
+    const url = URL.createObjectURL(newOrgBannerFile);
+    setNewOrgBannerPreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [newOrgBannerFile]);
+
+  useEffect(() => {
+    if (!newOrgFormError) return;
+    const container = newOrgFormScrollContainerRef.current;
+    const error = newOrgFormErrorRef.current;
+    if (!container || !error) return;
+    const errorTop =
+      error.getBoundingClientRect().top - container.getBoundingClientRect().top;
+    container.scrollBy({ top: errorTop, behavior: "smooth" });
+  }, [newOrgFormError]);
 
   const { upcoming, past } = partitionEvents(attendingEvents);
 
@@ -214,6 +292,105 @@ export default function ProfilePage() {
     }
   };
 
+  const handleCreateOrganization = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setNewOrgFormError("");
+    setNewOrgSaving(true);
+    try {
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        setNewOrgFormError("You must be signed in to create an organization.");
+        return;
+      }
+
+      let avatarUrl: string | null = null;
+      let bannerUrl: string | null = null;
+
+      try {
+        if (newOrgAvatarFile) {
+          avatarUrl = await uploadOrganizationAsset(
+            newOrgAvatarFile,
+            user.id,
+            "avatar",
+          );
+        }
+        if (newOrgBannerFile) {
+          bannerUrl = await uploadOrganizationAsset(
+            newOrgBannerFile,
+            user.id,
+            "banner",
+          );
+        }
+      } catch (uploadErr) {
+        setNewOrgFormError(
+          uploadErr instanceof Error
+            ? uploadErr.message
+            : "Image upload failed.",
+        );
+        return;
+      }
+
+      const result = await createOrganization(
+        newOrgName.trim(),
+        newOrgDescription.trim(),
+        avatarUrl,
+        bannerUrl,
+        normalizeWebsite(newOrgWebsite),
+        newOrgEmail.trim() || null,
+        newOrgPhone.trim() || null,
+        newOrgLocation.trim() || null,
+      );
+
+      if (isOrganization(result)) {
+        router.push(`/organizations/${result.id}`);
+        router.refresh();
+        setNewOrgOpen(false);
+        resetNewOrganizationForm();
+        return;
+      }
+
+      if (
+        result &&
+        typeof result === "object" &&
+        "code" in result &&
+        (result as { code?: string }).code === "23505" &&
+        typeof (result as { message?: string }).message === "string" &&
+        (result as { message: string }).message.includes("organizations_name")
+      ) {
+        setNewOrgFormError("Name must be unique.");
+        return;
+      }
+
+      if (result instanceof Error) {
+        setNewOrgFormError(result.message || "Could not create organization.");
+        return;
+      }
+
+      if (
+        result &&
+        typeof result === "object" &&
+        "message" in result &&
+        typeof (result as { message: unknown }).message === "string"
+      ) {
+        setNewOrgFormError(
+          (result as { message: string }).message ||
+            "Could not create organization.",
+        );
+        return;
+      }
+
+      setNewOrgFormError("Could not create organization.");
+    } catch {
+      setNewOrgFormError("Something went wrong. Try again.");
+    } finally {
+      setNewOrgSaving(false);
+    }
+  };
+
   const handleDeleteAccount = async () => {
     setDeleteError("");
     setDeleting(true);
@@ -238,7 +415,10 @@ export default function ProfilePage() {
     <>
       <main className="min-h-svh p-4 sm:p-8">
         <div className="mx-auto flex max-w-3xl flex-col gap-6">
-          <h1 className="text-3xl font-bold">My Profile</h1>
+          <div className="flex items-center gap-2">
+            <div className="h-8 w-1 shrink-0 bg-primary" />
+            <h1 className="text-3xl font-bold tracking-tight">My Profile</h1>
+          </div>
 
           <ProfileHeaderCard
             profile={profile}
@@ -253,6 +433,7 @@ export default function ProfilePage() {
             totalOrganizationPages={totalOrganizationPages}
             organizationsPageSize={PROFILE_ORGS_PAGE_SIZE}
             onPageChange={setOrganizationsPage}
+            onCreateOrganization={() => setNewOrgOpen(true)}
           />
 
           <EventsSection
@@ -275,11 +456,11 @@ export default function ProfilePage() {
         open={deleteOpen}
         deleting={deleting}
         error={deleteError}
-        onClose={() => setDeleteOpen(false)}
+        onOpenChange={setDeleteOpen}
         onConfirm={handleDeleteAccount}
       />
 
-      <EditProfileDrawer
+      <EditProfileDialog
         open={editOpen}
         saving={saving}
         formError={formError}
@@ -302,6 +483,34 @@ export default function ProfilePage() {
           setDeleteError("");
           setDeleteOpen(true);
         }}
+      />
+
+      <NewOrganizationDialog
+        open={newOrgOpen}
+        onOpenChange={handleNewOrgOpenChange}
+        onSubmit={handleCreateOrganization}
+        avatarInputId={newOrgAvatarInputId}
+        bannerInputId={newOrgBannerInputId}
+        formScrollContainerRef={newOrgFormScrollContainerRef}
+        formErrorRef={newOrgFormErrorRef}
+        name={newOrgName}
+        onNameChange={setNewOrgName}
+        description={newOrgDescription}
+        onDescriptionChange={setNewOrgDescription}
+        location={newOrgLocation}
+        onLocationChange={setNewOrgLocation}
+        website={newOrgWebsite}
+        onWebsiteChange={setNewOrgWebsite}
+        email={newOrgEmail}
+        onEmailChange={setNewOrgEmail}
+        phone={newOrgPhone}
+        onPhoneChange={setNewOrgPhone}
+        avatarPreview={newOrgAvatarPreview}
+        bannerPreview={newOrgBannerPreview}
+        onAvatarFileChange={setNewOrgAvatarFile}
+        onBannerFileChange={setNewOrgBannerFile}
+        formError={newOrgFormError}
+        saving={newOrgSaving}
       />
     </>
   );

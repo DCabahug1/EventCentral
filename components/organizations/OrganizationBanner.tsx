@@ -7,7 +7,7 @@ type Props = {
 export default function OrganizationBanner({ bannerUrl }: Props) {
   return (
     <div className="relative left-1/2 w-screen max-w-[100vw] -translate-x-1/2 border-b border-border bg-muted">
-      <div className="relative w-full sm:h-44 md:h-48 lg:h-52">
+      <div className="relative w-full sm:h-64 md:h-72 lg:h-80">
         {bannerUrl ? (
           <Image
             src={bannerUrl}

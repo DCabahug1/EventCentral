@@ -46,7 +46,7 @@ export default function EventsSection({
       <div className="flex flex-col gap-1">
         <div className="flex items-center gap-2">
           <div className="h-5 w-1 shrink-0 bg-primary" />
-          <h2 className="text-xl font-bold">Events</h2>
+          <h2 className="text-2xl font-bold">Events</h2>
         </div>
         <p className="pl-3 text-sm text-muted-foreground">
         Track your upcoming events and attendance history.

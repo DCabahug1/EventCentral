@@ -19,7 +19,7 @@ In Next.js 15+, `params` and `searchParams` on pages/layouts are **Promises**. *
 ## When a page file grows
 
 1. Extract **presentational sections** into `components/<feature>/<Name>.tsx`. Pass data and callbacks as props; avoid fetching inside leaf components unless that fetch is truly local and reusable.
-2. Extract **dialogs, drawers, and modals** into their own components in the same folder.
+2. Extract **dialogs and modals** (including `AlertDialog` for destructive confirms) into their own components in the same folder.
 3. Extract **loading skeletons** that mirror the page layout into `<Feature>PageSkeleton.tsx` (or similar) in the same folder.
 4. Keep **page-level** concerns in the page: route params via **`use(params)`** or `await params`, `useRouter`, `useState` for resource IDs and mutation state, `useEffect` for load/sync, submit/delete handlers, and composition of the extracted components.
 

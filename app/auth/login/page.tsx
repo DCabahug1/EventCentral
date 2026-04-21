@@ -56,7 +56,7 @@ function page() {
         transition={{ duration: 0.35, ease: "easeOut" }}
       >
         <div className="w-full max-w-md">
-          <h1 className="text-2xl font-bold">Welcome back</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Welcome back</h1>
           <p className="text-sm text-muted-foreground">
             Sign in to your EventCentral account
           </p>

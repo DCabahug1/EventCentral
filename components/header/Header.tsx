@@ -51,7 +51,7 @@ function Header() {
       <div className="sticky top-0 z-50 w-full h-16 bg-background border-b flex items-center justify-between px-6">
         <Link href="/">
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold">Event<span className="text-primary">Central</span></h1>
+            <h1 className="text-3xl font-bold tracking-tight">Event<span className="text-primary">Central</span></h1>
           </div>
         </Link>
 

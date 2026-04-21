@@ -17,7 +17,7 @@ import { Separator } from "@/components/ui/separator";
 import OrganizationBackLink from "@/components/organizations/OrganizationBackLink";
 import OrganizationBanner from "@/components/organizations/OrganizationBanner";
 import DeleteOrganizationDialog from "@/components/organizations/DeleteOrganizationDialog";
-import EditOrganizationDrawer from "@/components/organizations/EditOrganizationDrawer";
+import EditOrganizationDialog from "@/components/organizations/EditOrganizationDialog";
 import OrganizationEventsTabs from "@/components/organizations/OrganizationEventsTabs";
 import OrganizationPageSkeleton from "@/components/organizations/OrganizationPageSkeleton";
 import OrganizationProfileHeader from "@/components/organizations/OrganizationProfileHeader";
@@ -365,7 +365,7 @@ export default function OrganizationPage({ params }: OrganizationPageProps) {
   if (notFound || !org) {
     return (
       <div className="flex min-h-svh flex-col items-center justify-center gap-4 bg-background px-4">
-        <h1 className="text-xl font-semibold">Organization not found</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Organization not found</h1>
         <p className="text-center text-sm text-muted-foreground">
           This organization does not exist or you do not have access.
         </p>
@@ -408,17 +408,16 @@ export default function OrganizationPage({ params }: OrganizationPageProps) {
           />
         </div>
 
-        {deleteOpen ? (
-          <DeleteOrganizationDialog
-            orgName={org.name}
-            deleteError={deleteError}
-            deleting={deleting}
-            onClose={() => setDeleteOpen(false)}
-            onConfirm={handleDelete}
-          />
-        ) : null}
+        <DeleteOrganizationDialog
+          open={deleteOpen}
+          orgName={org.name}
+          deleteError={deleteError}
+          deleting={deleting}
+          onOpenChange={setDeleteOpen}
+          onConfirm={handleDelete}
+        />
 
-        <EditOrganizationDrawer
+        <EditOrganizationDialog
           open={editOpen}
           onOpenChange={setEditOpen}
           onSubmit={handleEditSubmit}

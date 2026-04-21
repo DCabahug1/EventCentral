@@ -5,13 +5,13 @@ import { Phone, Upload, UserRound } from "lucide-react";
 import { cn, formatUsPhoneInput } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer";
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Field,
   FieldContent,
@@ -22,7 +22,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
-type Props = {
+export type EditProfileDialogProps = {
   open: boolean;
   saving: boolean;
   formError: string;
@@ -43,7 +43,7 @@ type Props = {
   onRequestDelete: () => void;
 };
 
-export default function EditProfileDrawer({
+export default function EditProfileDialog({
   open,
   saving,
   formError,
@@ -62,28 +62,35 @@ export default function EditProfileDrawer({
   onDescriptionChange,
   onPhoneChange,
   onRequestDelete,
-}: Props) {
+}: EditProfileDialogProps) {
   return (
-    <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="flex max-h-[92vh] min-h-0 flex-col gap-0 overflow-hidden p-0">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent
+        showCloseButton={false}
+        className="flex max-h-[min(92vh,900px)] min-h-0 flex-col gap-0 overflow-hidden p-0 sm:max-w-lg"
+      >
         <form onSubmit={onSubmit} className="flex min-h-0 flex-1 flex-col">
-          <DrawerHeader className="shrink-0">
-            <DrawerTitle>Edit profile</DrawerTitle>
-          </DrawerHeader>
+          <DialogHeader className="shrink-0 px-4 py-4 sm:px-6">
+            <DialogTitle className="text-2xl font-bold tracking-tight">
+              Edit profile
+            </DialogTitle>
+          </DialogHeader>
           <div
             ref={formScrollContainerRef}
-            className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-2 [-webkit-overflow-scrolling:touch]"
+            className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 [-webkit-overflow-scrolling:touch] sm:p-6"
           >
             <FieldGroup className="gap-5">
               <Field>
-                <FieldLabel htmlFor={avatarInputId} className="text-muted-foreground">
-                  Avatar
-                </FieldLabel>
-                <FieldContent className="gap-2">
+                <div className="flex w-full justify-center">
+                  <FieldLabel htmlFor={avatarInputId} className="text-muted-foreground">
+                    Avatar
+                  </FieldLabel>
+                </div>
+                <FieldContent className="items-center gap-2">
                   <label
                     htmlFor={avatarInputId}
                     className={cn(
-                      "flex size-32 shrink-0 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-border transition-colors hover:border-muted-foreground",
+                      "flex size-32 shrink-0 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-full border border-border transition-colors hover:border-muted-foreground",
                     )}
                   >
                     {avatarPreview ? (
@@ -93,7 +100,7 @@ export default function EditProfileDrawer({
                         width={128}
                         height={128}
                         unoptimized
-                        className="size-full border border-border object-cover"
+                        className="size-full object-cover"
                       />
                     ) : profileAvatarUrl ? (
                       <Image
@@ -101,13 +108,13 @@ export default function EditProfileDrawer({
                         alt=""
                         width={128}
                         height={128}
-                        className="size-full border border-border object-cover"
+                        className="size-full object-cover"
                       />
                     ) : (
                       <span className="flex flex-col items-center gap-2">
                         <Upload className="size-5 text-muted-foreground" />
                         <span className="text-center text-xs text-muted-foreground">
-                          Square image
+                          Click to upload
                         </span>
                       </span>
                     )}
@@ -189,27 +196,25 @@ export default function EditProfileDrawer({
               </Field>
             </FieldGroup>
           </div>
-          <DrawerFooter className="shrink-0 border-t bg-background pt-4">
-            <div className="flex w-full flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-              <Button
-                type="button"
-                variant="destructive"
-                onClick={onRequestDelete}
-              >
-                Delete Account
+          <DialogFooter className="shrink-0 border-t bg-background px-4 py-4 sm:px-6">
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={onRequestDelete}
+            >
+              Delete Account
+            </Button>
+            <DialogClose asChild>
+              <Button type="button" variant="outline">
+                Cancel
               </Button>
-              <DrawerClose asChild>
-                <Button type="button" variant="outline">
-                  Cancel
-                </Button>
-              </DrawerClose>
-              <Button type="submit" disabled={saving}>
-                {saving ? "Saving…" : "Save changes"}
-              </Button>
-            </div>
-          </DrawerFooter>
+            </DialogClose>
+            <Button type="submit" disabled={saving}>
+              {saving ? "Saving…" : "Save changes"}
+            </Button>
+          </DialogFooter>
         </form>
-      </DrawerContent>
-    </Drawer>
+      </DialogContent>
+    </Dialog>
   );
 }
