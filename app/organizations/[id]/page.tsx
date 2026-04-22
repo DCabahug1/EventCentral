@@ -384,7 +384,7 @@ export default function OrganizationPage({ params }: OrganizationPageProps) {
           This organization does not exist or you do not have access.
         </p>
         <Button asChild>
-          <Link href="/">Back to Discover</Link>
+          <Link href="/discover">Back to Discover</Link>
         </Button>
       </div>
     );

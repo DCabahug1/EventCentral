@@ -27,8 +27,8 @@ function DesktopNav({ profile, pathname, onHostEvent }: DesktopNavProps) {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2, ease: "easeOut" }}
         >
-          <Button variant={pathname === "/" ? "default" : "ghost"} asChild>
-            <Link href="/">
+          <Button variant={pathname === "/discover" ? "default" : "ghost"} asChild>
+            <Link href="/discover">
               <Compass />
               Discover
             </Link>

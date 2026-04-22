@@ -3,6 +3,22 @@ import { createClient } from "./supabase/server";
 import { Event } from "./types";
 import { PostgrestError } from "@supabase/supabase-js";
 
+/** Returns upcoming/live events for the landing page featured strip. */
+export async function getFeaturedEvents(limit = 5): Promise<Event[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("events")
+    .select(
+      "id,organization_id,organization_name,rsvp_count,user_id,title,description,start_time,end_time,address,location_details,lat,lng,max_capacity,image_url,category,status,created_at,updated_at",
+    )
+    .gte("end_time", new Date().toISOString())
+    .order("start_time", { ascending: true })
+    .limit(limit);
+
+  if (error || !data) return [];
+  return data as Event[];
+}
+
 /** Returns confirmed RSVP events for one user. */
 export async function getAttendingEvents(userId?: string): Promise<Event[]> {
   const supabase = await createClient();
