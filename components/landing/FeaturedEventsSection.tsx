@@ -12,7 +12,7 @@ export default async function FeaturedEventsSection() {
     <section className="py-26 md:py-32 border-b border-border/50">
       <div className="max-w-330 mx-auto px-6 md:px-10">
         <div className="flex justify-between items-end gap-6 flex-wrap">
-          <h2 className="text-[clamp(32px,5.2vw,64px)] leading-[1.02] tracking-[-0.02em] font-semibold max-w-[18ch]">
+          <h2 className="text-[clamp(40px,5.2vw,64px)] leading-[1.02] tracking-[-0.02em] font-semibold max-w-[18ch]">
             A live feed of{" "}
             <em className="not-italic text-primary">what&apos;s going on.</em>
           </h2>
