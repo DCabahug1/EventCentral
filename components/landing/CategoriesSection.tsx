@@ -4,16 +4,23 @@ import { motion } from "motion/react";
 import { Music, PartyPopper, Code, Trophy, Sandwich, Paintbrush, Leaf } from "lucide-react";
 
 const CATEGORIES = [
-  { name: "Music",       icon: Music,       color: "oklch(0.72 0.19 305)", count: "612 tonight"  },
-  { name: "Parties",     icon: PartyPopper, color: "oklch(0.74 0.19 0)",   count: "284 tonight"  },
-  { name: "Tech",        icon: Code,        color: "oklch(0.7 0.17 252)",  count: "147 this week" },
-  { name: "Sports",      icon: Trophy,      color: "oklch(0.77 0.17 55)",  count: "98 this week"  },
-  { name: "Food & Drink",icon: Sandwich,    color: "oklch(0.7 0.19 25)",   count: "521 this week" },
-  { name: "Art",         icon: Paintbrush,  color: "oklch(0.82 0.15 85)",  count: "206 this week" },
-  { name: "Outdoor",     icon: Leaf,        color: "oklch(0.78 0.18 150)", count: "173 this week" },
+  { name: "Music",        icon: Music,       color: "oklch(0.72 0.19 305)" },
+  { name: "Parties",      icon: PartyPopper, color: "oklch(0.74 0.19 0)"   },
+  { name: "Tech",         icon: Code,        color: "oklch(0.7 0.17 252)"  },
+  { name: "Sports",       icon: Trophy,      color: "oklch(0.77 0.17 55)"  },
+  { name: "Food & Drink", icon: Sandwich,    color: "oklch(0.7 0.19 25)"   },
+  { name: "Art",          icon: Paintbrush,  color: "oklch(0.82 0.15 85)"  },
+  { name: "Outdoor",      icon: Leaf,        color: "oklch(0.78 0.18 150)" },
 ];
 
-function CategoryCard({ name, icon: Icon, color, count }: (typeof CATEGORIES)[0]) {
+interface CategoryCardProps {
+  name: string;
+  icon: React.ElementType;
+  color: string;
+  count: number;
+}
+
+function CategoryCard({ name, icon: Icon, color, count }: CategoryCardProps) {
   return (
     <Link
       href="/discover"
@@ -26,13 +33,19 @@ function CategoryCard({ name, icon: Icon, color, count }: (typeof CATEGORIES)[0]
       </span>
       <span>
         <div className="text-[22px] font-medium tracking-[-0.01em] leading-tight">{name}</div>
-        <div className="mt-1.5 text-[11px] text-muted-foreground uppercase tracking-[0.1em]">{count}</div>
+        <div className="mt-1.5 text-[11px] text-muted-foreground uppercase tracking-[0.1em]">
+        {count} upcoming
+      </div>
       </span>
     </Link>
   );
 }
 
-export default function CategoriesSection() {
+interface CategoriesSectionProps {
+  counts: Record<string, number>;
+}
+
+export default function CategoriesSection({ counts }: CategoriesSectionProps) {
   return (
     <section className="py-26 md:py-32 border-b border-border/50">
       <div className="max-w-330 mx-auto px-6 md:px-10">
@@ -69,8 +82,8 @@ export default function CategoriesSection() {
               onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.animationPlayState = "paused"; }}
               onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.animationPlayState = "running"; }}
             >
-              {CATEGORIES.map((cat) => <CategoryCard key={cat.name} {...cat} />)}
-              {CATEGORIES.map((cat) => <CategoryCard key={`${cat.name}-dup`} {...cat} />)}
+              {CATEGORIES.map((cat) => <CategoryCard key={cat.name} {...cat} count={counts[cat.name] ?? 0} />)}
+              {CATEGORIES.map((cat) => <CategoryCard key={`${cat.name}-dup`} {...cat} count={counts[cat.name] ?? 0} />)}
             </div>
           </div>
         </motion.div>

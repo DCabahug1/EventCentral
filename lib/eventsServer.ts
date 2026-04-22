@@ -19,6 +19,27 @@ export async function getFeaturedEvents(limit = 5): Promise<Event[]> {
   return data as Event[];
 }
 
+/** Returns upcoming event counts grouped by category. */
+export async function getCategoryCounts(): Promise<Record<string, number>> {
+  const supabase = await createClient();
+  const now = new Date().toISOString();
+  const categories = ["Music", "Parties", "Tech", "Sports", "Food & Drink", "Art", "Outdoor"];
+
+  const results = await Promise.all(
+    categories.map((cat) =>
+      supabase
+        .from("events")
+        .select("*", { count: "exact", head: true })
+        .eq("category", cat)
+        .gte("end_time", now)
+    )
+  );
+
+  return Object.fromEntries(
+    categories.map((cat, i) => [cat, results[i].count ?? 0])
+  );
+}
+
 /** Returns confirmed RSVP events for one user. */
 export async function getAttendingEvents(userId?: string): Promise<Event[]> {
   const supabase = await createClient();
