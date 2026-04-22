@@ -43,7 +43,7 @@ export default function CategoriesSection() {
           viewport={{ once: true, margin: "-40px 0px" }}
           transition={{ duration: 0.9, ease: [0.2, 0.7, 0.2, 1] }}
         >
-          Seven ways to spend <em className="not-italic text-primary">a Saturday</em>.
+          Find exactly <em className="not-italic text-primary">what you're looking for.</em>
         </motion.h2>
 
         <motion.p

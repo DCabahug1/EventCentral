@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { Alexandria, Noto_Serif } from "next/font/google";
+import { Afacad_Flux, Noto_Serif, DM_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/header/Header";
 import { ThemeProvider } from "@/components/theme-provider";
 import Footer from "@/components/footer/Footer";
 import PageMount from "@/components/ui/page-mount";
 
-const fontSans = Alexandria({
+const fontSans = Afacad_Flux({
   subsets: ["latin"],
   variable: "--font-sans",
 });
@@ -14,6 +14,12 @@ const fontSans = Alexandria({
 const fontSerif = Noto_Serif({
   subsets: ["latin"],
   variable: "--font-serif",
+});
+
+const fontMono = DM_Mono({
+  subsets: ["latin"],
+  weight: ["300", "400", "500"],
+  variable: "--font-mono",
 });
 
 export const metadata: Metadata = {
@@ -36,7 +42,9 @@ export default function RootLayout({
         />
       </head>
 
-      <body className={`${fontSans.variable} ${fontSerif.variable} antialiased`}>
+      <body
+        className={`${fontSans.variable} ${fontSerif.variable} ${fontMono.variable} antialiased`}
+      >
         <ThemeProvider attribute="class" defaultTheme="dark">
           <Header />
           <PageMount>{children}</PageMount>

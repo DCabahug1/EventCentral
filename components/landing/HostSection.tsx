@@ -24,7 +24,7 @@ const POINTS = [
 
 function FloatingCards() {
   return (
-    <div className="relative aspect-square w-full max-w-[560px] mx-auto">
+    <div className="relative aspect-square w-full max-w-[560px] mx-auto ">
       {/* Card 1: Create organization */}
       <motion.div
         className="absolute top-[6%] left-0 w-[62%] bg-card border border-border/50 p-5 flex flex-col gap-2"
@@ -88,7 +88,7 @@ function FloatingCards() {
 
 export default function HostSection() {
   return (
-    <section className="py-26 md:py-32 border-b border-border/50 bg-background">
+    <section className="py-26 md:py-32 border-b border-border/50 bg-primary/5">
       <div className="max-w-330 mx-auto px-6 md:px-10">
         <div className="grid grid-cols-1 gap-14 lg:grid-cols-[1.1fr_1fr] lg:gap-20 items-center">
           <FloatingCards />
@@ -101,7 +101,7 @@ export default function HostSection() {
               viewport={{ once: true, margin: "-40px 0px" }}
               transition={{ duration: 0.9, ease: [0.2, 0.7, 0.2, 1] }}
             >
-              Publish in <em className="not-italic text-primary">minutes</em>. Reach your crowd.
+              Publish in <em className="not-italic text-primary">minutes.</em> Reach your crowd.
             </motion.h2>
             <motion.p
               className="text-muted-foreground text-base leading-[1.6] max-w-[58ch] mt-4.5"

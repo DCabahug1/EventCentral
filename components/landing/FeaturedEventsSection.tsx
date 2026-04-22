@@ -14,7 +14,7 @@ export default async function FeaturedEventsSection() {
         <div className="flex justify-between items-end gap-6 flex-wrap">
           <h2 className="text-[clamp(32px,5.2vw,64px)] leading-[1.02] tracking-[-0.02em] font-semibold max-w-[18ch]">
             A live feed of{" "}
-            <em className="not-italic text-primary">what&apos;s going on</em>.
+            <em className="not-italic text-primary">what&apos;s going on.</em>
           </h2>
           <div style={{ marginBottom: "6px" }}>
             <Button variant="outline" asChild>

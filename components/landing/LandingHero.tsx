@@ -2,7 +2,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useScroll, useTransform } from "motion/react";
-import { MapPin, CalendarPlus } from "lucide-react";
+import { MapPin, CalendarPlus, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface LandingHeroProps {
@@ -15,7 +15,7 @@ export default function LandingHero({ isLoggedIn }: LandingHeroProps) {
   const scale = useTransform(scrollY, [0, 900], [1, 1.225]);
 
   return (
-    <section className="relative w-full overflow-hidden flex items-stretch border-b border-border/50 h-[min(78svh,720px)] min-h-[560px] dark">
+    <section className="relative w-full overflow-hidden flex items-stretch border-b border-border/50 h-[min(78svh,720px)] min-h-[800px] dark">
       {/* Parallax background */}
       <motion.div
         className="absolute -top-[8%] -bottom-[8%] inset-x-0 z-0 will-change-transform"
@@ -75,7 +75,7 @@ export default function LandingHero({ isLoggedIn }: LandingHeroProps) {
           {!isLoggedIn && (
             <Button size="lg" variant="outline" className="text-white" asChild>
               <Link href="/auth/register">
-                <CalendarPlus />
+                <UserPlus />
                 Get Started
               </Link>
             </Button>

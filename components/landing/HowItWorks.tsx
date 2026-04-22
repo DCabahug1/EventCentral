@@ -10,18 +10,18 @@ const STEPS = [
   {
     n: "02",
     title: "Filter the noise",
-    desc: "Seven categories, real capacity counts, live status. Sort by when you're free.",
+    desc: "Seven categories, real capacity counts, live status.",
   },
   {
     n: "03",
     title: "RSVP and show up",
-    desc: "One tap to reserve. We'll remind you an hour before.",
+    desc: "Find an event, open the page, and reserve your spot in seconds.",
   },
 ];
 
 export default function HowItWorks() {
   return (
-    <section className="py-26 md:py-32 border-b border-border/50">
+    <section className="py-26 md:py-32 border-b border-border/50 dark:bg-card bg-muted">
       <div className="max-w-330 mx-auto px-6 md:px-10">
         <motion.h2
           className="text-[clamp(32px,5.2vw,64px)] leading-[1.02] tracking-[-0.02em] font-semibold max-w-[18ch]"
@@ -30,8 +30,8 @@ export default function HowItWorks() {
           viewport={{ once: true, margin: "-40px 0px" }}
           transition={{ duration: 0.9, ease: [0.2, 0.7, 0.2, 1] }}
         >
-          Discover it now.{" "}
-          <em className="not-italic text-primary">Be there tonight.</em>
+          From scrolling to showing up,{" "}
+          <em className="not-italic text-primary">just like that.</em>
         </motion.h2>
 
         <div className="grid grid-cols-1 md:grid-cols-3 divide-y divide-border/50 md:divide-y-0 md:divide-x mt-16">
@@ -42,7 +42,11 @@ export default function HowItWorks() {
               initial={{ opacity: 0, y: 28 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px 0px" }}
-              transition={{ duration: 0.9, delay: i * 0.08, ease: [0.2, 0.7, 0.2, 1] }}
+              transition={{
+                duration: 0.9,
+                delay: i * 0.08,
+                ease: [0.2, 0.7, 0.2, 1],
+              }}
             >
               <div className="text-[40px] font-normal text-muted-foreground/40 leading-none">
                 {step.n}
