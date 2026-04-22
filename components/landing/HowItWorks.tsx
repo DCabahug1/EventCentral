@@ -24,7 +24,7 @@ export default function HowItWorks() {
     <section className="py-26 md:py-32 border-b border-border/50 dark:bg-card bg-muted">
       <div className="max-w-330 mx-auto px-6 md:px-10">
         <motion.h2
-          className="text-[clamp(32px,5.2vw,64px)] leading-[1.02] tracking-[-0.02em] font-semibold max-w-[18ch]"
+          className="text-[clamp(40px,5.2vw,64px)] leading-[1.02] tracking-[-0.02em] font-semibold max-w-[18ch]"
           initial={{ opacity: 0, y: 28 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-40px 0px" }}
@@ -48,13 +48,13 @@ export default function HowItWorks() {
                 ease: [0.2, 0.7, 0.2, 1],
               }}
             >
-              <div className="text-[40px] font-normal text-muted-foreground/40 leading-none">
+              <div className="text-2xl md:text-4xl font-normal text-muted-foreground/40 leading-none">
                 {step.n}
               </div>
-              <h3 className="text-[20px] font-medium tracking-[-0.01em]">
+              <h3 className="text-xl md:text-4xl font-medium tracking-[-0.01em]">
                 {step.title}
               </h3>
-              <p className="text-muted-foreground text-[15px] leading-[1.6]">
+              <p className="text-muted-foreground text-sm md:text-lg leading-[1.6]">
                 {step.desc}
               </p>
             </motion.div>

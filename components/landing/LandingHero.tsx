@@ -38,15 +38,14 @@ export default function LandingHero({ isLoggedIn }: LandingHeroProps) {
       <div className="absolute inset-0 z-[1] pointer-events-none opacity-30 [background-image:linear-gradient(to_right,oklch(1_0_0/0.08)_1px,transparent_1px),linear-gradient(to_bottom,oklch(1_0_0/0.08)_1px,transparent_1px)] [background-size:80px_80px] [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_75%)] [-webkit-mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_75%)]" />
 
       {/* Content */}
-      <div className="relative z-[2] flex flex-col justify-center w-full max-w-330 mx-auto px-6 md:px-10 pt-[72px] pb-[72px]">
+      <div className="relative z-[2] flex flex-col justify-center items-center lg:items-start text-center lg:text-left w-full max-w-330 mx-auto px-6 md:px-10 pt-[72px] pb-[72px]">
         <motion.h1
-          className="mt-4 text-[clamp(40px,6.4vw,88px)] leading-[0.98] font-bold tracking-[-0.025em] max-w-[14ch] text-white"
+          className="mt-4 text-[clamp(52px,6.4vw,88px)] leading-[0.98] font-bold tracking-[-0.025em] max-w-[18ch] text-white"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.08, ease: "easeOut" }}
         >
-          Discover what&apos;s happening
-          <br />
+          Discover what&apos;s happening{" "}
           <em className="not-italic text-primary">around you.</em>
         </motion.h1>
 
@@ -61,7 +60,7 @@ export default function LandingHero({ isLoggedIn }: LandingHeroProps) {
         </motion.p>
 
         <motion.div
-          className="mt-8 flex flex-wrap gap-3"
+          className="mt-8 flex flex-wrap gap-3 justify-center lg:justify-start"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.24, ease: "easeOut" }}
