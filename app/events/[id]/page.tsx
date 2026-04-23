@@ -59,7 +59,7 @@ export default async function EventPage({ params }: PageProps) {
 
       <div className="flex flex-wrap gap-3">
         <Button asChild variant="outline">
-          <Link href="/">Discover</Link>
+          <Link href="/discover">Discover</Link>
         </Button>
         {event.organization_id != null ? (
           <Button asChild variant="outline">

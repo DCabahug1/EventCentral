@@ -3,6 +3,43 @@ import { createClient } from "./supabase/server";
 import { Event } from "./types";
 import { PostgrestError } from "@supabase/supabase-js";
 
+/** Returns upcoming/live events for the landing page featured strip. */
+export async function getFeaturedEvents(limit = 5): Promise<Event[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("events")
+    .select(
+      "id,organization_id,organization_name,rsvp_count,user_id,title,description,start_time,end_time,address,location_details,lat,lng,max_capacity,image_url,category,status,created_at,updated_at",
+    )
+    .gte("end_time", new Date().toISOString())
+    .order("start_time", { ascending: true })
+    .limit(limit);
+
+  if (error || !data) return [];
+  return data as Event[];
+}
+
+/** Returns upcoming event counts grouped by category. */
+export async function getCategoryCounts(): Promise<Record<string, number>> {
+  const supabase = await createClient();
+  const now = new Date().toISOString();
+  const categories = ["Music", "Parties", "Tech", "Sports", "Food & Drink", "Art", "Outdoor"];
+
+  const results = await Promise.all(
+    categories.map((cat) =>
+      supabase
+        .from("events")
+        .select("*", { count: "exact", head: true })
+        .eq("category", cat)
+        .gte("end_time", now)
+    )
+  );
+
+  return Object.fromEntries(
+    categories.map((cat, i) => [cat, results[i].count ?? 0])
+  );
+}
+
 /** Returns confirmed RSVP events for one user. */
 export async function getAttendingEvents(userId?: string): Promise<Event[]> {
   const supabase = await createClient();

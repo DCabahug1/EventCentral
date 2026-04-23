@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { Profile } from "@/lib/types";
 import { Button } from "../ui/button";
@@ -15,6 +15,8 @@ interface DesktopNavProps {
 
 function DesktopNav({ profile, pathname, onHostEvent }: DesktopNavProps) {
   const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   return (
     <AnimatePresence mode="wait" initial={false}>
@@ -27,8 +29,8 @@ function DesktopNav({ profile, pathname, onHostEvent }: DesktopNavProps) {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2, ease: "easeOut" }}
         >
-          <Button variant={pathname === "/" ? "default" : "ghost"} asChild>
-            <Link href="/">
+          <Button variant={pathname === "/discover" ? "default" : "ghost"} asChild>
+            <Link href="/discover">
               <Compass />
               Discover
             </Link>
@@ -69,7 +71,7 @@ function DesktopNav({ profile, pathname, onHostEvent }: DesktopNavProps) {
             size="icon"
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
           >
-            {theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
+            {mounted && (theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />)}
           </Button>
         </motion.div>
       ) : null}

@@ -37,8 +37,8 @@ function MobileNav({ profile, onHostEvent }: MobileNavProps) {
         <DropdownMenuContent align="end" side="bottom" className="w-56">
           {profile ? (
             <>
-              <DropdownMenuItem asChild className={pathname === "/" ? "bg-accent" : ""}>
-                <Link href="/" className="flex cursor-pointer items-center gap-2">
+              <DropdownMenuItem asChild className={pathname === "/discover" ? "bg-accent" : ""}>
+                <Link href="/discover" className="flex cursor-pointer items-center gap-2">
                   <Compass className="size-4" />
                   Discover
                 </Link>

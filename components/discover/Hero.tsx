@@ -156,7 +156,7 @@ function Hero({
         />
       </motion.div>
 
-      <div className="absolute inset-0 -z-10 bg-linear-to-t from-black/70 to-transparent" />
+      <div className="absolute inset-0 -z-10 bg-linear-to-t from-black/60  via-black/40 to-black/20" />
 
       <motion.div
         className="flex flex-col items-center gap-3 text-center"

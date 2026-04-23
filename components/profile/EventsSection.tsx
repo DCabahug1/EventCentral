@@ -73,7 +73,7 @@ export default function EventsSection({
               message="No upcoming events found."
               action={
                 <Button asChild size="sm">
-                  <Link href="/">Discover Events</Link>
+                  <Link href="/discover">Discover Events</Link>
                 </Button>
               }
             />
@@ -114,7 +114,7 @@ export default function EventsSection({
               message="No past events found."
               action={
                 <Button asChild size="sm">
-                  <Link href="/">Discover Events</Link>
+                  <Link href="/discover">Discover Events</Link>
                 </Button>
               }
             />
