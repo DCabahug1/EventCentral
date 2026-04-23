@@ -67,3 +67,8 @@ export type Review = {
   created_at: string;
   edited_at: string | null;
 }
+
+export type ReviewWithProfile = Review & {
+  username: string | null;
+  avatar_url: string | null;
+}

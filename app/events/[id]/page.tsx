@@ -1,8 +1,14 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Button } from "@/components/ui/button";
+import { PostgrestError } from "@supabase/supabase-js";
+import { createClient } from "@/lib/supabase/server";
 import { getEventById } from "@/lib/eventsServer";
-import { formatDateTime } from "@/lib/utils";
+import { getOrganizationById } from "@/lib/organizations";
+import { getProfile } from "@/lib/profiles";
+import { getReviewsWithProfilesByEvent } from "@/lib/reviews";
+import { isOrganization } from "@/lib/organizationPage";
+import EventHero from "@/components/events/EventHero";
+import EventPageContent from "@/components/events/EventPageContent";
+import type { Organization } from "@/lib/types";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -13,62 +19,63 @@ export default async function EventPage({ params }: PageProps) {
   const id = Number(idParam);
   if (!Number.isFinite(id)) notFound();
 
-  const event = await getEventById(id);
+  const supabase = await createClient();
+
+  const [event, { data: { user } }] = await Promise.all([
+    getEventById(id),
+    supabase.auth.getUser(),
+  ]);
+
   if (!event) notFound();
 
+  const [orgResult, reviews] = await Promise.all([
+    event.organization_id
+      ? getOrganizationById(event.organization_id)
+      : Promise.resolve(null),
+    getReviewsWithProfilesByEvent(event.id),
+  ]);
+
+  const organization: Organization | null = isOrganization(orgResult)
+    ? orgResult
+    : null;
+
+  let hasRsvp = false;
+  let currentUserProfile: { username: string | null; avatar_url: string | null } | null =
+    null;
+
+  if (user) {
+    const [rsvpResponse, profileResult] = await Promise.all([
+      supabase
+        .from("rsvps")
+        .select("id")
+        .eq("event_id", event.id)
+        .eq("user_id", user.id)
+        .eq("status", "CONFIRMED")
+        .maybeSingle(),
+      getProfile(user.id),
+    ]);
+
+    hasRsvp = !!rsvpResponse.data;
+
+    if (profileResult && !(profileResult instanceof PostgrestError)) {
+      currentUserProfile = {
+        username: profileResult.username,
+        avatar_url: profileResult.avatar_url,
+      };
+    }
+  }
+
   return (
-    <main className="mx-auto flex min-h-svh max-w-3xl flex-col gap-6 p-4 sm:p-8">
-      <div className="flex flex-col gap-2">
-        {event.organization_name ? (
-          <p className="text-sm text-muted-foreground">{event.organization_name}</p>
-        ) : null}
-        <h1 className="text-2xl font-bold tracking-tight">{event.title}</h1>
-        {event.description ? (
-          <p className="text-muted-foreground leading-relaxed">{event.description}</p>
-        ) : null}
-      </div>
-
-      <dl className="grid gap-3 text-sm">
-        <div>
-          <dt className="font-medium text-muted-foreground">Starts</dt>
-          <dd>{formatDateTime(event.start_time)}</dd>
-        </div>
-        <div>
-          <dt className="font-medium text-muted-foreground">Ends</dt>
-          <dd>{formatDateTime(event.end_time)}</dd>
-        </div>
-        {event.address ? (
-          <div>
-            <dt className="font-medium text-muted-foreground">Location</dt>
-            <dd>{event.address}</dd>
-          </div>
-        ) : null}
-        {event.max_capacity != null ? (
-          <div>
-            <dt className="font-medium text-muted-foreground">Capacity</dt>
-            <dd>{event.max_capacity} attendees</dd>
-          </div>
-        ) : null}
-        {event.category ? (
-          <div>
-            <dt className="font-medium text-muted-foreground">Category</dt>
-            <dd>{event.category}</dd>
-          </div>
-        ) : null}
-      </dl>
-
-      <div className="flex flex-wrap gap-3">
-        <Button asChild variant="outline">
-          <Link href="/discover">Discover</Link>
-        </Button>
-        {event.organization_id != null ? (
-          <Button asChild variant="outline">
-            <Link href={`/organizations/${event.organization_id}`}>
-              Organization page
-            </Link>
-          </Button>
-        ) : null}
-      </div>
-    </main>
+    <>
+      <EventHero imageUrl={event.image_url} title={event.title} />
+      <EventPageContent
+        event={event}
+        organization={organization}
+        reviews={reviews}
+        initialRsvpStatus={hasRsvp}
+        currentUserId={user?.id ?? null}
+        currentUserProfile={currentUserProfile}
+      />
+    </>
   );
 }

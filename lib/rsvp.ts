@@ -1,9 +1,21 @@
 'use server'
 import { createClient } from "./supabase/server";
 import { RSVP } from "./types";
-import { PostgrestError } from "@supabase/supabase-js";
+import { PostgrestError, SupabaseClient } from "@supabase/supabase-js";
 
 type RSVPInput = Omit<RSVP, "id" | "user_id" | "status" | "created_at">;
+
+async function syncRsvpCount(supabase: SupabaseClient, event_id: number) {
+  const { count } = await supabase
+    .from('rsvps')
+    .select('*', { count: 'exact', head: true })
+    .eq('event_id', event_id)
+    .eq('status', 'CONFIRMED');
+  await supabase
+    .from('events')
+    .update({ rsvp_count: count ?? 0 })
+    .eq('id', event_id);
+}
 
 // Registers the currently authenticated user for an event.
 // Returns the inserted row or an Error/PostgrestError on failure.
@@ -38,6 +50,7 @@ export const createRSVP = async (
       .single();
 
     if (error) return error;
+    await syncRsvpCount(supabase, input.event_id);
     return data as RSVP;
   }
 
@@ -72,6 +85,7 @@ export const createRSVP = async (
     .single();
 
   if (error) return error;
+  await syncRsvpCount(supabase, input.event_id);
   return data as RSVP;
 }
 
@@ -133,5 +147,6 @@ export const cancelRSVP = async (
     .eq('user_id', user.id);
 
   if (error) return error;
+  await syncRsvpCount(supabase, event_id);
   return null;
 }
