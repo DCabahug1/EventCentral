@@ -15,7 +15,7 @@ export default function LandingHero({ isLoggedIn }: LandingHeroProps) {
   const scale = useTransform(scrollY, [0, 900], [1, 1.225]);
 
   return (
-    <section className="relative w-full overflow-hidden flex items-stretch border-b border-border/50 h-[min(78svh,720px)] min-h-[800px] dark">
+    <section className="relative w-full overflow-hidden flex items-stretch border-b border-border/50 h-[min(78svh,720px)] min-h-[700px] dark">
       {/* Parallax background */}
       <motion.div
         className="absolute -top-[8%] -bottom-[8%] inset-x-0 z-0 will-change-transform"
