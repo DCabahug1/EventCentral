@@ -22,6 +22,7 @@ export default function LandingHero({ isLoggedIn }: LandingHeroProps) {
       >
         <video
           src="/landing-page/HeroVideo.mp4"
+          poster="/landing-page/HeroImage.jpg"
           autoPlay
           muted
           loop
