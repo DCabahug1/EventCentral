@@ -1,5 +1,4 @@
 "use client";
-import Image from "next/image";
 import Link from "next/link";
 import { motion, useScroll, useTransform } from "motion/react";
 import { MapPin, CalendarPlus, UserPlus } from "lucide-react";
@@ -21,12 +20,13 @@ export default function LandingHero({ isLoggedIn }: LandingHeroProps) {
         className="absolute -top-[8%] -bottom-[8%] inset-x-0 z-0 will-change-transform"
         style={{ y, scale }}
       >
-        <Image
-          src="/discover-page/Hero.jpg"
-          alt=""
-          fill
-          priority
-          className="object-cover object-[center_40%]"
+        <video
+          src="/landing-page/HeroVideo.mp4"
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover object-[center_40%]"
         />
         {/* Bottom-to-top fade to background */}
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/80 to-background" />
