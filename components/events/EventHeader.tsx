@@ -39,13 +39,13 @@ export default function EventHeader({
         ? "text-muted-foreground"
         : statusLabel === "Live"
           ? "text-green-500"
-          : "text-muted-foreground";
+          : "text-primary";
 
   return (
     <div className="mb-8">
       {/* Mobile-only image — above text on small screens */}
       {imageUrl && (
-        <div className="relative mb-6 aspect-video w-full overflow-hidden rounded-xl lg:hidden">
+        <div className="relative mb-6 aspect-video w-full overflow-hidden rounded-xl lg:hidden ">
           <Image
             src={imageUrl}
             alt={event.title}
@@ -66,7 +66,9 @@ export default function EventHeader({
       >
         {/* Left: text content */}
         <div className="flex flex-col gap-3">
-          <p className={cn("font-bold", statusColor)}>{statusLabel}</p>
+          <p className={cn("font-bold", statusColor)}>
+            {statusLabel.toUpperCase()}
+          </p>
 
           <div className="flex flex-wrap items-center gap-3">
             <h1 className="min-w-0 flex-1 text-2xl font-bold tracking-tight sm:text-3xl">
@@ -89,7 +91,10 @@ export default function EventHeader({
           {categoryConfig && (
             <Badge
               variant="outline"
-              className={cn("w-fit flex items-center gap-1.5 text-sm", categoryConfig.colorClass)}
+              className={cn(
+                "w-fit flex items-center gap-1.5 text-sm",
+                categoryConfig.colorClass,
+              )}
             >
               {CategoryIcon && <CategoryIcon className="size-4" />}
               <span className="text-foreground">{categoryConfig.label}</span>
@@ -121,7 +126,10 @@ export default function EventHeader({
               <Users className="size-4 shrink-0" />
               <span>
                 {rsvpCount}
-                {event.max_capacity !== null ? ` / ${event.max_capacity}` : ""} attending
+                {event.max_capacity !== null
+                  ? ` / ${event.max_capacity}`
+                  : ""}{" "}
+                attending
               </span>
             </div>
           </div>
@@ -129,7 +137,7 @@ export default function EventHeader({
 
         {/* Right: desktop-only image */}
         {imageUrl && (
-          <div className="relative hidden aspect-video w-full overflow-hidden rounded-xl lg:block">
+          <div className="relative hidden aspect-video w-full overflow-hidden rounded-xl lg:block border">
             <Image
               src={imageUrl}
               alt={event.title}
