@@ -1,5 +1,3 @@
-"use server";
-
 import { Review } from "./types";
 import Anthropic from "@anthropic-ai/sdk";
 
