@@ -111,7 +111,7 @@ export default function EventHeader({
             </Link>
           )}
 
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
+          <div className="flex flex-col gap-x-6 gap-y-2 text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
               <Calendar className="size-4 shrink-0" />
               <span>{formatDateTime(event.start_time)}</span>

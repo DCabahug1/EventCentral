@@ -127,6 +127,35 @@ export const getRSVPsByUser = async (): Promise<RSVP[] | Error | PostgrestError 
   return data as RSVP[];
 }
 
+// Returns the first `limit` confirmed attendee profiles (username + avatar_url) for an event.
+export const getEventAttendeeAvatars = async (
+  eventId: number,
+  limit = 4,
+): Promise<{ username: string | null; avatar_url: string | null }[]> => {
+  const supabase = await createClient();
+
+  const { data: rsvps } = await supabase
+    .from("rsvps")
+    .select("user_id")
+    .eq("event_id", eventId)
+    .eq("status", "CONFIRMED")
+    .limit(limit);
+
+  if (!rsvps || rsvps.length === 0) return [];
+
+  const userIds = rsvps.map((r: { user_id: string }) => r.user_id);
+
+  const { data: profiles } = await supabase
+    .from("profiles")
+    .select("username, avatar_url")
+    .in("user_id", userIds);
+
+  return (profiles ?? []).map((p) => ({
+    username: (p.username as string | null) ?? null,
+    avatar_url: (p.avatar_url as string | null) ?? null,
+  }));
+};
+
 // Returns the current confirmed RSVP count for an event from the events table.
 export const getEventRsvpCount = async (event_id: number): Promise<number> => {
   const supabase = await createClient();

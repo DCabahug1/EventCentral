@@ -6,6 +6,7 @@ import { getEventById } from "@/lib/eventsServer";
 import { getOrganizationById } from "@/lib/organizations";
 import { getProfile } from "@/lib/profiles";
 import { getReviewsWithProfilesByEvent } from "@/lib/reviews";
+import { getEventAttendeeAvatars } from "@/lib/rsvp";
 import { isOrganization } from "@/lib/organizationPage";
 import EventPageContent from "@/components/events/EventPageContent";
 import type { Organization } from "@/lib/types";
@@ -28,11 +29,12 @@ export default async function EventPage({ params }: PageProps) {
 
   if (!event) notFound();
 
-  const [orgResult, reviews] = await Promise.all([
+  const [orgResult, reviews, attendeeAvatars] = await Promise.all([
     event.organization_id
       ? getOrganizationById(event.organization_id)
       : Promise.resolve(null),
     getReviewsWithProfilesByEvent(event.id),
+    getEventAttendeeAvatars(event.id, 4),
   ]);
 
   const organization: Organization | null = isOrganization(orgResult)
@@ -74,6 +76,7 @@ export default async function EventPage({ params }: PageProps) {
         initialRsvpStatus={hasRsvp}
         currentUserId={user?.id ?? null}
         currentUserProfile={currentUserProfile}
+        attendeeAvatars={attendeeAvatars}
       />
     </EventPageMapsProvider>
   );

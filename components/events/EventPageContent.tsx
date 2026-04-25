@@ -32,6 +32,7 @@ type Props = {
   initialRsvpStatus: boolean;
   currentUserId: string | null;
   currentUserProfile: { username: string | null; avatar_url: string | null } | null;
+  attendeeAvatars: { username: string | null; avatar_url: string | null }[];
 };
 
 export default function EventPageContent({
@@ -41,6 +42,7 @@ export default function EventPageContent({
   initialRsvpStatus,
   currentUserId,
   currentUserProfile,
+  attendeeAvatars,
 }: Props) {
   const router = useRouter();
 
@@ -218,6 +220,7 @@ export default function EventPageContent({
                 rsvpError={rsvpError}
                 isEnded={isEnded}
                 isFull={isFull}
+                attendeeAvatars={attendeeAvatars}
                 onRsvp={handleRsvp}
                 onCalendarOpen={() => setCalendarDialogOpen(true)}
                 onCopyLink={handleCopyLink}

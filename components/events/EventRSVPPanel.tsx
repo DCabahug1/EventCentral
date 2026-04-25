@@ -4,6 +4,13 @@ import { CalendarPlus, Copy, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
+import {
+  Avatar,
+  AvatarImage,
+  AvatarFallback,
+  AvatarGroup,
+  AvatarGroupCount,
+} from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import type { Event } from "@/lib/types";
 
@@ -15,6 +22,7 @@ type Props = {
   rsvpError: string;
   isEnded: boolean;
   isFull: boolean;
+  attendeeAvatars: { username: string | null; avatar_url: string | null }[];
   onRsvp: () => void;
   onCalendarOpen: () => void;
   onCopyLink: () => void;
@@ -29,6 +37,7 @@ export default function EventRSVPPanel({
   rsvpError,
   isEnded,
   isFull,
+  attendeeAvatars,
   onRsvp,
   onCalendarOpen,
   onCopyLink,
@@ -62,6 +71,24 @@ export default function EventRSVPPanel({
             {spotsRemaining === 0 ? "Event is full" : `${spotsRemaining} spots remaining`}
           </p>
         </div>
+      )}
+
+      {rsvpCount > 0 && (
+        <AvatarGroup className={cn("transition-opacity", rsvpPending && "opacity-40")}>
+          {attendeeAvatars.map((a, i) => (
+            <Avatar key={i} size="sm">
+              {a.avatar_url && <AvatarImage src={a.avatar_url} alt={a.username ?? ""} />}
+              <AvatarFallback>
+                {a.username ? a.username.slice(0, 2).toUpperCase() : "?"}
+              </AvatarFallback>
+            </Avatar>
+          ))}
+          {rsvpCount > attendeeAvatars.length && (
+            <AvatarGroupCount className="text-xs">
+              +{rsvpCount - attendeeAvatars.length}
+            </AvatarGroupCount>
+          )}
+        </AvatarGroup>
       )}
 
       {rsvpError && <p className="text-sm text-destructive">{rsvpError}</p>}
