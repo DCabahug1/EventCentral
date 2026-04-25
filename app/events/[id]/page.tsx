@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { PostgrestError } from "@supabase/supabase-js";
+import EventPageMapsProvider from "@/components/events/EventPageMapsProvider";
 import { createClient } from "@/lib/supabase/server";
 import { getEventById } from "@/lib/eventsServer";
 import { getOrganizationById } from "@/lib/organizations";
@@ -66,7 +67,7 @@ export default async function EventPage({ params }: PageProps) {
   }
 
   return (
-    <>
+    <EventPageMapsProvider>
       <EventHero imageUrl={event.image_url} title={event.title} />
       <EventPageContent
         event={event}
@@ -76,6 +77,6 @@ export default async function EventPage({ params }: PageProps) {
         currentUserId={user?.id ?? null}
         currentUserProfile={currentUserProfile}
       />
-    </>
+    </EventPageMapsProvider>
   );
 }

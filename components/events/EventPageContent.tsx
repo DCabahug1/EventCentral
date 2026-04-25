@@ -9,6 +9,7 @@ import {
   Calendar,
   CalendarPlus,
   MapPin,
+  Pencil,
   Users,
   Star,
   Share2,
@@ -35,6 +36,9 @@ import { formatDateTime, cn } from "@/lib/utils";
 import { createRSVP, cancelRSVP, getEventRsvpCount } from "@/lib/rsvp";
 import { generateReviewSummary } from "@/lib/reviewSummary";
 import { createReview } from "@/lib/reviews";
+import EditEventDialog from "@/components/events/EditEventDialog";
+import DeleteEventDialog from "@/components/events/DeleteEventDialog";
+import { deleteEvent } from "@/lib/eventsServer";
 import type {
   Event,
   Organization,
@@ -73,6 +77,24 @@ export default function EventPageContent({
   const [reviewSummary, setReviewSummary] = useState<string | null>(null);
   const [summaryLoading, setSummaryLoading] = useState(false);
   const [calendarDialogOpen, setCalendarDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
+  const [deleting, setDeleting] = useState(false);
+
+  const isOwner = !!currentUserId && currentUserId === event.user_id;
+
+  const handleDelete = async () => {
+    setDeleteError("");
+    setDeleting(true);
+    const result = await deleteEvent(event.id);
+    setDeleting(false);
+    if (result === null) {
+      router.push("/discover");
+    } else {
+      setDeleteError(result instanceof Error ? result.message : "Failed to delete event.");
+    }
+  };
 
   useEffect(() => {
     if (reviews.length === 0) return;
@@ -289,9 +311,23 @@ export default function EventPageContent({
             <Badge variant="outline" className="text-foreground">
               {statusLabel}
             </Badge>
-            <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
-              {event.title}
-            </h1>
+            <div className="flex flex-wrap items-center gap-3">
+              <h1 className="min-w-0 flex-1 text-2xl font-bold tracking-tight sm:text-3xl">
+                {event.title}
+              </h1>
+              {isOwner && (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  className="shrink-0"
+                  onClick={() => setEditDialogOpen(true)}
+                >
+                  <Pencil className="size-4" />
+                  Edit
+                </Button>
+              )}
+            </div>
 
             {categoryConfig && (
               <Badge
@@ -630,6 +666,7 @@ export default function EventPageContent({
                     </Button>
                   </div>
                 </div>
+
               </div>
 
               {/* Hosted by */}
@@ -703,6 +740,29 @@ export default function EventPageContent({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+    <EditEventDialog
+      event={event}
+      open={editDialogOpen}
+      onOpenChange={setEditDialogOpen}
+      onSuccess={() => {
+        setEditDialogOpen(false);
+        router.refresh();
+      }}
+      onRequestDelete={() => {
+        setEditDialogOpen(false);
+        setDeleteDialogOpen(true);
+      }}
+    />
+
+    <DeleteEventDialog
+      open={deleteDialogOpen}
+      eventTitle={event.title}
+      deleteError={deleteError}
+      deleting={deleting}
+      onOpenChange={setDeleteDialogOpen}
+      onConfirm={handleDelete}
+    />
     </>
   );
 }
