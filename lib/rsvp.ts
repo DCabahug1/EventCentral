@@ -127,6 +127,17 @@ export const getRSVPsByUser = async (): Promise<RSVP[] | Error | PostgrestError 
   return data as RSVP[];
 }
 
+// Returns the current confirmed RSVP count for an event from the events table.
+export const getEventRsvpCount = async (event_id: number): Promise<number> => {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from('events')
+    .select('rsvp_count')
+    .eq('id', event_id)
+    .single();
+  return data?.rsvp_count ?? 0;
+};
+
 // Cancels the currently authenticated user's RSVP for an event.
 // Soft delete sets status to CANCELLED instead of deleting the row.
 // Returns null on success or an Error/PostgrestError on failure.

@@ -21,7 +21,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { getCategoryConfig } from "@/lib/categoryConfig";
 import { formatDateTime, cn } from "@/lib/utils";
-import { createRSVP, cancelRSVP } from "@/lib/rsvp";
+import { createRSVP, cancelRSVP, getEventRsvpCount } from "@/lib/rsvp";
 import { createReview } from "@/lib/reviews";
 import type { Event, Organization, Review, ReviewWithProfile } from "@/lib/types";
 
@@ -85,7 +85,7 @@ export default function EventPageContent({
         const result = await cancelRSVP(event.id);
         if (result === null) {
           setIsRsvped(false);
-          setRsvpCount((c) => Math.max(0, c - 1));
+          setRsvpCount(await getEventRsvpCount(event.id));
         } else {
           setRsvpError(
             result instanceof Error ? result.message : "Failed to cancel RSVP."
@@ -100,7 +100,7 @@ export default function EventPageContent({
           "event_id" in result
         ) {
           setIsRsvped(true);
-          setRsvpCount((c) => c + 1);
+          setRsvpCount(await getEventRsvpCount(event.id));
         } else {
           setRsvpError(
             result instanceof Error ? result.message : "Failed to RSVP."
@@ -427,7 +427,7 @@ export default function EventPageContent({
               <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                 Attending
               </p>
-              <div className="flex items-end gap-2">
+              <div className={cn("flex items-end gap-2 transition-opacity", rsvpPending && "opacity-40")}>
                 <span className="text-4xl font-bold leading-none">
                   {rsvpCount}
                 </span>
@@ -438,7 +438,7 @@ export default function EventPageContent({
                 )}
               </div>
               {maxCapacity !== null && (
-                <>
+                <div className={cn("flex flex-col gap-1 transition-opacity", rsvpPending && "opacity-40")}>
                   <Progress
                     value={Math.min(100, (rsvpCount / maxCapacity) * 100)}
                     className="h-1.5"
@@ -448,7 +448,7 @@ export default function EventPageContent({
                       ? "Event is full"
                       : `${spotsRemaining} spots remaining`}
                   </p>
-                </>
+                </div>
               )}
               {rsvpError && (
                 <p className="text-sm text-destructive">{rsvpError}</p>
