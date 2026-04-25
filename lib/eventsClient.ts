@@ -34,7 +34,8 @@ export const getEvents = async (filters?: {
   // 1. Query Supabase: filter by date range and category server-side.
   let query = supabase
     .from("events")
-    .select("*");
+    .select("*")
+    .eq("CANCELLED", false);
 
   // Apply date predicates only when explicitly provided.
   // For timestampz, use full ISO boundaries to cover the selected day.

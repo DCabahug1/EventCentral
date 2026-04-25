@@ -11,6 +11,7 @@ export async function getFeaturedEvents(limit = 5): Promise<Event[]> {
     .select(
       "id,organization_id,organization_name,rsvp_count,user_id,title,description,start_time,end_time,address,location_details,lat,lng,max_capacity,image_url,category,CANCELLED,created_at,updated_at",
     )
+    .eq("CANCELLED", false)
     .gte("end_time", new Date().toISOString())
     .order("start_time", { ascending: true })
     .limit(limit);
@@ -31,6 +32,7 @@ export async function getCategoryCounts(): Promise<Record<string, number>> {
         .from("events")
         .select("*", { count: "exact", head: true })
         .eq("category", cat)
+        .eq("CANCELLED", false)
         .gte("end_time", now)
     )
   );
@@ -65,6 +67,7 @@ export async function getAttendingEvents(userId?: string): Promise<Event[]> {
       "id,organization_id,organization_name,rsvp_count,user_id,title,description,start_time,end_time,address,location_details,lat,lng,max_capacity,image_url,category,CANCELLED,created_at,updated_at",
     )
     .in("id", ids)
+    .eq("CANCELLED", false)
     .order("start_time", { ascending: true });
 
   if (error || !data) return [];
@@ -103,7 +106,8 @@ export async function getAttendingEventsPage(
       "id,organization_id,organization_name,rsvp_count,user_id,title,description,start_time,end_time,address,location_details,lat,lng,max_capacity,image_url,category,CANCELLED,created_at,updated_at",
       { count: "exact" },
     )
-    .in("id", ids);
+    .in("id", ids)
+    .eq("CANCELLED", false);
 
   eventQuery =
     bucket === "upcoming"
@@ -128,6 +132,7 @@ export async function getEventsByOrganizationId(
       "id,organization_id,organization_name,rsvp_count,user_id,title,description,start_time,end_time,address,location_details,lat,lng,max_capacity,image_url,category,CANCELLED,created_at,updated_at",
     )
     .eq("organization_id", organizationId)
+    .eq("CANCELLED", false)
     .order("start_time", { ascending: true });
 
   if (error || !data) {
