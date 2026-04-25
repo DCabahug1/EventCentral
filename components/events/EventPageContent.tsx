@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -12,6 +12,7 @@ import {
   Star,
   Share2,
   Copy,
+  Sparkles,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -22,6 +23,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { getCategoryConfig } from "@/lib/categoryConfig";
 import { formatDateTime, cn } from "@/lib/utils";
 import { createRSVP, cancelRSVP, getEventRsvpCount } from "@/lib/rsvp";
+import { generateReviewSummary } from "@/lib/reviewSummary";
 import { createReview } from "@/lib/reviews";
 import type { Event, Organization, Review, ReviewWithProfile } from "@/lib/types";
 
@@ -49,6 +51,20 @@ export default function EventPageContent({
   const [reviews, setReviews] = useState<ReviewWithProfile[]>(initialReviews);
   const [rsvpPending, startRsvpTransition] = useTransition();
   const [rsvpError, setRsvpError] = useState("");
+
+  const [reviewSummary, setReviewSummary] = useState<string | null>(null);
+  const [summaryLoading, setSummaryLoading] = useState(false);
+
+  useEffect(() => {
+    if (reviews.length === 0) return;
+    setSummaryLoading(true);
+    generateReviewSummary(reviews)
+      .then((result) => {
+        if (typeof result === "string") setReviewSummary(result);
+      })
+      .catch(() => {})
+      .finally(() => setSummaryLoading(false));
+  }, []);
 
   const [reviewRating, setReviewRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
@@ -307,6 +323,31 @@ export default function EventPageContent({
 
               {reviews.length === 0 && (
                 <p className="text-sm text-muted-foreground">No reviews yet.</p>
+              )}
+
+              {/* AI Summary */}
+              {reviews.length > 0 && (
+                <div className="flex flex-col gap-2 rounded-lg border border-border bg-muted/40 p-4">
+                  <div className="flex items-center gap-1.5 text-sm font-semibold">
+                    <Sparkles className="size-4" />
+                    Summary
+                  </div>
+                  {summaryLoading ? (
+                    <div className="flex flex-col gap-2">
+                      <div className="h-3 w-full animate-pulse rounded bg-muted-foreground/20" />
+                      <div className="h-3 w-5/6 animate-pulse rounded bg-muted-foreground/20" />
+                      <div className="h-3 w-4/6 animate-pulse rounded bg-muted-foreground/20" />
+                    </div>
+                  ) : reviewSummary ? (
+                    <p className="text-sm leading-relaxed text-muted-foreground">
+                      {reviewSummary.split(/\*\*(.+?)\*\*/g).map((part, i) =>
+                        i % 2 === 1
+                          ? <strong key={i} className="font-semibold text-foreground">{part}</strong>
+                          : part
+                      )}
+                    </p>
+                  ) : null}
+                </div>
               )}
 
               {reviews.map((review) => (
