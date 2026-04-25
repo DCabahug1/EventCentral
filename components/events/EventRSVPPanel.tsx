@@ -83,9 +83,9 @@ export default function EventRSVPPanel({
               </AvatarFallback>
             </Avatar>
           ))}
-          {rsvpCount > attendeeAvatars.length && (
+          {attendeeAvatars.length === 4 && rsvpCount > 4 && (
             <AvatarGroupCount className="text-xs">
-              +{rsvpCount - attendeeAvatars.length}
+              +{rsvpCount - 4}
             </AvatarGroupCount>
           )}
         </AvatarGroup>
