@@ -1,9 +1,21 @@
 'use server'
 import { createClient } from "./supabase/server";
 import { RSVP } from "./types";
-import { PostgrestError } from "@supabase/supabase-js";
+import { PostgrestError, SupabaseClient } from "@supabase/supabase-js";
 
 type RSVPInput = Omit<RSVP, "id" | "user_id" | "status" | "created_at">;
+
+async function syncRsvpCount(supabase: SupabaseClient, event_id: number) {
+  const { count } = await supabase
+    .from('rsvps')
+    .select('*', { count: 'exact', head: true })
+    .eq('event_id', event_id)
+    .eq('status', 'CONFIRMED');
+  await supabase
+    .from('events')
+    .update({ rsvp_count: count ?? 0 })
+    .eq('id', event_id);
+}
 
 // Registers the currently authenticated user for an event.
 // Returns the inserted row or an Error/PostgrestError on failure.
@@ -38,6 +50,7 @@ export const createRSVP = async (
       .single();
 
     if (error) return error;
+    await syncRsvpCount(supabase, input.event_id);
     return data as RSVP;
   }
 
@@ -72,6 +85,7 @@ export const createRSVP = async (
     .single();
 
   if (error) return error;
+  await syncRsvpCount(supabase, input.event_id);
   return data as RSVP;
 }
 
@@ -113,6 +127,46 @@ export const getRSVPsByUser = async (): Promise<RSVP[] | Error | PostgrestError 
   return data as RSVP[];
 }
 
+// Returns the first `limit` confirmed attendee profiles (username + avatar_url) for an event.
+export const getEventAttendeeAvatars = async (
+  eventId: number,
+  limit = 4,
+): Promise<{ username: string | null; avatar_url: string | null }[]> => {
+  const supabase = await createClient();
+
+  const { data: rsvps } = await supabase
+    .from("rsvps")
+    .select("user_id")
+    .eq("event_id", eventId)
+    .eq("status", "CONFIRMED")
+    .limit(limit);
+
+  if (!rsvps || rsvps.length === 0) return [];
+
+  const userIds = rsvps.map((r: { user_id: string }) => r.user_id);
+
+  const { data: profiles } = await supabase
+    .from("profiles")
+    .select("username, avatar_url")
+    .in("user_id", userIds);
+
+  return (profiles ?? []).map((p) => ({
+    username: (p.username as string | null) ?? null,
+    avatar_url: (p.avatar_url as string | null) ?? null,
+  }));
+};
+
+// Returns the current confirmed RSVP count for an event from the events table.
+export const getEventRsvpCount = async (event_id: number): Promise<number> => {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from('events')
+    .select('rsvp_count')
+    .eq('id', event_id)
+    .single();
+  return data?.rsvp_count ?? 0;
+};
+
 // Cancels the currently authenticated user's RSVP for an event.
 // Soft delete sets status to CANCELLED instead of deleting the row.
 // Returns null on success or an Error/PostgrestError on failure.
@@ -133,5 +187,6 @@ export const cancelRSVP = async (
     .eq('user_id', user.id);
 
   if (error) return error;
+  await syncRsvpCount(supabase, event_id);
   return null;
 }

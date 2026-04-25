@@ -2,6 +2,7 @@
 import { createClient } from "./supabase/client";
 import { distanceBetweenLocations } from "./utils";
 import { Event } from "./types";
+import { PostgrestError } from "@supabase/supabase-js";
 
 export const getEvents = async (filters?: {
   keyword?: string;
@@ -33,7 +34,8 @@ export const getEvents = async (filters?: {
   // 1. Query Supabase: filter by date range and category server-side.
   let query = supabase
     .from("events")
-    .select("*");
+    .select("*")
+    .eq("CANCELLED", false);
 
   // Apply date predicates only when explicitly provided.
   // For timestampz, use full ISO boundaries to cover the selected day.
@@ -94,4 +96,17 @@ export const getEvents = async (filters?: {
 
     return true;
   });
+};
+
+export const getEventById = async (id: number): Promise<Event | PostgrestError | null> => {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("events")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (error) return error;
+  if (!data) return null;
+  return data as Event;
 };

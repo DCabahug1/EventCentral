@@ -1,6 +1,6 @@
 'use server'
 import { createClient } from "./supabase/server";
-import { Review } from "./types";
+import { Review, ReviewWithProfile } from "./types";
 import { PostgrestError } from "@supabase/supabase-js";
 
 type ReviewInput = Omit<Review, "id" | "user_id" | "created_at" | "edited_at">;
@@ -21,7 +21,7 @@ export const createReview = async (
   // Business rule: event must be completed/ended
   const { data: event } = await supabase
     .from('events')
-    .select('status')
+    .select('end_time')
     .eq('id', input.event_id)
     .single();
 
@@ -29,7 +29,9 @@ export const createReview = async (
     return new Error("Event not found.");
   }
 
-  if (event.status !== 'ENDED' && event.status !== 'COMPLETED') {
+  const eventIsOver = event.end_time && new Date(event.end_time as string) <= new Date();
+
+  if (!eventIsOver) {
     return new Error("You can only review an event that has ended.");
   }
 
@@ -157,3 +159,37 @@ export const deleteReview = async (
   if (error) return error;
   return null;
 }
+
+export const getReviewsWithProfilesByEvent = async (
+  event_id: number
+): Promise<ReviewWithProfile[]> => {
+  const supabase = await createClient();
+
+  const { data: reviews, error } = await supabase
+    .from('reviews')
+    .select('*')
+    .eq('event_id', event_id)
+    .order('created_at', { ascending: false });
+
+  if (error || !reviews || reviews.length === 0) return [];
+
+  const userIds = [...new Set((reviews as Review[]).map((r) => r.user_id))];
+
+  const { data: profiles } = await supabase
+    .from('profiles')
+    .select('user_id, username, avatar_url')
+    .in('user_id', userIds);
+
+  const profileMap = new Map<string, { username: string | null; avatar_url: string | null }>(
+    (profiles ?? []).map((p) => [
+      p.user_id as string,
+      { username: p.username as string | null, avatar_url: p.avatar_url as string | null },
+    ])
+  );
+
+  return (reviews as Review[]).map((review) => ({
+    ...review,
+    username: profileMap.get(review.user_id)?.username ?? null,
+    avatar_url: profileMap.get(review.user_id)?.avatar_url ?? null,
+  }));
+};

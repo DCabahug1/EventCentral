@@ -263,7 +263,7 @@ export default function CreateEventForm({
         max_capacity: cap,
         image_url: imageUrl,
         category,
-        status: "UPCOMING",
+        CANCELLED: false,
         rsvp_count: null,
       });
 
