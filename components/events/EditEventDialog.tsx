@@ -49,13 +49,6 @@ function toLocalInput(isoStr: string): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
-const STATUS_OPTIONS: { value: Event["status"]; label: string }[] = [
-  { value: "UPCOMING", label: "Upcoming" },
-  { value: "STARTED", label: "Live" },
-  { value: "ENDED", label: "Ended" },
-  { value: "CANCELLED", label: "Cancelled" },
-];
-
 type Props = {
   event: Event;
   open: boolean;
@@ -82,7 +75,7 @@ export default function EditEventDialog({
   const [title, setTitle] = useState(event.title);
   const [description, setDescription] = useState(event.description ?? "");
   const [category, setCategory] = useState(event.category ?? CATEGORY_CONFIG[0].label);
-  const [status, setStatus] = useState<Event["status"]>(event.status);
+  const [isCancelled, setIsCancelled] = useState(event.CANCELLED);
   const [startLocal, setStartLocal] = useState(() => toLocalInput(event.start_time));
   const [endLocal, setEndLocal] = useState(() => toLocalInput(event.end_time));
   const [address, setAddress] = useState(event.address ?? "");
@@ -99,7 +92,7 @@ export default function EditEventDialog({
     setTitle(event.title);
     setDescription(event.description ?? "");
     setCategory(event.category ?? CATEGORY_CONFIG[0].label);
-    setStatus(event.status);
+    setIsCancelled(event.CANCELLED);
     setStartLocal(toLocalInput(event.start_time));
     setEndLocal(toLocalInput(event.end_time));
     setAddress(event.address ?? "");
@@ -175,7 +168,7 @@ export default function EditEventDialog({
         title: title.trim(),
         description: description.trim() || null,
         category,
-        status,
+        CANCELLED: isCancelled,
         start_time: start.toISOString(),
         end_time: end.toISOString(),
         address: address.trim(),
@@ -315,26 +308,6 @@ export default function EditEventDialog({
               </Field>
 
               <Field>
-                <FieldLabel className="text-muted-foreground">
-                  Status <RequiredMark />
-                </FieldLabel>
-                <FieldContent>
-                  <Select value={status} onValueChange={(v) => setStatus(v as Event["status"])}>
-                    <SelectTrigger className="w-full min-w-0">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {STATUS_OPTIONS.map((opt) => (
-                        <SelectItem key={opt.value} value={opt.value}>
-                          {opt.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FieldContent>
-              </Field>
-
-              <Field>
                 <FieldLabel htmlFor="edit-event-start" className="text-muted-foreground">
                   Start <RequiredMark />
                 </FieldLabel>
@@ -435,6 +408,13 @@ export default function EditEventDialog({
               onClick={onRequestDelete}
             >
               Delete event
+            </Button>
+            <Button
+              type="button"
+              variant={isCancelled ? "outline" : "destructive"}
+              onClick={() => setIsCancelled((v) => !v)}
+            >
+              {isCancelled ? "Uncancel event" : "Cancel event"}
             </Button>
             <DialogClose asChild>
               <Button type="button" variant="outline">

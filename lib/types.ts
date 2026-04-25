@@ -45,7 +45,7 @@ export type Event = {
   max_capacity: number | null;
   image_url: string | null;
   category: string | null;
-  status: 'UPCOMING' | 'STARTED' | 'ENDED' | 'CANCELLED';
+  CANCELLED: boolean;
   created_at: string;
   updated_at: string;
 }

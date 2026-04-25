@@ -10,54 +10,84 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Separator } from "@/components/ui/separator";
 
 type Props = {
   open: boolean;
   eventTitle: string;
-  deleteError: string;
+  error: string;
   deleting: boolean;
+  cancelling: boolean;
+  isAlreadyCancelled: boolean;
   onOpenChange: (open: boolean) => void;
-  onConfirm: () => void;
+  onDelete: () => void;
+  onCancel: () => void;
 };
 
 export default function DeleteEventDialog({
   open,
   eventTitle,
-  deleteError,
+  error,
   deleting,
+  cancelling,
+  isAlreadyCancelled,
   onOpenChange,
-  onConfirm,
+  onDelete,
+  onCancel,
 }: Props) {
+  const busy = deleting || cancelling;
+
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle className="text-2xl font-bold tracking-tight">
-            Delete event?
+            Remove this event?
           </AlertDialogTitle>
-          <AlertDialogDescription>
-            This will permanently remove{" "}
-            <span className="font-medium text-foreground">{eventTitle}</span>.
-            This cannot be undone.
+          <AlertDialogDescription asChild>
+            <div className="flex flex-col gap-3 text-sm text-muted-foreground">
+              {!isAlreadyCancelled && (
+                <>
+                  <p>
+                    Consider <span className="font-medium text-foreground">cancelling</span> instead.
+                    Attendees will see it as cancelled and won&apos;t lose it from their history.
+                  </p>
+                  <Separator />
+                </>
+              )}
+              <p>
+                Deleting{" "}
+                <span className="font-medium text-foreground">{eventTitle}</span>{" "}
+                is permanent and cannot be undone.
+              </p>
+            </div>
           </AlertDialogDescription>
         </AlertDialogHeader>
-        {deleteError ? (
-          <p className="text-sm text-destructive">{deleteError}</p>
-        ) : null}
+        {error ? <p className="text-sm text-destructive">{error}</p> : null}
         <AlertDialogFooter>
           <AlertDialogCancel asChild>
-            <Button type="button" variant="outline" disabled={deleting}>
-              Cancel
+            <Button type="button" variant="outline" disabled={busy}>
+              Go back
             </Button>
           </AlertDialogCancel>
           <Button
             type="button"
-            variant="destructive"
-            disabled={deleting}
-            onClick={onConfirm}
+            variant={isAlreadyCancelled ? "destructive" : "outline"}
+            disabled={busy}
+            onClick={onDelete}
           >
             {deleting ? "Deleting…" : "Delete event"}
           </Button>
+          {!isAlreadyCancelled && (
+            <Button
+              type="button"
+              variant="destructive"
+              disabled={busy}
+              onClick={onCancel}
+            >
+              {cancelling ? "Cancelling…" : "Cancel event"}
+            </Button>
+          )}
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

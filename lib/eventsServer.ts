@@ -9,7 +9,7 @@ export async function getFeaturedEvents(limit = 5): Promise<Event[]> {
   const { data, error } = await supabase
     .from("events")
     .select(
-      "id,organization_id,organization_name,rsvp_count,user_id,title,description,start_time,end_time,address,location_details,lat,lng,max_capacity,image_url,category,status,created_at,updated_at",
+      "id,organization_id,organization_name,rsvp_count,user_id,title,description,start_time,end_time,address,location_details,lat,lng,max_capacity,image_url,category,CANCELLED,created_at,updated_at",
     )
     .gte("end_time", new Date().toISOString())
     .order("start_time", { ascending: true })
@@ -62,7 +62,7 @@ export async function getAttendingEvents(userId?: string): Promise<Event[]> {
   const { data, error } = await supabase
     .from("events")
     .select(
-      "id,organization_id,organization_name,rsvp_count,user_id,title,description,start_time,end_time,address,location_details,lat,lng,max_capacity,image_url,category,status,created_at,updated_at",
+      "id,organization_id,organization_name,rsvp_count,user_id,title,description,start_time,end_time,address,location_details,lat,lng,max_capacity,image_url,category,CANCELLED,created_at,updated_at",
     )
     .in("id", ids)
     .order("start_time", { ascending: true });
@@ -100,7 +100,7 @@ export async function getAttendingEventsPage(
   let eventQuery = supabase
     .from("events")
     .select(
-      "id,organization_id,organization_name,rsvp_count,user_id,title,description,start_time,end_time,address,location_details,lat,lng,max_capacity,image_url,category,status,created_at,updated_at",
+      "id,organization_id,organization_name,rsvp_count,user_id,title,description,start_time,end_time,address,location_details,lat,lng,max_capacity,image_url,category,CANCELLED,created_at,updated_at",
       { count: "exact" },
     )
     .in("id", ids);
@@ -125,7 +125,7 @@ export async function getEventsByOrganizationId(
   const { data, error } = await supabase
     .from("events")
     .select(
-      "id,organization_id,organization_name,rsvp_count,user_id,title,description,start_time,end_time,address,location_details,lat,lng,max_capacity,image_url,category,status,created_at,updated_at",
+      "id,organization_id,organization_name,rsvp_count,user_id,title,description,start_time,end_time,address,location_details,lat,lng,max_capacity,image_url,category,CANCELLED,created_at,updated_at",
     )
     .eq("organization_id", organizationId)
     .order("start_time", { ascending: true });
@@ -143,7 +143,7 @@ export async function getEventById(
   const { data, error } = await supabase
     .from("events")
     .select(
-      "id,organization_id,organization_name,rsvp_count,user_id,title,description,start_time,end_time,address,location_details,lat,lng,max_capacity,image_url,category,status,created_at,updated_at",
+      "id,organization_id,organization_name,rsvp_count,user_id,title,description,start_time,end_time,address,location_details,lat,lng,max_capacity,image_url,category,CANCELLED,created_at,updated_at",
     )
     .eq("id", id)
     .single();

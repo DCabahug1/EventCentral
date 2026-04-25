@@ -38,13 +38,23 @@ import { generateReviewSummary } from "@/lib/reviewSummary";
 import { createReview } from "@/lib/reviews";
 import EditEventDialog from "@/components/events/EditEventDialog";
 import DeleteEventDialog from "@/components/events/DeleteEventDialog";
-import { deleteEvent } from "@/lib/eventsServer";
+import { deleteEvent, updateEvent } from "@/lib/eventsServer";
 import type {
   Event,
   Organization,
   Review,
   ReviewWithProfile,
 } from "@/lib/types";
+
+type EventStatus = "UPCOMING" | "STARTED" | "ENDED" | "CANCELLED";
+
+function getEventStatus(event: Event): EventStatus {
+  if (event.CANCELLED) return "CANCELLED";
+  const now = new Date();
+  if (new Date(event.end_time) <= now) return "ENDED";
+  if (new Date(event.start_time) <= now) return "STARTED";
+  return "UPCOMING";
+}
 
 type Props = {
   event: Event;
@@ -81,8 +91,10 @@ export default function EventPageContent({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteError, setDeleteError] = useState("");
   const [deleting, setDeleting] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
 
   const isOwner = !!currentUserId && currentUserId === event.user_id;
+  const eventStatus = getEventStatus(event);
 
   const handleDelete = async () => {
     setDeleteError("");
@@ -93,6 +105,19 @@ export default function EventPageContent({
       router.push("/discover");
     } else {
       setDeleteError(result instanceof Error ? result.message : "Failed to delete event.");
+    }
+  };
+
+  const handleCancelEvent = async () => {
+    setDeleteError("");
+    setCancelling(true);
+    const result = await updateEvent(event.id, { CANCELLED: true });
+    setCancelling(false);
+    if (result && typeof result === "object" && "id" in result) {
+      setDeleteDialogOpen(false);
+      router.refresh();
+    } else {
+      setDeleteError(result instanceof Error ? result.message : "Failed to cancel event.");
     }
   };
 
@@ -120,12 +145,8 @@ export default function EventPageContent({
   const maxCapacity = event.max_capacity;
   const spotsRemaining = maxCapacity !== null ? maxCapacity - rsvpCount : null;
   const isFull = maxCapacity !== null && rsvpCount >= maxCapacity;
-  const isEnded =
-    event.status === "ENDED" ||
-    event.status === "CANCELLED" ||
-    new Date(event.end_time) <= new Date();
-  const canReview =
-    event.status === "ENDED" || new Date(event.end_time) <= new Date();
+  const isEnded = eventStatus === "ENDED" || eventStatus === "CANCELLED";
+  const canReview = new Date(event.end_time) <= new Date();
 
   const avgRating =
     reviews.length > 0
@@ -264,10 +285,7 @@ export default function EventPageContent({
     });
   };
 
-  const statusConfig: Record<
-    Event["status"],
-    { label: string; className: string }
-  > = {
+  const statusConfig: Record<EventStatus, { label: string; className: string }> = {
     UPCOMING: {
       label: "Upcoming",
       className:
@@ -290,8 +308,7 @@ export default function EventPageContent({
     },
   };
 
-  const { label: statusLabel, className: statusClassName } =
-    statusConfig[event.status] ?? statusConfig.ENDED;
+  const { label: statusLabel, className: statusClassName } = statusConfig[eventStatus];
 
   return (
     <>
@@ -308,7 +325,7 @@ export default function EventPageContent({
 
           {/* Event header */}
           <div className="flex flex-col gap-3 mb-8">
-            <Badge variant="outline" className="text-foreground">
+            <Badge variant="outline" className={cn("w-fit", statusClassName)}>
               {statusLabel}
             </Badge>
             <div className="flex flex-wrap items-center gap-3">
@@ -758,10 +775,13 @@ export default function EventPageContent({
     <DeleteEventDialog
       open={deleteDialogOpen}
       eventTitle={event.title}
-      deleteError={deleteError}
+      error={deleteError}
       deleting={deleting}
+      cancelling={cancelling}
+      isAlreadyCancelled={event.CANCELLED}
       onOpenChange={setDeleteDialogOpen}
-      onConfirm={handleDelete}
+      onDelete={handleDelete}
+      onCancel={handleCancelEvent}
     />
     </>
   );

@@ -21,7 +21,7 @@ export const createReview = async (
   // Business rule: event must be completed/ended
   const { data: event } = await supabase
     .from('events')
-    .select('status, end_time')
+    .select('end_time')
     .eq('id', input.event_id)
     .single();
 
@@ -29,9 +29,7 @@ export const createReview = async (
     return new Error("Event not found.");
   }
 
-  const eventIsOver =
-    event.status === 'ENDED' ||
-    (event.end_time && new Date(event.end_time as string) <= new Date());
+  const eventIsOver = event.end_time && new Date(event.end_time as string) <= new Date();
 
   if (!eventIsOver) {
     return new Error("You can only review an event that has ended.");
