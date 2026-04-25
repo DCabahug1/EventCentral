@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, CalendarPlus } from "lucide-react";
+import { motion, useReducedMotion } from "motion/react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -155,30 +156,41 @@ export default function EventPageContent({
     }
   };
 
+  const prefersReducedMotion = useReducedMotion();
+  const fadeUp = (delay = 0) => ({
+    initial: { opacity: 0, y: prefersReducedMotion ? 0 : 16 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.45, ease: "easeOut" as const, delay },
+  });
+
   return (
     <>
       <div className="min-h-svh bg-background">
         <div className="mx-auto max-w-5xl px-4 pb-16 pt-6 sm:px-6 lg:px-8">
-          <Link
-            href="/discover"
-            className="mb-6 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-          >
-            <ChevronLeft className="size-4" />
-            Back to Discover
-          </Link>
+          <motion.div {...fadeUp(0)}>
+            <Link
+              href="/discover"
+              className="mb-6 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+            >
+              <ChevronLeft className="size-4" />
+              Back to Discover
+            </Link>
+          </motion.div>
 
-          <EventHeader
-            event={event}
-            organization={organization}
-            rsvpCount={rsvpCount}
-            isOwner={isOwner}
-            eventStatus={eventStatus}
-            onEditClick={() => setEditDialogOpen(true)}
-          />
+          <motion.div {...fadeUp(0.08)}>
+            <EventHeader
+              event={event}
+              organization={organization}
+              rsvpCount={rsvpCount}
+              isOwner={isOwner}
+              eventStatus={eventStatus}
+              onEditClick={() => setEditDialogOpen(true)}
+            />
+          </motion.div>
 
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_300px]">
             {/* Left column */}
-            <div className="order-2 flex flex-col gap-8 lg:order-1">
+            <motion.div className="order-2 flex flex-col gap-8 lg:order-1" {...fadeUp(0.18)}>
               {event.description && (
                 <div className="flex flex-col gap-3">
                   <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
@@ -194,10 +206,10 @@ export default function EventPageContent({
                 currentUserId={currentUserId}
                 currentUserProfile={currentUserProfile}
               />
-            </div>
+            </motion.div>
 
             {/* Right column */}
-            <div className="order-1 flex flex-col gap-6 lg:order-2 lg:sticky lg:top-24 lg:self-start">
+            <motion.div className="order-1 flex flex-col gap-6 lg:order-2 lg:sticky lg:top-24 lg:self-start" {...fadeUp(0.12)}>
               <EventRSVPPanel
                 event={event}
                 isRsvped={isRsvped}
@@ -212,7 +224,7 @@ export default function EventPageContent({
                 onShare={handleShare}
               />
               {organization && <EventHostedByCard organization={organization} />}
-            </div>
+            </motion.div>
           </div>
         </div>
       </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 
 type Props = {
   imageUrl: string | null;
@@ -10,35 +10,33 @@ type Props = {
 
 export default function EventHero({ imageUrl, title }: Props) {
   const prefersReducedMotion = useReducedMotion();
-  const { scrollY } = useScroll();
-  const parallaxY = useTransform(
-    scrollY,
-    [0, 500],
-    ["0%", prefersReducedMotion ? "8%" : "50%"],
-  );
 
   return (
-    <div className="relative h-56 w-full overflow-hidden bg-muted sm:h-72 md:h-96">
-      {imageUrl ? (
-        <>
-          <motion.div
-            className="absolute inset-x-0 -top-[25%] h-[150%]"
-            style={{ y: parallaxY }}
-          >
-            <Image
-              src={imageUrl}
-              alt={title}
-              fill
-              className="object-cover"
-              sizes="100vw"
-              priority
-            />
-          </motion.div>
-          <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent" />
-        </>
-      ) : (
-        <div className="absolute inset-0 bg-linear-to-br from-primary/30 via-muted to-muted" />
-      )}
+    <div className="bg-background">
+      <div className="mx-auto max-w-5xl px-4 pt-6 sm:px-6 lg:px-8">
+        <motion.div
+          className="relative aspect-video w-full overflow-hidden rounded-xl bg-muted"
+          initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, ease: "easeOut" as const }}
+        >
+          {imageUrl ? (
+            <>
+              <Image
+                src={imageUrl}
+                alt={title}
+                fill
+                className="object-cover"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 1024px"
+                priority
+              />
+              <div className="absolute inset-0 bg-linear-to-t from-black/30 to-transparent" />
+            </>
+          ) : (
+            <div className="absolute inset-0 bg-linear-to-br from-primary/30 via-muted to-muted" />
+          )}
+        </motion.div>
+      </div>
     </div>
   );
 }

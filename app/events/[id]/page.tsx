@@ -7,7 +7,6 @@ import { getOrganizationById } from "@/lib/organizations";
 import { getProfile } from "@/lib/profiles";
 import { getReviewsWithProfilesByEvent } from "@/lib/reviews";
 import { isOrganization } from "@/lib/organizationPage";
-import EventHero from "@/components/events/EventHero";
 import EventPageContent from "@/components/events/EventPageContent";
 import type { Organization } from "@/lib/types";
 
@@ -68,7 +67,6 @@ export default async function EventPage({ params }: PageProps) {
 
   return (
     <EventPageMapsProvider>
-      <EventHero imageUrl={event.image_url} title={event.title} />
       <EventPageContent
         event={event}
         organization={organization}
