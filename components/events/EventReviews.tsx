@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Star } from "lucide-react";
+import { Pencil, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { createReview } from "@/lib/reviews";
+import EditReviewDialog from "@/components/events/EditReviewDialog";
 import EventReviewSummary from "@/components/events/EventReviewSummary";
 import type { Event, Review, ReviewWithProfile } from "@/lib/types";
 
@@ -30,6 +31,7 @@ export default function EventReviews({
   const [reviewPending, startReviewTransition] = useTransition();
   const [reviewError, setReviewError] = useState("");
   const [reviewSuccess, setReviewSuccess] = useState(false);
+  const [editingReview, setEditingReview] = useState<ReviewWithProfile | null>(null);
 
   const canReview = new Date(event.end_time) <= new Date();
 
@@ -117,13 +119,26 @@ export default function EventReviews({
                 {review.username ?? "Anonymous"}
               </span>
             </div>
-            <span className="shrink-0 text-xs text-muted-foreground">
-              {new Date(review.created_at).toLocaleDateString("en-US", {
-                month: "long",
-                day: "numeric",
-                year: "numeric",
-              })}
-            </span>
+            <div className="flex shrink-0 items-center gap-2">
+              <span className="text-xs text-muted-foreground">
+                {new Date(review.created_at).toLocaleDateString("en-US", {
+                  month: "long",
+                  day: "numeric",
+                  year: "numeric",
+                })}
+              </span>
+              {review.user_id === currentUserId && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="size-7 text-muted-foreground hover:text-foreground"
+                  onClick={() => setEditingReview(review)}
+                >
+                  <Pencil className="size-3.5" />
+                </Button>
+              )}
+            </div>
           </div>
 
           <div className="flex gap-0.5">
@@ -200,6 +215,22 @@ export default function EventReviews({
           {reviewPending ? "Submitting..." : "Submit Review"}
         </Button>
       </div>
+
+      {editingReview && (
+        <EditReviewDialog
+          review={editingReview}
+          open={!!editingReview}
+          onOpenChange={(open) => { if (!open) setEditingReview(null); }}
+          onUpdated={(updated) => {
+            setReviews((prev) => prev.map((r) => r.id === updated.id ? updated : r));
+            setEditingReview(null);
+          }}
+          onDeleted={(reviewId) => {
+            setReviews((prev) => prev.filter((r) => r.id !== reviewId));
+            setEditingReview(null);
+          }}
+        />
+      )}
     </div>
   );
 }
