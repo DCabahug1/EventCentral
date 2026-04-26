@@ -161,7 +161,7 @@ export const getAttendeesPage = async (
   eventId: number,
   page: number,
   pageSize: number,
-): Promise<{ items: { username: string | null; avatar_url: string | null }[]; total: number }> => {
+): Promise<{ items: { userId: string; username: string | null; avatar_url: string | null }[]; total: number }> => {
   const supabase = await createClient();
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
@@ -190,9 +190,27 @@ export const getAttendeesPage = async (
   );
 
   return {
-    items: userIds.map((uid) => profileMap.get(uid) ?? { username: null, avatar_url: null }),
+    items: userIds.map((uid) => ({
+      userId: uid,
+      ...(profileMap.get(uid) ?? { username: null, avatar_url: null }),
+    })),
     total: count ?? 0,
   };
+};
+
+// Cancels a specific user's RSVP for an event. Callable by the event host.
+export const removeAttendee = async (
+  eventId: number,
+  targetUserId: string,
+): Promise<null | Error> => {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("rsvps")
+    .update({ status: "CANCELLED" })
+    .eq("event_id", eventId)
+    .eq("user_id", targetUserId);
+  if (error) return new Error(error.message);
+  return null;
 };
 
 // Returns the current confirmed RSVP count for an event from the events table.

@@ -49,6 +49,7 @@ export default function EventPageContent({
 
   const [isRsvped, setIsRsvped] = useState(initialRsvpStatus);
   const [rsvpCount, setRsvpCount] = useState(event.rsvp_count ?? 0);
+  const [localAttendeeAvatars, setLocalAttendeeAvatars] = useState(attendeeAvatars);
   const [rsvpPending, startRsvpTransition] = useTransition();
   const [rsvpError, setRsvpError] = useState("");
 
@@ -74,6 +75,15 @@ export default function EventPageContent({
         if (result === null) {
           setIsRsvped(false);
           setRsvpCount(await getEventRsvpCount(event.id));
+          setLocalAttendeeAvatars((prev) =>
+            prev.filter(
+              (a) =>
+                !(
+                  a.avatar_url === currentUserProfile?.avatar_url &&
+                  a.username === currentUserProfile?.username
+                ),
+            ),
+          );
         } else {
           setRsvpError(result instanceof Error ? result.message : "Failed to cancel RSVP.");
         }
@@ -82,6 +92,13 @@ export default function EventPageContent({
         if (result && typeof result === "object" && "id" in result && "event_id" in result) {
           setIsRsvped(true);
           setRsvpCount(await getEventRsvpCount(event.id));
+          if (currentUserProfile) {
+            setLocalAttendeeAvatars((prev) =>
+              prev.length < 4
+                ? [{ username: currentUserProfile.username, avatar_url: currentUserProfile.avatar_url }, ...prev]
+                : prev,
+            );
+          }
         } else {
           setRsvpError(result instanceof Error ? result.message : "Failed to RSVP.");
         }
@@ -222,7 +239,7 @@ export default function EventPageContent({
                 rsvpError={rsvpError}
                 isEnded={isEnded}
                 isFull={isFull}
-                attendeeAvatars={attendeeAvatars}
+                attendeeAvatars={localAttendeeAvatars}
                 onRsvp={handleRsvp}
                 onCalendarOpen={() => setCalendarDialogOpen(true)}
                 onCopyLink={handleCopyLink}
@@ -261,8 +278,10 @@ export default function EventPageContent({
       <AttendeeListDialog
         eventId={event.id}
         total={rsvpCount}
+        isOwner={isOwner}
         open={attendeeListOpen}
         onOpenChange={setAttendeeListOpen}
+        onAttendeeRemoved={() => setRsvpCount((c) => Math.max(0, c - 1))}
       />
 
       <EditEventDialog
