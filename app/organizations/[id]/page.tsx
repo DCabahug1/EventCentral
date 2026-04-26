@@ -5,7 +5,6 @@ import {
   useCallback,
   useEffect,
   useId,
-  useMemo,
   useRef,
   useState,
 } from "react";
@@ -28,7 +27,7 @@ import {
   getOrganizationById,
   updateOrganization,
 } from "@/lib/organizations";
-import { getEventsByOrganizationId } from "@/lib/eventsServer";
+import { getEventsByOrganizationIdPage } from "@/lib/eventsServer";
 import { uploadOrganizationAsset } from "@/lib/bucketHandler";
 import { createClient } from "@/lib/supabase/client";
 import { PostgrestError } from "@supabase/supabase-js";
@@ -38,7 +37,6 @@ import {
   isOrganization,
   normalizeWebsite,
   ORG_EVENTS_PAGE_SIZE,
-  partitionEvents,
 } from "@/lib/organizationPage";
 
 type OrganizationPageProps = {
@@ -53,7 +51,10 @@ export default function OrganizationPage({ params }: OrganizationPageProps) {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [org, setOrg] = useState<Organization | null>(null);
-  const [events, setEvents] = useState<Event[]>([]);
+  const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
+  const [pastEvents, setPastEvents] = useState<Event[]>([]);
+  const [upcomingTotal, setUpcomingTotal] = useState(0);
+  const [pastTotal, setPastTotal] = useState(0);
   const [founderProfile, setFounderProfile] = useState<Profile | null>(null);
   const [isOwner, setIsOwner] = useState(false);
 
@@ -96,16 +97,20 @@ export default function OrganizationPage({ params }: OrganizationPageProps) {
     setNotFound(false);
 
     try {
-      const [rawOrg, eventRows, supabase] = await Promise.all([
+      const [rawOrg, upcomingResult, pastResult, supabase] = await Promise.all([
         getOrganizationById(orgId),
-        getEventsByOrganizationId(orgId),
+        getEventsByOrganizationIdPage(orgId, "upcoming", 1, ORG_EVENTS_PAGE_SIZE),
+        getEventsByOrganizationIdPage(orgId, "past", 1, ORG_EVENTS_PAGE_SIZE),
         createClient(),
       ]);
 
       if (!rawOrg || !isOrganization(rawOrg)) {
         setNotFound(true);
         setOrg(null);
-        setEvents([]);
+        setUpcomingEvents([]);
+        setPastEvents([]);
+        setUpcomingTotal(0);
+        setPastTotal(0);
         setFounderProfile(null);
         setIsOwner(false);
         return;
@@ -127,7 +132,12 @@ export default function OrganizationPage({ params }: OrganizationPageProps) {
       } = await supabase.auth.getUser();
 
       setOrg(rawOrg);
-      setEvents(eventRows);
+      setUpcomingEvents(upcomingResult.items);
+      setUpcomingTotal(upcomingResult.total);
+      setPastEvents(pastResult.items);
+      setPastTotal(pastResult.total);
+      setUpcomingPage(1);
+      setPastPage(1);
       setIsOwner(!!user?.id && user.id === rawOrg.user_id);
       setName(rawOrg.name);
       setDescription(rawOrg.description ?? "");
@@ -195,50 +205,22 @@ export default function OrganizationPage({ params }: OrganizationPageProps) {
     container.scrollBy({ top: errorTop, behavior: "smooth" });
   }, [formError]);
 
-  const { upcoming, past } = useMemo(
-    () => partitionEvents(events),
-    [events],
-  );
+  const totalUpcomingPages = Math.max(1, Math.ceil(upcomingTotal / ORG_EVENTS_PAGE_SIZE));
+  const totalPastPages = Math.max(1, Math.ceil(pastTotal / ORG_EVENTS_PAGE_SIZE));
 
-  useEffect(() => {
-    setUpcomingPage(1);
-    setPastPage(1);
+  const handleUpcomingPageChange = useCallback(async (page: number) => {
+    setUpcomingPage(page);
+    const result = await getEventsByOrganizationIdPage(orgId, "upcoming", page, ORG_EVENTS_PAGE_SIZE);
+    setUpcomingEvents(result.items);
+    setUpcomingTotal(result.total);
   }, [orgId]);
 
-  useEffect(() => {
-    const maxUp = Math.max(
-      1,
-      Math.ceil(upcoming.length / ORG_EVENTS_PAGE_SIZE),
-    );
-    setUpcomingPage((p) => Math.min(p, maxUp));
-  }, [upcoming.length]);
-
-  useEffect(() => {
-    const maxPast = Math.max(
-      1,
-      Math.ceil(past.length / ORG_EVENTS_PAGE_SIZE),
-    );
-    setPastPage((p) => Math.min(p, maxPast));
-  }, [past.length]);
-
-  const paginatedUpcoming = useMemo(() => {
-    const start = (upcomingPage - 1) * ORG_EVENTS_PAGE_SIZE;
-    return upcoming.slice(start, start + ORG_EVENTS_PAGE_SIZE);
-  }, [upcoming, upcomingPage]);
-
-  const paginatedPast = useMemo(() => {
-    const start = (pastPage - 1) * ORG_EVENTS_PAGE_SIZE;
-    return past.slice(start, start + ORG_EVENTS_PAGE_SIZE);
-  }, [past, pastPage]);
-
-  const totalUpcomingPages = Math.max(
-    1,
-    Math.ceil(upcoming.length / ORG_EVENTS_PAGE_SIZE),
-  );
-  const totalPastPages = Math.max(
-    1,
-    Math.ceil(past.length / ORG_EVENTS_PAGE_SIZE),
-  );
+  const handlePastPageChange = useCallback(async (page: number) => {
+    setPastPage(page);
+    const result = await getEventsByOrganizationIdPage(orgId, "past", page, ORG_EVENTS_PAGE_SIZE);
+    setPastEvents(result.items);
+    setPastTotal(result.total);
+  }, [orgId]);
 
   const handleEditSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -409,16 +391,16 @@ export default function OrganizationPage({ params }: OrganizationPageProps) {
 
           <OrganizationEventsTabs
             org={org}
-            upcoming={upcoming}
-            past={past}
-            paginatedUpcoming={paginatedUpcoming}
-            paginatedPast={paginatedPast}
+            upcoming={upcomingEvents}
+            past={pastEvents}
+            upcomingTotal={upcomingTotal}
+            pastTotal={pastTotal}
             upcomingPage={upcomingPage}
             pastPage={pastPage}
             totalUpcomingPages={totalUpcomingPages}
             totalPastPages={totalPastPages}
-            onUpcomingPageChange={setUpcomingPage}
-            onPastPageChange={setPastPage}
+            onUpcomingPageChange={handleUpcomingPageChange}
+            onPastPageChange={handlePastPageChange}
             isOwner={isOwner}
             onCreateEvent={
               isOwner ? () => setCreateEventOpen(true) : undefined

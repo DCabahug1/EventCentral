@@ -121,24 +121,39 @@ export async function getAttendingEventsPage(
   return { items: data as Event[], total: count ?? 0 };
 }
 
-/** Returns events for one organization by start time. */
-export async function getEventsByOrganizationId(
+/** Returns one page of upcoming or past events for an organization. */
+export async function getEventsByOrganizationIdPage(
   organizationId: number,
-): Promise<Event[]> {
+  bucket: "upcoming" | "past",
+  page: number,
+  pageSize: number,
+): Promise<{ items: Event[]; total: number }> {
+  const safePage = Math.max(1, page);
+  const safePageSize = Math.max(1, pageSize);
+  const from = (safePage - 1) * safePageSize;
+  const to = from + safePageSize - 1;
+
   const supabase = await createClient();
-  const { data, error } = await supabase
+  const nowIso = new Date().toISOString();
+
+  let query = supabase
     .from("events")
     .select(
       "id,organization_id,organization_name,rsvp_count,user_id,title,description,start_time,end_time,address,location_details,lat,lng,max_capacity,image_url,category,CANCELLED,created_at,updated_at",
+      { count: "exact" },
     )
     .eq("organization_id", organizationId)
-    .eq("CANCELLED", false)
-    .order("start_time", { ascending: true });
+    .eq("CANCELLED", false);
 
-  if (error || !data) {
-    return [];
-  }
-  return data as Event[];
+  query =
+    bucket === "upcoming"
+      ? query.gte("end_time", nowIso).order("start_time", { ascending: true })
+      : query.lt("end_time", nowIso).order("start_time", { ascending: false });
+
+  const { data, error, count } = await query.range(from, to);
+
+  if (error || !data) return { items: [], total: 0 };
+  return { items: data as Event[], total: count ?? 0 };
 }
 
 export async function getEventById(

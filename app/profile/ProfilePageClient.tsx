@@ -22,7 +22,7 @@ import EditProfileDialog from "@/components/profile/EditProfileDialog";
 import NewOrganizationDialog from "@/components/organizations/NewOrganizationDialog";
 
 const PROFILE_ORGS_PAGE_SIZE = 4;
-const PROFILE_EVENTS_PAGE_SIZE = 8;
+const PROFILE_EVENTS_PAGE_SIZE = 6;
 
 type Props = {
   userId: string;

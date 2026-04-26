@@ -1,4 +1,4 @@
-import type { Event, Organization } from "@/lib/types";
+import type { Organization } from "@/lib/types";
 
 export const ORG_EVENTS_PAGE_SIZE = 8;
 
@@ -7,25 +7,6 @@ export function normalizeWebsite(input: string): string | null {
   if (!trimmedInput) return null;
   if (!/^https?:\/\//i.test(trimmedInput)) return `https://${trimmedInput}`;
   return trimmedInput;
-}
-
-export function partitionEvents(events: Event[]) {
-  const now = new Date();
-  const upcoming: Event[] = [];
-  const past: Event[] = [];
-  for (const event of events) {
-    if (new Date(event.end_time) >= now) upcoming.push(event);
-    else past.push(event);
-  }
-  upcoming.sort(
-    (a, b) =>
-      new Date(a.start_time).getTime() - new Date(b.start_time).getTime(),
-  );
-  past.sort(
-    (a, b) =>
-      new Date(b.start_time).getTime() - new Date(a.start_time).getTime(),
-  );
-  return { upcoming, past };
 }
 
 /**

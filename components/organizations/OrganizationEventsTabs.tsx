@@ -14,8 +14,8 @@ type Props = {
   org: Organization;
   upcoming: Event[];
   past: Event[];
-  paginatedUpcoming: Event[];
-  paginatedPast: Event[];
+  upcomingTotal: number;
+  pastTotal: number;
   upcomingPage: number;
   pastPage: number;
   totalUpcomingPages: number;
@@ -30,8 +30,8 @@ export default function OrganizationEventsTabs({
   org,
   upcoming,
   past,
-  paginatedUpcoming,
-  paginatedPast,
+  upcomingTotal,
+  pastTotal,
   upcomingPage,
   pastPage,
   totalUpcomingPages,
@@ -42,7 +42,7 @@ export default function OrganizationEventsTabs({
   onCreateEvent,
 }: Props) {
   const [tab, setTab] = useState<"upcoming" | "past">("upcoming");
-  const tabCount = tab === "upcoming" ? upcoming.length : past.length;
+  const tabCount = tab === "upcoming" ? upcomingTotal : pastTotal;
 
   return (
     <section className="flex flex-col gap-4" aria-labelledby="org-events-heading">
@@ -82,12 +82,12 @@ export default function OrganizationEventsTabs({
         </TabsList>
 
         <TabsContent value="upcoming" className="flex flex-col gap-4">
-          {upcoming.length === 0 ? (
+          {upcomingTotal === 0 ? (
             <ListEmptyState message="No upcoming events found." />
           ) : (
             <>
               <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
-                {paginatedUpcoming.map((ev) => (
+                {upcoming.map((ev) => (
                   <EventCard
                     key={ev.id}
                     event={ev}
@@ -100,7 +100,7 @@ export default function OrganizationEventsTabs({
                 label="Upcoming organization events"
                 page={upcomingPage}
                 totalPages={totalUpcomingPages}
-                totalItems={upcoming.length}
+                totalItems={upcomingTotal}
                 pageSize={ORG_EVENTS_PAGE_SIZE}
                 onPageChange={onUpcomingPageChange}
               />
@@ -109,12 +109,12 @@ export default function OrganizationEventsTabs({
         </TabsContent>
 
         <TabsContent value="past" className="flex flex-col gap-4">
-          {past.length === 0 ? (
+          {pastTotal === 0 ? (
             <ListEmptyState message="No past events found." />
           ) : (
             <>
               <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
-                {paginatedPast.map((ev) => (
+                {past.map((ev) => (
                   <EventCard
                     key={ev.id}
                     event={ev}
@@ -127,7 +127,7 @@ export default function OrganizationEventsTabs({
                 label="Past organization events"
                 page={pastPage}
                 totalPages={totalPastPages}
-                totalItems={past.length}
+                totalItems={pastTotal}
                 pageSize={ORG_EVENTS_PAGE_SIZE}
                 onPageChange={onPastPageChange}
               />

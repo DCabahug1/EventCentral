@@ -6,7 +6,7 @@ import ProfileSkeleton from "@/components/profile/ProfileSkeleton";
 import ProfilePageClient from "./ProfilePageClient";
 
 const PROFILE_ORGS_PAGE_SIZE = 4;
-const PROFILE_EVENTS_PAGE_SIZE = 8;
+const PROFILE_EVENTS_PAGE_SIZE = 6;
 
 export default async function ProfilePage() {
   const supabase = await createClient();
