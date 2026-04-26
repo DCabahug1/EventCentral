@@ -157,14 +157,54 @@ export const getEventAttendeeAvatars = async (
 };
 
 // Returns a paginated list of confirmed attendee profiles for an event.
+// When `search` is provided, filters by username (case-insensitive substring match).
 export const getAttendeesPage = async (
   eventId: number,
   page: number,
   pageSize: number,
+  search?: string,
 ): Promise<{ items: { userId: string; username: string | null; avatar_url: string | null }[]; total: number }> => {
   const supabase = await createClient();
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
+  const query = search?.trim() ?? "";
+
+  if (query) {
+    // Find profiles whose username matches the search term, then intersect with confirmed RSVPs.
+    const { data: matchingProfiles } = await supabase
+      .from("profiles")
+      .select("user_id, username, avatar_url")
+      .ilike("username", `%${query}%`);
+
+    if (!matchingProfiles || matchingProfiles.length === 0) return { items: [], total: 0 };
+
+    const matchingUserIds = matchingProfiles.map((p) => p.user_id as string);
+    const profileMap = new Map(
+      matchingProfiles.map((p) => [
+        p.user_id as string,
+        { username: (p.username as string | null) ?? null, avatar_url: (p.avatar_url as string | null) ?? null },
+      ]),
+    );
+
+    const { data: rsvps, count } = await supabase
+      .from("rsvps")
+      .select("user_id", { count: "exact" })
+      .eq("event_id", eventId)
+      .eq("status", "CONFIRMED")
+      .in("user_id", matchingUserIds)
+      .order("created_at", { ascending: false })
+      .range(from, to);
+
+    if (!rsvps || rsvps.length === 0) return { items: [], total: count ?? 0 };
+
+    return {
+      items: rsvps.map((r: { user_id: string }) => ({
+        userId: r.user_id,
+        ...(profileMap.get(r.user_id) ?? { username: null, avatar_url: null }),
+      })),
+      total: count ?? 0,
+    };
+  }
 
   const { data: rsvps, count } = await supabase
     .from("rsvps")

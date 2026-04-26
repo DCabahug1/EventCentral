@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
-import { UserMinus } from "lucide-react";
+import { useEffect, useRef, useState, useTransition } from "react";
+import { Search, UserMinus, X } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogClose,
@@ -49,26 +50,42 @@ export default function AttendeeListDialog({
   const [attendees, setAttendees] = useState<Attendee[]>([]);
   const [count, setCount] = useState(total);
   const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [confirmRemove, setConfirmRemove] = useState<Attendee | null>(null);
   const [removeError, setRemoveError] = useState("");
   const [removePending, startRemoveTransition] = useTransition();
+  const searchRef = useRef<HTMLInputElement>(null);
 
   const totalPages = Math.max(1, Math.ceil(count / PAGE_SIZE));
 
+  // Reset everything when dialog opens/closes
   useEffect(() => {
     if (!open) return;
     setPage(1);
+    setSearch("");
+    setDebouncedSearch("");
   }, [open]);
 
+  // Debounce search input
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  // Fetch on open, page change, or search change
   useEffect(() => {
     if (!open) return;
     setLoading(true);
-    getAttendeesPage(eventId, page, PAGE_SIZE).then((result) => {
+    getAttendeesPage(eventId, page, PAGE_SIZE, debouncedSearch).then((result) => {
       setAttendees(result.items);
       setCount(result.total);
       setLoading(false);
     });
-  }, [open, eventId, page]);
+  }, [open, eventId, page, debouncedSearch]);
 
   const handleConfirmRemove = () => {
     if (!confirmRemove) return;
@@ -92,8 +109,10 @@ export default function AttendeeListDialog({
         <DialogContent
           showCloseButton={false}
           className="flex max-h-[min(92vh,640px)] min-h-0 flex-col gap-0 overflow-hidden p-0 sm:max-w-md"
+          onPointerDownOutside={(e) => { if (confirmRemove) e.preventDefault(); }}
+          onInteractOutside={(e) => { if (confirmRemove) e.preventDefault(); }}
         >
-          <DialogHeader className="shrink-0 px-4 py-4 sm:px-6">
+          <DialogHeader className="shrink-0 px-4 pt-4 sm:px-6 sm:pt-6">
             <DialogTitle className="text-2xl font-bold tracking-tight">
               Attendees
               <span className="ml-2 text-base font-normal text-muted-foreground">
@@ -102,10 +121,33 @@ export default function AttendeeListDialog({
             </DialogTitle>
           </DialogHeader>
 
+          {/* Search bar — sticky below header */}
+          <div className="shrink-0 px-4 py-3 sm:px-6">
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                ref={searchRef}
+                placeholder="Search attendees..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-9 pr-9"
+              />
+              {search && (
+                <button
+                  type="button"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  onClick={() => { setSearch(""); searchRef.current?.focus(); }}
+                >
+                  <X className="size-4" />
+                </button>
+              )}
+            </div>
+          </div>
+
           <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch]">
             {loading ? (
               <div className="flex flex-col">
-                {Array.from({ length: 8 }).map((_, i) => (
+                {Array.from({ length: 6 }).map((_, i) => (
                   <div key={i} className="flex items-center gap-3 px-4 py-3 sm:px-6">
                     <div className="size-9 shrink-0 rounded-full bg-muted" />
                     <div className="h-4 w-32 rounded bg-muted" />
@@ -114,15 +156,12 @@ export default function AttendeeListDialog({
               </div>
             ) : attendees.length === 0 ? (
               <p className="px-4 py-6 text-sm text-muted-foreground sm:px-6">
-                No attendees yet.
+                {debouncedSearch ? "No attendees match your search." : "No attendees yet."}
               </p>
             ) : (
               <ul>
                 {attendees.map((a) => (
-                  <li
-                    key={a.userId}
-                    className="flex items-center gap-3 px-4 py-3 sm:px-6"
-                  >
+                  <li key={a.userId} className="flex items-center gap-3 px-4 py-3 sm:px-6">
                     <Avatar className="size-9 shrink-0">
                       {a.avatar_url && (
                         <AvatarImage src={a.avatar_url} alt={a.username ?? ""} />
