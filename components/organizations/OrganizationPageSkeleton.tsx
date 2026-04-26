@@ -42,9 +42,9 @@ export default function OrganizationPageSkeleton() {
 
       <div className="mx-auto flex max-w-5xl flex-col gap-8 px-4 pb-16 pt-6 sm:px-6 lg:px-8">
         {/* OrganizationBackLink */}
-        <div className="inline-flex w-fit items-center gap-2">
-          <Skeleton className="size-4 shrink-0 rounded-sm" />
-          <Skeleton className="h-5 w-36" />
+        <div className="inline-flex items-center gap-1">
+          <Skeleton className="size-4 shrink-0" />
+          <Skeleton className="h-4 w-28" />
         </div>
 
         {/* OrganizationProfileHeader */}

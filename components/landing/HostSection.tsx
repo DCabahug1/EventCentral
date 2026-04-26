@@ -172,7 +172,7 @@ export default function HostSection() {
               }}
             >
               <Button size="lg" asChild>
-                <Link href="/organizations/new">
+                <Link href="/profile">
                   <CalendarPlus />
                   Create Your Organization
                 </Link>

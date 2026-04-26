@@ -1,13 +1,13 @@
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 
 export default function OrganizationBackLink() {
   return (
     <Link
       href="/discover"
-      className="inline-flex w-fit items-center gap-2 text-sm text-primary transition-colors hover:text-primary/80"
+      className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
     >
-      <ArrowLeft className="size-4 shrink-0" />
+      <ChevronLeft className="size-4" />
       Back to Discover
     </Link>
   );
