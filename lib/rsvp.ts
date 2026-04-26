@@ -156,6 +156,45 @@ export const getEventAttendeeAvatars = async (
   }));
 };
 
+// Returns a paginated list of confirmed attendee profiles for an event.
+export const getAttendeesPage = async (
+  eventId: number,
+  page: number,
+  pageSize: number,
+): Promise<{ items: { username: string | null; avatar_url: string | null }[]; total: number }> => {
+  const supabase = await createClient();
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
+  const { data: rsvps, count } = await supabase
+    .from("rsvps")
+    .select("user_id", { count: "exact" })
+    .eq("event_id", eventId)
+    .eq("status", "CONFIRMED")
+    .order("created_at", { ascending: false })
+    .range(from, to);
+
+  if (!rsvps || rsvps.length === 0) return { items: [], total: count ?? 0 };
+
+  const userIds = rsvps.map((r: { user_id: string }) => r.user_id);
+  const { data: profiles } = await supabase
+    .from("profiles")
+    .select("user_id, username, avatar_url")
+    .in("user_id", userIds);
+
+  const profileMap = new Map(
+    (profiles ?? []).map((p) => [
+      p.user_id as string,
+      { username: (p.username as string | null) ?? null, avatar_url: (p.avatar_url as string | null) ?? null },
+    ]),
+  );
+
+  return {
+    items: userIds.map((uid) => profileMap.get(uid) ?? { username: null, avatar_url: null }),
+    total: count ?? 0,
+  };
+};
+
 // Returns the current confirmed RSVP count for an event from the events table.
 export const getEventRsvpCount = async (event_id: number): Promise<number> => {
   const supabase = await createClient();

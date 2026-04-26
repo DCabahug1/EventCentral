@@ -27,6 +27,7 @@ type Props = {
   onCalendarOpen: () => void;
   onCopyLink: () => void;
   onShare: () => void;
+  onViewAttendees: () => void;
 };
 
 export default function EventRSVPPanel({
@@ -42,6 +43,7 @@ export default function EventRSVPPanel({
   onCalendarOpen,
   onCopyLink,
   onShare,
+  onViewAttendees,
 }: Props) {
   const maxCapacity = event.max_capacity;
   const spotsRemaining = maxCapacity !== null ? maxCapacity - rsvpCount : null;
@@ -74,21 +76,30 @@ export default function EventRSVPPanel({
       )}
 
       {rsvpCount > 0 && (
-        <AvatarGroup className={cn("transition-opacity", rsvpPending && "opacity-40")}>
-          {attendeeAvatars.map((a, i) => (
-            <Avatar key={i} size="sm">
-              {a.avatar_url && <AvatarImage src={a.avatar_url} alt={a.username ?? ""} />}
-              <AvatarFallback>
-                {a.username ? a.username.slice(0, 2).toUpperCase() : "?"}
-              </AvatarFallback>
-            </Avatar>
-          ))}
-          {attendeeAvatars.length === 4 && rsvpCount > 4 && (
-            <AvatarGroupCount className="text-xs">
-              +{rsvpCount - 4}
-            </AvatarGroupCount>
-          )}
-        </AvatarGroup>
+        <div className={cn("flex flex-col gap-2 transition-opacity", rsvpPending && "opacity-40")}>
+          <AvatarGroup>
+            {attendeeAvatars.map((a, i) => (
+              <Avatar key={i} size="sm">
+                {a.avatar_url && <AvatarImage src={a.avatar_url} alt={a.username ?? ""} />}
+                <AvatarFallback>
+                  {a.username ? a.username.slice(0, 2).toUpperCase() : "?"}
+                </AvatarFallback>
+              </Avatar>
+            ))}
+            {attendeeAvatars.length === 4 && rsvpCount > 4 && (
+              <AvatarGroupCount className="text-xs">
+                +{rsvpCount - 4}
+              </AvatarGroupCount>
+            )}
+          </AvatarGroup>
+          <button
+            type="button"
+            className="w-fit text-xs text-muted-foreground hover:text-foreground hover:underline"
+            onClick={onViewAttendees}
+          >
+            View all {rsvpCount} attendee{rsvpCount !== 1 ? "s" : ""}
+          </button>
+        </div>
       )}
 
       {rsvpError && <p className="text-sm text-destructive">{rsvpError}</p>}

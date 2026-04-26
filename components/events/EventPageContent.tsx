@@ -23,6 +23,7 @@ import EventRSVPPanel from "@/components/events/EventRSVPPanel";
 import EventHostedByCard from "@/components/events/EventHostedByCard";
 import EditEventDialog from "@/components/events/EditEventDialog";
 import DeleteEventDialog from "@/components/events/DeleteEventDialog";
+import AttendeeListDialog from "@/components/events/AttendeeListDialog";
 import type { Event, Organization, ReviewWithProfile } from "@/lib/types";
 
 type Props = {
@@ -52,6 +53,7 @@ export default function EventPageContent({
   const [rsvpError, setRsvpError] = useState("");
 
   const [calendarDialogOpen, setCalendarDialogOpen] = useState(false);
+  const [attendeeListOpen, setAttendeeListOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteError, setDeleteError] = useState("");
@@ -225,6 +227,7 @@ export default function EventPageContent({
                 onCalendarOpen={() => setCalendarDialogOpen(true)}
                 onCopyLink={handleCopyLink}
                 onShare={handleShare}
+                onViewAttendees={() => setAttendeeListOpen(true)}
               />
               {organization && <EventHostedByCard organization={organization} />}
             </motion.div>
@@ -254,6 +257,13 @@ export default function EventPageContent({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AttendeeListDialog
+        eventId={event.id}
+        total={rsvpCount}
+        open={attendeeListOpen}
+        onOpenChange={setAttendeeListOpen}
+      />
 
       <EditEventDialog
         event={event}
