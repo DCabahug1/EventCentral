@@ -310,8 +310,15 @@ export default function EditOrganizationDialog({
                       pattern="[^\s]*\.[^\s]+"
                       className="pl-10"
                       value={website}
-                      onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity("Please enter a valid domain (e.g. website.com)")}
-                      onChange={(e) => { (e.target as HTMLInputElement).setCustomValidity(""); onWebsiteChange(e.target.value); }}
+                      onInvalid={(e) =>
+                        (e.target as HTMLInputElement).setCustomValidity(
+                          "Please enter a valid domain (e.g. website.com)",
+                        )
+                      }
+                      onChange={(e) => {
+                        (e.target as HTMLInputElement).setCustomValidity("");
+                        onWebsiteChange(e.target.value);
+                      }}
                     />
                   </div>
                   <div className="relative">
@@ -325,8 +332,15 @@ export default function EditOrganizationDialog({
                       placeholder="Contact email"
                       className="pl-10"
                       value={email}
-                      onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity("Please enter a valid email address")}
-                      onChange={(e) => { (e.target as HTMLInputElement).setCustomValidity(""); onEmailChange(e.target.value); }}
+                      onInvalid={(e) =>
+                        (e.target as HTMLInputElement).setCustomValidity(
+                          "Please enter a valid email address",
+                        )
+                      }
+                      onChange={(e) => {
+                        (e.target as HTMLInputElement).setCustomValidity("");
+                        onEmailChange(e.target.value);
+                      }}
                     />
                   </div>
                   <div className="relative">
@@ -343,8 +357,15 @@ export default function EditOrganizationDialog({
                       pattern="\(\d{3}\) \d{3}-\d{4}"
                       className="pl-10"
                       value={phone}
-                      onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity("Please enter a complete 10-digit phone number")}
-                      onChange={(e) => { (e.target as HTMLInputElement).setCustomValidity(""); onPhoneChange(formatUsPhoneInput(e.target.value)); }}
+                      onInvalid={(e) =>
+                        (e.target as HTMLInputElement).setCustomValidity(
+                          "Please enter a complete 10-digit phone number",
+                        )
+                      }
+                      onChange={(e) => {
+                        (e.target as HTMLInputElement).setCustomValidity("");
+                        onPhoneChange(formatUsPhoneInput(e.target.value));
+                      }}
                     />
                   </div>
                   {formError ? (
