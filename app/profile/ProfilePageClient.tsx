@@ -293,7 +293,7 @@ export default function ProfilePageClient({
         bannerUrl,
         normalizeWebsite(newOrgWebsite),
         newOrgEmail.trim() || null,
-        newOrgPhone.trim() || null,
+        phoneDigitsForTel(newOrgPhone) || null,
         newOrgLocation.trim() || null,
       );
 

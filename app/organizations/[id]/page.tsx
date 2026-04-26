@@ -21,7 +21,7 @@ import CreateEventDialog from "@/components/organizations/CreateEventDialog";
 import OrganizationEventsTabs from "@/components/organizations/OrganizationEventsTabs";
 import OrganizationPageSkeleton from "@/components/organizations/OrganizationPageSkeleton";
 import OrganizationProfileHeader from "@/components/organizations/OrganizationProfileHeader";
-import { formatUsPhoneDisplay } from "@/lib/utils";
+import { formatUsPhoneDisplay, phoneDigitsForTel } from "@/lib/utils";
 import {
   deleteOrganization,
   getOrganizationById,
@@ -277,7 +277,7 @@ export default function OrganizationPage({ params }: OrganizationPageProps) {
         bannerUrl,
         normalizeWebsite(website),
         email.trim() || null,
-        phone.trim() || null,
+        phoneDigitsForTel(phone) || null,
         location.trim() || null,
       );
 
