@@ -399,25 +399,25 @@ function Form({
             {/* Submit disabled until location is valid.
                 Hidden when rendered inside the mobile filters dialog (dialog provides its own button). */}
             <div
-              className={`flex w-full gap-2 ${hideSubmitButton && !showClearFilters ? "hidden" : ""} ${hideSubmitButton ? "justify-end" : ""}`}
+              className={`flex flex-col w-full gap-2 ${hideSubmitButton && !showClearFilters ? "hidden" : ""}`}
             >
-              {showClearFilters && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  className={hideSubmitButton ? "w-full" : "flex-1"}
-                  onClick={() => setFormData(buildDefaultFormData())}
-                >
-                  <X className="size-4" /> Clear filters
-                </Button>
-              )}
               {!hideSubmitButton && (
                 <Button
                   type="submit"
                   disabled={!canSubmit}
-                  className={showClearFilters ? "flex-1" : "w-full"}
+                  className="w-full"
                 >
                   <Search className="size-4" /> Find Events
+                </Button>
+              )}
+              {showClearFilters && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => setFormData(buildDefaultFormData())}
+                >
+                  <X className="size-4" /> Clear filters
                 </Button>
               )}
             </div>
