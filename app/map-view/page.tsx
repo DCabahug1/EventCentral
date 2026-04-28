@@ -8,6 +8,12 @@ import { todayDateString, daysFromNowDateString } from "@/lib/utils";
 import EventList from "@/components/map-view/EventList";
 import { getEvents } from "@/lib/eventsClient";
 import { APIProvider } from "@vis.gl/react-google-maps";
+import {
+  SidebarProvider,
+  Sidebar,
+  SidebarContent,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
 
 type MapSearchQuery = {
   keyword: string;
@@ -50,7 +56,7 @@ function page() {
 
   // Ref on the map wrapper div used to scroll it into view when a list card is clicked
   const mapRef = useRef<HTMLDivElement>(null);
-  // Main scroll container on mobile/tablet (map + list column)
+  // Main scroll container (map + list column)
   const contentScrollRef = useRef<HTMLDivElement>(null);
 
   const appliedKeyword = appliedQuery.keyword.trim();
@@ -150,33 +156,38 @@ function page() {
   };
 
   // Load an initial set of events on mount using the default form values.
-  // No region bounds means show all events.
   useEffect(() => {
-    fetchEvents({
-      ...DEFAULT_QUERY,
-    });
+    fetchEvents({ ...DEFAULT_QUERY });
   }, []);
 
   return (
-    // APIProvider must wrap both the Form and MapView so that useMapsLibrary()
-    // hooks inside Form (geocoding) and MapView (geocoding) share the same context
+    // APIProvider must wrap both Form and MapView so that useMapsLibrary()
+    // hooks inside both share the same context.
     <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!}>
-      <div className="h-[calc(100svh-64px)] flex flex-col md:flex-row">
-        {/* Side panel visible on desktop only.
-          Contains the full filter form with an inline submit button. */}
-        <div className="hidden md:flex flex-col p-4 gap-4 w-80 h-full border-r overflow-y-auto">
-          <Form fetchEvents={fetchEvents} appliedQuery={appliedQuery} />
-        </div>
+      <SidebarProvider
+        style={{ "--sidebar-offset": "4rem", minHeight: 0 } as React.CSSProperties}
+        className="h-[calc(100svh-64px)]"
+      >
+        {/* Filter sidebar — visible on desktop, slides off-canvas when toggled */}
+        <Sidebar collapsible="offcanvas">
+          <SidebarContent className="p-4">
+            <Form fetchEvents={fetchEvents} appliedQuery={appliedQuery} />
+          </SidebarContent>
+        </Sidebar>
 
-        {/* Main content area with map and list stacked */}
+        {/* Main content: map stacked above event list */}
         <div ref={contentScrollRef} className="flex-1 flex flex-col overflow-y-auto relative">
-          {/* Mobile filter trigger in the top left of the map.
-            Opens a dialog with the same form fields. */}
+          {/* Mobile filter trigger — opens FiltersDialog */}
           <div className="absolute top-4 left-4 z-10 md:hidden">
             <FiltersDialog fetchEvents={fetchEvents} appliedQuery={appliedQuery} />
           </div>
 
-          {/* Map wrapper ref for scroll back to map from list */}
+          {/* Desktop sidebar toggle — floats over the top-left of the map */}
+          <div className="absolute top-4 left-4 z-10 hidden md:block">
+            <SidebarTrigger className="bg-background shadow-sm border" />
+          </div>
+
+          {/* Map wrapper ref used to scroll back to map from event list */}
           <div ref={mapRef}>
             <MapView
               location={mapLocation}
@@ -199,7 +210,7 @@ function page() {
             loading={loadingEvents}
           />
         </div>
-      </div>
+      </SidebarProvider>
     </APIProvider>
   );
 }
