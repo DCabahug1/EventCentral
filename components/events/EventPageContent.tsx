@@ -226,6 +226,7 @@ export default function EventPageContent({
                 initialReviews={reviews}
                 currentUserId={currentUserId}
                 currentUserProfile={currentUserProfile}
+                isRsvped={isRsvped}
               />
             </motion.div>
 
