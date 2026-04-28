@@ -16,6 +16,7 @@ type Props = {
   initialReviews: ReviewWithProfile[];
   currentUserId: string | null;
   currentUserProfile: { username: string | null; avatar_url: string | null } | null;
+  isRsvped: boolean;
 };
 
 export default function EventReviews({
@@ -23,6 +24,7 @@ export default function EventReviews({
   initialReviews,
   currentUserId,
   currentUserProfile,
+  isRsvped,
 }: Props) {
   const [reviews, setReviews] = useState<ReviewWithProfile[]>(initialReviews);
   const [reviewRating, setReviewRating] = useState(0);
@@ -162,15 +164,19 @@ export default function EventReviews({
       ))}
 
       {/* Leave a review */}
-      {!canReview && (
+      {!canReview ? (
         <p className="text-sm text-muted-foreground">
           Reviews can be left once the event has ended.
         </p>
-      )}
+      ) : !isRsvped ? (
+        <p className="text-sm text-muted-foreground">
+          Only attendees can leave a review.
+        </p>
+      ) : null}
       <div
         className={cn(
           "flex flex-col gap-3 rounded-lg border border-border p-4",
-          !canReview && "opacity-50 pointer-events-none",
+          (!canReview || !isRsvped) && "opacity-50 pointer-events-none",
         )}
       >
         <h3 className="font-medium">Leave a review</h3>
