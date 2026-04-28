@@ -12,6 +12,7 @@ import { useTheme } from "next-themes";
 import { Event } from "@/lib/types";
 import { formatDateTime } from "@/lib/utils";
 import { X, ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 type MappableEvent = Event & { lat: number; lng: number };
 
@@ -102,7 +103,13 @@ function MapViewInner({
 
   // When an event is selected from the list, pan to its coordinates and zoom in
   useEffect(() => {
-    if (!map || !selectedEvent || selectedEvent.lat == null || selectedEvent.lng == null) return;
+    if (
+      !map ||
+      !selectedEvent ||
+      selectedEvent.lat == null ||
+      selectedEvent.lng == null
+    )
+      return;
     map.panTo({ lat: selectedEvent.lat, lng: selectedEvent.lng });
     map.setZoom(14);
   }, [map, selectedEvent]);
@@ -207,104 +214,112 @@ export default function MapView({
               event.lat != null && event.lng != null,
           )
           .map((event) => {
-          const isActive = activeMarkerId === event.id;
-          const eventImageUrl = event.image_url ?? "/discover-page/Hero.jpg";
-          const eventAddress = event.address ?? "Location TBD";
-          return (
-            <AdvancedMarker
-              key={event.id}
-              position={{ lat: event.lat, lng: event.lng }}
-              onClick={() => handleMarkerClick(event.id)}
-              zIndex={isActive ? 999 : 1}
-            >
-              {/* Wrapper keeps the popup and marker aligned on a shared center axis.
+            const isActive = activeMarkerId === event.id;
+            const eventImageUrl = event.image_url ?? "/discover-page/Hero.jpg";
+            const eventAddress = event.address ?? "Location TBD";
+            return (
+              <AdvancedMarker
+                key={event.id}
+                position={{ lat: event.lat, lng: event.lng }}
+                onClick={() => handleMarkerClick(event.id)}
+                zIndex={isActive ? 999 : 1}
+              >
+                {/* Wrapper keeps the popup and marker aligned on a shared center axis.
                   The popup is absolute so it doesn't shift the AdvancedMarker anchor point. */}
-              <div className="relative flex flex-col items-center">
-                {/* Custom popup rendered above marker when active.
+                <div className="relative flex flex-col items-center">
+                  {/* Custom popup rendered above marker when active.
                     Uses bottom-full + mb-3 to float just above the circle. */}
-                {isActive && (
+                  {isActive && (
+                    <div
+                      className="absolute bottom-full mb-3 w-56 bg-background border rounded-xl shadow-2xl overflow-hidden z-50 cursor-default!"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {/* Event image header */}
+                      <div className="relative h-24 w-full">
+                        <Image
+                          src={eventImageUrl}
+                          alt={event.title}
+                          fill
+                          className="border border-border object-cover"
+                          sizes="224px"
+                        />
+                        {/* Close button */}
+                        <button
+                          className="absolute top-2 right-2 size-6 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center hover:bg-background transition-colors cursor-pointer"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setActiveMarkerId(null);
+                          }}
+                        >
+                          <X className="size-3" />
+                        </button>
+                      </div>
+
+                      {/* Event details */}
+                      <div className="p-3 flex flex-col gap-2">
+                        <p className="font-semibold text-sm leading-tight">
+                          {event.title}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {formatDateTime(event.start_time)}
+                        </p>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {eventAddress}
+                        </p>
+
+                        {/* Scroll-to-card button */}
+                        <Button
+                          size="sm"
+                          className="w-full mt-1"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onScrollToEvent?.(event.id);
+                          }}
+                          asChild
+                        >
+                          <Link href={`/events/${event.id}`}>
+                            View event <ArrowRight className="size-3" />
+                          </Link>
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Map pin with circle image and triangular point at bottom.
+                    Uses Tailwind group so hover on the container drives both
+                    the circle border and triangle color simultaneously. */}
                   <div
-                    className="absolute bottom-full mb-3 w-56 bg-background border rounded-xl shadow-2xl overflow-hidden z-50 cursor-default!"
-                    onClick={(e) => e.stopPropagation()}
+                    className={`group flex flex-col items-center transition-all duration-200 cursor-pointer drop-shadow-lg ${isActive ? "scale-125" : "hover:scale-110"}`}
                   >
-                    {/* Event image header */}
-                    <div className="relative h-24 w-full">
+                    <div
+                      className={`size-11 rounded-full border-[3px] overflow-hidden transition-colors duration-200 ${
+                        isActive
+                          ? "border-primary"
+                          : "border-white group-hover:border-primary"
+                      }`}
+                    >
                       <Image
                         src={eventImageUrl}
                         alt={event.title}
-                        fill
-                        className="border border-border object-cover"
-                        sizes="224px"
+                        width={44}
+                        height={44}
+                        className="h-full w-full border border-border object-cover"
                       />
-                      {/* Close button */}
-                      <button
-                        className="absolute top-2 right-2 size-6 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center hover:bg-background transition-colors cursor-pointer"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setActiveMarkerId(null);
-                        }}
-                      >
-                        <X className="size-3" />
-                      </button>
                     </div>
-
-                    {/* Event details */}
-                    <div className="p-3 flex flex-col gap-2">
-                      <p className="font-semibold text-sm leading-tight">
-                        {event.title}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {formatDateTime(event.start_time)}
-                      </p>
-                      <p className="text-xs text-muted-foreground truncate">
-                        {eventAddress}
-                      </p>
-
-                      {/* Scroll-to-card button */}
-                      <Button
-                        size="sm"
-                        className="w-full mt-1"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onScrollToEvent?.(event.id);
-                        }}
-                      >
-                        View event <ArrowRight className="size-3" />
-                      </Button>
-                    </div>
-                  </div>
-                )}
-
-                {/* Map pin with circle image and triangular point at bottom.
-                    Uses Tailwind group so hover on the container drives both
-                    the circle border and triangle color simultaneously. */}
-                <div className={`group flex flex-col items-center transition-all duration-200 cursor-pointer drop-shadow-lg ${isActive ? "scale-125" : "hover:scale-110"}`}>
-                  <div
-                    className={`size-11 rounded-full border-[3px] overflow-hidden transition-colors duration-200 ${
-                      isActive ? "border-primary" : "border-white group-hover:border-primary"
-                    }`}
-                  >
-                    <Image
-                      src={eventImageUrl}
-                      alt={event.title}
-                      width={44}
-                      height={44}
-                      className="h-full w-full border border-border object-cover"
+                    {/* Triangle point color matches the circle border */}
+                    <div
+                      className={`w-0 h-0 border-x-10 border-x-transparent border-t-12 -mt-[2px] transition-colors duration-200 ${
+                        isActive
+                          ? "border-t-primary"
+                          : "border-t-white group-hover:border-t-primary"
+                      }`}
                     />
                   </div>
-                  {/* Triangle point color matches the circle border */}
-                  <div
-                    className={`w-0 h-0 border-x-10 border-x-transparent border-t-12 -mt-[2px] transition-colors duration-200 ${
-                      isActive ? "border-t-primary" : "border-t-white group-hover:border-t-primary"
-                    }`}
-                  />
                 </div>
-              </div>
-            </AdvancedMarker>
-          );
-        })}
+              </AdvancedMarker>
+            );
+          })}
       </Map>
-
     </div>
   );
 }
