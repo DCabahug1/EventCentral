@@ -71,7 +71,7 @@ function page() {
         return;
       }
 
-      router.push("/");
+      router.push("/discover");
     } catch (error) {
       setErrorMessage("There was an error creating your profile");
     } finally {

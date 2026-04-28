@@ -39,7 +39,7 @@ function page() {
         return;
       }
 
-      router.push("/");
+      router.push("/discover");
     } catch {
       setErrorMessage("There was an error signing in");
     } finally {

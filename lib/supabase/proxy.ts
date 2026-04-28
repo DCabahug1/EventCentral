@@ -82,7 +82,7 @@ export async function updateSession(request: NextRequest) {
   // User has a profile so block auth and onboarding pages.
   if (pathname.startsWith("/auth") || pathname.startsWith("/onboarding")) {
     const url = request.nextUrl.clone();
-    url.pathname = "/";
+    url.pathname = "/discover";
     return NextResponse.redirect(url);
   }
 
