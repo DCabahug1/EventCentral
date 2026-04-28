@@ -5,6 +5,7 @@ import Header from "@/components/header/Header";
 import { ThemeProvider } from "@/components/theme-provider";
 import Footer from "@/components/footer/Footer";
 import PageMount from "@/components/ui/page-mount";
+import { Toaster } from "@/components/ui/sonner";
 
 const fontSans = Afacad_Flux({
   subsets: ["latin"],
@@ -49,6 +50,7 @@ export default function RootLayout({
           <Header />
           <PageMount>{children}</PageMount>
           <Footer />
+          <Toaster richColors position="top-right" />
         </ThemeProvider>
       </body>
     </html>
