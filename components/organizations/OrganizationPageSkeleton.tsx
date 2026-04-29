@@ -32,10 +32,10 @@ function OrgEventCardSkeleton() {
 
 export default function OrganizationPageSkeleton() {
   return (
-    <div className="min-h-svh overflow-x-hidden bg-muted/30">
+    <div className="min-h-svh overflow-x-hidden">
       {/* Matches OrganizationBanner: full-bleed + responsive height */}
       <div className="relative left-1/2 w-screen max-w-[100vw] -translate-x-1/2 border-b border-border bg-muted">
-        <div className="relative w-full sm:h-64 md:h-72 lg:h-80">
+        <div className="relative h-48 w-full sm:h-64 md:h-72 lg:h-80">
           <Skeleton className="absolute inset-0 size-full rounded-none" />
         </div>
       </div>
@@ -93,6 +93,7 @@ export default function OrganizationPageSkeleton() {
           <div className="flex w-full max-w-md gap-2 sm:w-fit">
             <Skeleton className="h-9 flex-1 rounded-md sm:w-28" />
             <Skeleton className="h-9 flex-1 rounded-md sm:w-24" />
+            <Skeleton className="h-9 flex-1 rounded-md sm:w-28" />
           </div>
 
           <div className="flex flex-col gap-4">
