@@ -29,8 +29,8 @@ export default function LandingHero({ isLoggedIn }: LandingHeroProps) {
           playsInline
           className="absolute inset-0 w-full h-full object-cover object-[center_40%]"
         />
-        {/* Bottom-to-top fade to background */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/80 to-background" />
+        {/* Dark gradient overlay: bottom dark, top near transparent */}
+        <div className="absolute inset-0 bg-linear-to-t from-black via-black/60 to-transparent" />
         {/* Primary radial glow */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_30%_20%,oklch(0.68_0.17_254/0.3),transparent_60%)]" />
       </motion.div>

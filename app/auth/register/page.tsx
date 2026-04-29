@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { Suspense, useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -9,11 +9,12 @@ import { Separator } from "@/components/ui/separator";
 import { AuthMarketingHero } from "@/components/auth/AuthHero";
 import { signUpWithEmailAndPassword, signInWithGoogle } from "@/lib/auth";
 import { AuthError } from "@supabase/supabase-js";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "motion/react";
 import { FormRequiredLegend, RequiredMark } from "@/components/ui/form-field-hints";
+import { safeNextPath } from "@/lib/redirect";
 
-function page() {
+function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -23,6 +24,10 @@ function page() {
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const next = safeNextPath(searchParams.get("next"));
+  const loginHref = `/auth/login?next=${encodeURIComponent(next)}`;
+  const onboardingHref = `/onboarding?next=${encodeURIComponent(next)}`;
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -45,7 +50,7 @@ function page() {
         return;
       }
 
-      router.push("/onboarding");
+      router.push(onboardingHref);
     } catch {
       setErrorMessage("There was an error creating your account");
     } finally {
@@ -141,13 +146,13 @@ function page() {
             variant="outline"
             className="w-full"
             disabled={loading}
-            onClick={signInWithGoogle}
+            onClick={() => signInWithGoogle(next)}
           >
             {loading ? <Loader2 className="animate-spin" /> : "Continue with Google"}
           </Button>
           <p className="text-sm text-muted-foreground">
             Already have an account?{" "}
-            <Link href="/auth/login" className="text-primary underline">
+            <Link href={loginHref} className="text-primary underline">
               Login
             </Link>
           </p>
@@ -157,4 +162,12 @@ function page() {
   );
 }
 
-export default page;
+function Page() {
+  return (
+    <Suspense fallback={null}>
+      <RegisterForm />
+    </Suspense>
+  );
+}
+
+export default Page;

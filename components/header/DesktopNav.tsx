@@ -72,7 +72,7 @@ function DesktopNav({ profile, pathname, onHostEvent }: DesktopNavProps) {
               Map View
             </Link>
           </Button>
-          <Button asChild>
+          <Button variant='outline' asChild>
             <Link href="/auth/login">
               <User />
               Sign in

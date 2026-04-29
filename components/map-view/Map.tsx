@@ -301,9 +301,9 @@ export default function MapView({
                       <Image
                         src={eventImageUrl}
                         alt={event.title}
-                        width={44}
-                        height={44}
-                        className="h-full w-full border border-border object-cover"
+                        width={88}
+                        height={88}
+                        className="h-full w-full object-cover"
                       />
                     </div>
                     {/* Triangle point color matches the circle border */}

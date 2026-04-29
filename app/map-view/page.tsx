@@ -2,11 +2,12 @@
 import Form from "@/components/map-view/Form";
 import MapView from "@/components/map-view/Map";
 import FiltersDialog from "@/components/map-view/FiltersDialog";
-import React, { useRef, useState, useEffect } from "react";
+import React, { Suspense, useRef, useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { Event } from "@/lib/types";
 import { todayDateString, daysFromNowDateString } from "@/lib/utils";
 import EventList from "@/components/map-view/EventList";
-import { getEvents } from "@/lib/eventsClient";
+import { getEvents, getEventById } from "@/lib/eventsClient";
 import { APIProvider } from "@vis.gl/react-google-maps";
 import {
   SidebarProvider,
@@ -39,7 +40,14 @@ const DEFAULT_QUERY: MapSearchQuery = {
   eventType: "all",
 };
 
-function page() {
+function MapViewPage() {
+  const searchParams = useSearchParams();
+  const focusEventIdParam = searchParams.get("event");
+  const focusEventId =
+    focusEventIdParam && Number.isFinite(Number(focusEventIdParam))
+      ? Number(focusEventIdParam)
+      : null;
+
   const [events, setEvents] = useState<Event[]>([]);
   const [loadingEvents, setLoadingEvents] = useState(true);
   const [appliedQuery, setAppliedQuery] = useState<MapSearchQuery>(DEFAULT_QUERY);
@@ -155,10 +163,29 @@ function page() {
     scrollToCard(12);
   };
 
-  // Load an initial set of events on mount using the default form values.
+  // Load an initial set of events on mount. When ?event=<id> is present,
+  // widen the date range to include that specific event and pre-select it
+  // so the map pans to its pin and opens its popup.
   useEffect(() => {
-    fetchEvents({ ...DEFAULT_QUERY });
-  }, []);
+    const init = async () => {
+      if (focusEventId != null) {
+        const result = await getEventById(focusEventId);
+        if (result && typeof result === "object" && "id" in result) {
+          const eventDate = result.start_time.slice(0, 10);
+          await fetchEvents({
+            ...DEFAULT_QUERY,
+            startDate: eventDate,
+            endDate: eventDate,
+          });
+          setSelectedEventId(focusEventId);
+          return;
+        }
+      }
+      void fetchEvents({ ...DEFAULT_QUERY });
+    };
+    void init();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focusEventId]);
 
   return (
     // APIProvider must wrap both Form and MapView so that useMapsLibrary()
@@ -215,4 +242,10 @@ function page() {
   );
 }
 
-export default page;
+export default function Page() {
+  return (
+    <Suspense>
+      <MapViewPage />
+    </Suspense>
+  );
+}
