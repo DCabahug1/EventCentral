@@ -26,10 +26,12 @@ function Header() {
         const userResult = await getCurrentUser();
 
         if (userResult instanceof AuthError) {
+          setProfile(null);
           return;
         }
 
         if (!userResult.user) {
+          setProfile(null);
           return;
         }
 
@@ -37,12 +39,14 @@ function Header() {
 
         if (profile instanceof PostgrestError || profile instanceof AuthError) {
           console.error("Error getting profile", profile.message);
+          setProfile(null);
           return;
         }
 
         setProfile(profile);
       } catch (error) {
         console.error("Error getting profile", error);
+        setProfile(null);
         return;
       }
     };

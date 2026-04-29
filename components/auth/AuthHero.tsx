@@ -15,7 +15,7 @@ export function AuthMarketingHero() {
         priority
       />
       <div
-        className="pointer-events-none absolute inset-0 bg-linear-to-b from-transparent via-black/50 to-black/65"
+        className="pointer-events-none absolute inset-0 bg-linear-to-t from-black via-black/50 to-transparent"
         aria-hidden
       />
       <div className="pointer-events-none absolute inset-0 flex items-end p-10 w-full">

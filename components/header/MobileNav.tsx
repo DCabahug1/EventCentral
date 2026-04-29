@@ -67,15 +67,32 @@ function MobileNav({ profile, onHostEvent }: MobileNavProps) {
               </DropdownMenuItem>
             </>
           ) : (
-            <DropdownMenuItem asChild>
-              <Link
-                href="/auth/login"
-                className="flex cursor-pointer items-center gap-2"
+            <>
+              <DropdownMenuItem asChild className={pathname === "/discover" ? "bg-accent" : ""}>
+                <Link href="/discover" className="flex cursor-pointer items-center gap-2">
+                  <Compass className="size-4" />
+                  Discover
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                asChild
+                className={pathname === "/map-view" ? "bg-accent" : ""}
               >
-                <User className="size-4" />
-                Sign in
-              </Link>
-            </DropdownMenuItem>
+                <Link href="/map-view" className="flex cursor-pointer items-center gap-2">
+                  <MapPin className="size-4" />
+                  Map View
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link
+                  href="/auth/login"
+                  className="flex cursor-pointer items-center gap-2"
+                >
+                  <User className="size-4" />
+                  Sign in
+                </Link>
+              </DropdownMenuItem>
+            </>
           )}
         </DropdownMenuContent>
       </DropdownMenu>
