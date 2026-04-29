@@ -1,5 +1,8 @@
+"use client";
+
 import AnalyticsBarChart from "@/components/organizations/analytics/AnalyticsBarChart";
 import AnalyticsSectionCard from "@/components/organizations/analytics/AnalyticsSectionCard";
+import AnimatedNumber from "@/components/organizations/analytics/AnimatedNumber";
 import type { ReachStats } from "@/lib/types";
 
 type Props = {
@@ -8,7 +11,7 @@ type Props = {
 
 type ReachStat = {
   label: string;
-  value: string;
+  value: number;
   note: string;
 };
 
@@ -16,12 +19,12 @@ export default function AnalyticsReach({ data }: Props) {
   const stats: ReachStat[] = [
     {
       label: "Total Organization views",
-      value: data.orgProfileViews.toLocaleString(),
-      note: "unique visits to this organization's page",
+      value: data.orgProfileViews,
+      note: `unique ${data.orgProfileViews == 1 ? "view" : "views"} to this organization's page`,
     },
     {
       label: "Total event page views",
-      value: data.totalEventViews.toLocaleString(),
+      value: data.totalEventViews,
       note: "across all events under this organization",
     },
   ];
@@ -32,7 +35,7 @@ export default function AnalyticsReach({ data }: Props) {
   }));
 
   return (
-    <AnalyticsSectionCard title="Reach">
+    <AnalyticsSectionCard title="Reach" delay={0.15}>
       <div className="flex flex-col sm:flex-row">
         {stats.map((stat, index) => (
           <div
@@ -46,8 +49,8 @@ export default function AnalyticsReach({ data }: Props) {
             <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
               {stat.label}
             </div>
-            <div className="text-3xl font-bold leading-none tracking-tight">
-              {stat.value}
+            <div className="text-3xl font-bold leading-none tracking-tight tabular-nums">
+              <AnimatedNumber value={stat.value} />
             </div>
             <div className="text-xs text-muted-foreground/60">{stat.note}</div>
           </div>
@@ -58,7 +61,7 @@ export default function AnalyticsReach({ data }: Props) {
 
       <div className="flex flex-col gap-3">
         <span className="text-xs text-muted-foreground">
-          Views by event — top 5
+          Views by event (top 5)
         </span>
         <AnalyticsBarChart data={chartData} unit="views" />
       </div>

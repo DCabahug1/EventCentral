@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { motion } from "motion/react";
 
 type Bar = { label: string; value: number };
 
@@ -80,16 +81,21 @@ export default function AnalyticsBarChart({
         {data.map((d, i) => {
           const bh = toBarH(d.value);
           const x = toX(i) - barW / 2;
-          const y = padT + chartH - bh;
+          const baseline = padT + chartH;
           return (
             <g key={`bar-${i}`}>
-              <rect
+              <motion.rect
                 x={x}
-                y={y}
                 width={barW}
-                height={bh}
                 className="fill-primary"
                 opacity={1 - i * 0.1}
+                initial={{ y: baseline, height: 0 }}
+                animate={{ y: baseline - bh, height: bh }}
+                transition={{
+                  duration: 0.7,
+                  delay: 0.1 + i * 0.06,
+                  ease: [0.2, 0.7, 0.2, 1],
+                }}
                 onMouseEnter={() => setHovered(i)}
                 onMouseLeave={() => setHovered(null)}
               />
@@ -110,7 +116,10 @@ export default function AnalyticsBarChart({
         const bh = toBarH(data[hovered].value);
         const y = padT + chartH - bh;
         return (
-          <div
+          <motion.div
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.15 }}
             className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-[130%] border bg-muted px-2.5 py-1.5 text-xs whitespace-nowrap"
             style={{
               left: `${(toX(hovered) / W) * 100}%`,
@@ -122,7 +131,7 @@ export default function AnalyticsBarChart({
               {data[hovered].value.toLocaleString()}
               {unit ? ` ${unit}` : ""}
             </div>
-          </div>
+          </motion.div>
         );
       })()}
     </div>

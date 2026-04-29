@@ -4,6 +4,7 @@ import { useTransition } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import AnalyticsContentSkeleton from "@/components/organizations/analytics/AnalyticsContentSkeleton";
 import AnalyticsEngagement from "@/components/organizations/analytics/AnalyticsEngagement";
 import AnalyticsReach from "@/components/organizations/analytics/AnalyticsReach";
@@ -62,7 +63,12 @@ export default function AnalyticsPageContent({
           Back to {orgName}
         </Link>
 
-        <div className="flex flex-wrap items-start justify-between gap-4">
+        <motion.div
+          className="flex flex-wrap items-start justify-between gap-4"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, ease: [0.2, 0.7, 0.2, 1] }}
+        >
           <div className="flex flex-col gap-1">
             <h1 className="text-2xl font-bold leading-tight tracking-tight">
               Organization <span className="text-primary">Analytics</span>
@@ -75,27 +81,44 @@ export default function AnalyticsPageContent({
             </Link>
           </div>
           <AnalyticsTimeRange value={range} onValueChange={handleRangeChange} />
-        </div>
+        </motion.div>
 
-        {isPending ? (
-          <AnalyticsContentSkeleton />
-        ) : (
-          <>
-            <AnalyticsStatGrid
-              totalRsvps={engagement.totalConfirmedRsvps}
-              avgRating={reviews.averageRating}
-              totalReviews={reviews.totalReviews}
-              totalViews={totalViews}
-              totalEvents={totalEvents}
-            />
+        <AnimatePresence mode="wait">
+          {isPending ? (
+            <motion.div
+              key="skeleton"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <AnalyticsContentSkeleton />
+            </motion.div>
+          ) : (
+            <motion.div
+              key={`content-${range}`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="flex flex-col gap-6"
+            >
+              <AnalyticsStatGrid
+                totalRsvps={engagement.totalConfirmedRsvps}
+                avgRating={reviews.averageRating}
+                totalReviews={reviews.totalReviews}
+                totalViews={totalViews}
+                totalEvents={totalEvents}
+              />
 
-            <div className="flex flex-col gap-5">
-              <AnalyticsEngagement data={engagement} range={range} />
-              <AnalyticsReviews data={reviews} />
-              <AnalyticsReach data={reach} />
-            </div>
-          </>
-        )}
+              <div className="flex flex-col gap-5">
+                <AnalyticsEngagement data={engagement} range={range} />
+                <AnalyticsReviews data={reviews} />
+                <AnalyticsReach data={reach} />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

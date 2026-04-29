@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { motion } from "motion/react";
 import AnalyticsLineChart from "@/components/organizations/analytics/AnalyticsLineChart";
 import AnalyticsSectionCard from "@/components/organizations/analytics/AnalyticsSectionCard";
 import type { AnalyticsRange, EngagementStats } from "@/lib/types";
@@ -38,7 +41,7 @@ export default function AnalyticsEngagement({ data, range }: Props) {
   );
 
   return (
-    <AnalyticsSectionCard title="Engagement">
+    <AnalyticsSectionCard title="Engagement" delay={0.05}>
       <div className="flex flex-col gap-3">
         <span className="text-xs text-muted-foreground">
           RSVP trend · {rangeLabel}
@@ -54,9 +57,16 @@ export default function AnalyticsEngagement({ data, range }: Props) {
         </span>
         <ul className="flex flex-col">
           {data.topEventsByRsvp.map((event, index) => (
-            <li
+            <motion.li
               key={event.id}
               className="flex items-center gap-3 border-b py-2.5 last:border-b-0"
+              initial={{ opacity: 0, x: -8 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{
+                duration: 0.4,
+                delay: 0.2 + index * 0.06,
+                ease: [0.2, 0.7, 0.2, 1],
+              }}
             >
               <span className="w-4 shrink-0 text-right text-xs text-muted-foreground">
                 {index + 1}
@@ -68,15 +78,23 @@ export default function AnalyticsEngagement({ data, range }: Props) {
                 {event.title}
               </Link>
               <div className="h-1 w-24 max-w-[120px] flex-1 bg-muted">
-                <div
+                <motion.div
                   className="h-full bg-primary"
-                  style={{ width: `${(event.rsvp_count / maxRsvp) * 100}%` }}
+                  initial={{ width: 0 }}
+                  animate={{
+                    width: `${(event.rsvp_count / maxRsvp) * 100}%`,
+                  }}
+                  transition={{
+                    duration: 0.8,
+                    delay: 0.3 + index * 0.06,
+                    ease: [0.2, 0.7, 0.2, 1],
+                  }}
                 />
               </div>
-              <span className="w-9 shrink-0 text-right text-sm font-semibold">
+              <span className="w-9 shrink-0 text-right text-sm font-semibold tabular-nums">
                 {event.rsvp_count}
               </span>
-            </li>
+            </motion.li>
           ))}
         </ul>
       </div>

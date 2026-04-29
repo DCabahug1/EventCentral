@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { motion } from "motion/react";
 
 type Point = { label: string; value: number };
 
@@ -33,6 +34,12 @@ export default function AnalyticsLineChart({
   const toY = (v: number) => padT + chartH - (v / maxV) * chartH;
 
   const points = data.map((d, i) => `${toX(i)},${toY(d.value)}`).join(" ");
+  const areaPath =
+    data.length > 0
+      ? `M ${toX(0)},${padT + chartH} ` +
+        data.map((d, i) => `L ${toX(i)},${toY(d.value)}`).join(" ") +
+        ` L ${toX(data.length - 1)},${padT + chartH} Z`
+      : "";
   const yTicks = [...new Set([0, Math.round(maxV * 0.5), maxV])];
   const xStep = Math.max(1, Math.ceil(data.length / 6));
   const xLabels = data.filter(
@@ -49,6 +56,12 @@ export default function AnalyticsLineChart({
         height={height}
         className="block"
       >
+        <defs>
+          <linearGradient id="lineAreaFill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="currentColor" stopOpacity={0.18} />
+            <stop offset="100%" stopColor="currentColor" stopOpacity={0} />
+          </linearGradient>
+        </defs>
         {yTicks.map((v) => (
           <line
             key={`grid-${v}`}
@@ -87,13 +100,29 @@ export default function AnalyticsLineChart({
             </text>
           );
         })}
-        <polyline
+        {areaPath && (
+          <motion.path
+            d={areaPath}
+            fill="url(#lineAreaFill)"
+            className="text-primary"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 1.0, ease: "easeOut" }}
+          />
+        )}
+        <motion.polyline
           points={points}
           fill="none"
           className="stroke-primary"
           strokeWidth={2}
           strokeLinejoin="round"
           strokeLinecap="round"
+          initial={{ pathLength: 0, opacity: 0 }}
+          animate={{ pathLength: 1, opacity: 1 }}
+          transition={{
+            pathLength: { duration: 1.1, ease: [0.2, 0.7, 0.2, 1] },
+            opacity: { duration: 0.2 },
+          }}
         />
         {data.map((_, i) => (
           <rect
@@ -108,18 +137,24 @@ export default function AnalyticsLineChart({
           />
         ))}
         {hovered != null && (
-          <circle
+          <motion.circle
             cx={toX(hovered)}
             cy={toY(data[hovered].value)}
             r={5}
             className="fill-primary stroke-card"
             strokeWidth={2}
-            style={{ pointerEvents: "none" }}
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            style={{ pointerEvents: "none", transformOrigin: "center" }}
           />
         )}
       </svg>
       {tooltip && hovered != null && (
-        <div
+        <motion.div
+          initial={{ opacity: 0, y: 4 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.15 }}
           className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-[130%] border bg-muted px-2.5 py-1.5 text-xs whitespace-nowrap"
           style={{
             left: `${(toX(hovered) / W) * 100}%`,
@@ -131,7 +166,7 @@ export default function AnalyticsLineChart({
             {tooltip.value.toLocaleString()}
             {unit ? ` ${unit}` : ""}
           </div>
-        </div>
+        </motion.div>
       )}
     </div>
   );
