@@ -4,7 +4,9 @@
       "WebFetch(domain:api.anthropic.com)",
       "WebFetch(domain:claude.ai)",
       "WebFetch(domain:storage.googleapis.com)",
-      "Bash(pnpm exec:*)"
+      "Bash(pnpm exec:*)",
+      "Bash(xargs grep *)",
+      "Bash(grep -E \"\\(if|&&|\\\\\\\\?\\)\")"
     ]
   }
 }

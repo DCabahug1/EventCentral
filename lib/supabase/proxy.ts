@@ -46,8 +46,18 @@ export async function updateSession(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname;
 
+  const PROTECTED_PATHS = [
+    "/profile",
+    "/onboarding",
+    "/organizations/new",
+    "/create-event",
+  ];
+  const isProtectedPath = PROTECTED_PATHS.some(
+    (path) => pathname === path || pathname.startsWith(`${path}/`),
+  );
+
   if (!user) {
-    if (pathname !== "/" && !pathname.startsWith("/auth")) {
+    if (isProtectedPath) {
       const url = request.nextUrl.clone();
       url.pathname = "/auth/login";
       return NextResponse.redirect(url);

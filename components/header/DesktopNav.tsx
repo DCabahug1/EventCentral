@@ -60,6 +60,18 @@ function DesktopNav({ profile, pathname, onHostEvent }: DesktopNavProps) {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2, ease: "easeOut" }}
         >
+          <Button variant={pathname === "/discover" ? "default" : "ghost"} asChild>
+            <Link href="/discover">
+              <Compass />
+              Discover
+            </Link>
+          </Button>
+          <Button variant={pathname === "/map-view" ? "default" : "ghost"} asChild>
+            <Link href="/map-view">
+              <MapPin />
+              Map View
+            </Link>
+          </Button>
           <Button asChild>
             <Link href="/auth/login">
               <User />
