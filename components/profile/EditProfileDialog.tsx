@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Phone, Upload, UserRound } from "lucide-react";
+import { Phone, Upload, UserRound, X } from "lucide-react";
 import { cn, formatUsPhoneInput } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -46,6 +46,7 @@ export type EditProfileDialogProps = {
   onUsernameChange: (value: string) => void;
   onDescriptionChange: (value: string) => void;
   onPhoneChange: (value: string) => void;
+  onRemoveAvatar: () => void;
   onRequestDelete: () => void;
 };
 
@@ -67,8 +68,10 @@ export default function EditProfileDialog({
   onUsernameChange,
   onDescriptionChange,
   onPhoneChange,
+  onRemoveAvatar,
   onRequestDelete,
 }: EditProfileDialogProps) {
+  const hasAvatar = avatarPreview !== null || profileAvatarUrl !== null;
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
@@ -137,6 +140,18 @@ export default function EditProfileDialog({
                       onChange={(e) => onAvatarChange(e.target.files?.[0] ?? null)}
                     />
                   </label>
+                  {hasAvatar ? (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="text-muted-foreground hover:text-destructive"
+                      onClick={onRemoveAvatar}
+                    >
+                      <X className="size-4" aria-hidden />
+                      Remove avatar
+                    </Button>
+                  ) : null}
                 </FieldContent>
               </Field>
 
@@ -155,6 +170,7 @@ export default function EditProfileDialog({
                       placeholder="Your display name"
                       className="pl-10"
                       required
+                      maxLength={32}
                       value={username}
                       onChange={(e) => onUsernameChange(e.target.value)}
                     />
@@ -172,6 +188,7 @@ export default function EditProfileDialog({
                     id="edit-description"
                     className="min-h-24 resize-none"
                     value={description}
+                    maxLength={500}
                     placeholder="Tell people about yourself..."
                     onChange={(e) => onDescriptionChange(e.target.value)}
                   />
@@ -195,9 +212,18 @@ export default function EditProfileDialog({
                       inputMode="numeric"
                       autoComplete="tel"
                       placeholder="Phone"
+                      pattern="\(\d{3}\) \d{3}-\d{4}"
                       className="pl-10"
                       value={phone}
-                      onChange={(e) => onPhoneChange(formatUsPhoneInput(e.target.value))}
+                      onInvalid={(e) =>
+                        (e.target as HTMLInputElement).setCustomValidity(
+                          "Please enter a complete 10-digit phone number",
+                        )
+                      }
+                      onChange={(e) => {
+                        (e.target as HTMLInputElement).setCustomValidity("");
+                        onPhoneChange(formatUsPhoneInput(e.target.value));
+                      }}
                     />
                   </div>
                   {formError ? (

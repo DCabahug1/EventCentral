@@ -134,6 +134,7 @@ export default function EditReviewDialog({
                   placeholder="Share your experience..."
                   value={content}
                   rows={4}
+                  maxLength={1000}
                   onChange={(e) => setContent(e.target.value)}
                 />
 

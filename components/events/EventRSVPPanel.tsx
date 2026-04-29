@@ -11,7 +11,7 @@ import {
   AvatarGroup,
   AvatarGroupCount,
 } from "@/components/ui/avatar";
-import { cn } from "@/lib/utils";
+import { cn, formatCount } from "@/lib/utils";
 import type { Event } from "@/lib/types";
 
 type Props = {
@@ -55,10 +55,10 @@ export default function EventRSVPPanel({
       </p>
 
       <div className={cn("flex items-end gap-2 transition-opacity", rsvpPending && "opacity-40")}>
-        <span className="text-4xl font-bold leading-none">{rsvpCount}</span>
+        <span className="text-4xl font-bold leading-none">{formatCount(rsvpCount)}</span>
         {maxCapacity !== null && (
           <span className="pb-1 text-xl leading-none text-muted-foreground">
-            / {maxCapacity}
+            / {formatCount(maxCapacity)}
           </span>
         )}
       </div>
@@ -70,7 +70,7 @@ export default function EventRSVPPanel({
             className="h-1.5"
           />
           <p className="text-xs text-muted-foreground">
-            {spotsRemaining === 0 ? "Event is full" : `${spotsRemaining} spots remaining`}
+            {spotsRemaining === 0 ? "Event is full" : `${formatCount(spotsRemaining ?? 0)} spots remaining`}
           </p>
         </div>
       )}
@@ -88,7 +88,7 @@ export default function EventRSVPPanel({
             ))}
             {attendeeAvatars.length === 4 && rsvpCount > 4 && (
               <AvatarGroupCount className="text-xs">
-                +{rsvpCount - 4}
+                +{formatCount(rsvpCount - 4)}
               </AvatarGroupCount>
             )}
           </AvatarGroup>
@@ -97,7 +97,7 @@ export default function EventRSVPPanel({
             className="w-fit text-xs text-muted-foreground hover:text-foreground hover:underline"
             onClick={onViewAttendees}
           >
-            View all {rsvpCount} attendee{rsvpCount !== 1 ? "s" : ""}
+            View all {formatCount(rsvpCount)} attendee{rsvpCount !== 1 ? "s" : ""}
           </button>
         </div>
       )}

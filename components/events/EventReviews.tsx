@@ -36,6 +36,8 @@ export default function EventReviews({
   const [editingReview, setEditingReview] = useState<ReviewWithProfile | null>(null);
 
   const canReview = new Date(event.end_time) <= new Date();
+  const userHasReview =
+    currentUserId !== null && reviews.some((r) => r.user_id === currentUserId);
 
   const avgRating =
     reviews.length > 0
@@ -43,6 +45,10 @@ export default function EventReviews({
       : 0;
 
   const handleSubmitReview = () => {
+    if (userHasReview) {
+      setReviewError("You've already reviewed this event. Edit your existing review instead.");
+      return;
+    }
     if (reviewRating === 0) {
       setReviewError("Please select a rating.");
       return;
@@ -172,7 +178,12 @@ export default function EventReviews({
         <p className="text-sm text-muted-foreground">
           Only attendees can leave a review.
         </p>
+      ) : userHasReview ? (
+        <p className="text-sm text-muted-foreground">
+          You&apos;ve already reviewed this event. Use the pencil on your review to edit it.
+        </p>
       ) : null}
+      {!userHasReview && (
       <div
         className={cn(
           "flex flex-col gap-3 rounded-lg border border-border p-4",
@@ -208,6 +219,7 @@ export default function EventReviews({
           placeholder="Share your experience..."
           value={reviewContent}
           rows={3}
+          maxLength={1000}
           onChange={(e) => {
             setReviewContent(e.target.value);
             setReviewSuccess(false);
@@ -221,6 +233,7 @@ export default function EventReviews({
           {reviewPending ? "Submitting..." : "Submit Review"}
         </Button>
       </div>
+      )}
 
       {editingReview && (
         <EditReviewDialog

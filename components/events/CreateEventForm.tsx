@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import Image from "next/image";
 import { useMapsLibrary } from "@vis.gl/react-google-maps";
 import { Upload } from "lucide-react";
@@ -13,7 +13,7 @@ import {
 import type { Event, Organization } from "@/lib/types";
 import { createClient } from "@/lib/supabase/client";
 import { uploadEventImage } from "@/lib/bucketHandler";
-import { cn } from "@/lib/utils";
+import { cn, imageSizeError } from "@/lib/utils";
 import {
   Field,
   FieldContent,
@@ -122,6 +122,7 @@ export default function CreateEventForm({
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [formError, setFormError] = useState("");
   const [saving, setSaving] = useState(false);
+  const submitLockRef = useRef(false);
 
   useEffect(() => {
     if (!imageFile) {
@@ -167,6 +168,7 @@ export default function CreateEventForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submitLockRef.current) return;
     setFormError("");
     const cap = Number(maxCapacity);
     if (!title.trim()) {
@@ -185,8 +187,8 @@ export default function CreateEventForm({
       setFormError("Event image is required.");
       return;
     }
-    if (!Number.isFinite(cap) || cap < 1) {
-      setFormError("Max capacity must be at least 1.");
+    if (!Number.isInteger(cap) || cap < 1 || cap > 10000) {
+      setFormError("Max capacity must be a whole number between 1 and 10000.");
       return;
     }
     if (!address.trim() || !locationReady) {
@@ -204,6 +206,7 @@ export default function CreateEventForm({
       return;
     }
 
+    submitLockRef.current = true;
     setSaving(true);
     try {
       const supabase = createClient();
@@ -230,19 +233,19 @@ export default function CreateEventForm({
       let lat: number | null = null;
       let lng: number | null = null;
       if (locationPlaceId && geocoder) {
-        const coords = await new Promise<{
-          lat: number;
-          lng: number;
-        } | null>((resolve) => {
-          geocoder.geocode({ placeId: locationPlaceId }, (results, status) => {
-            if (status !== "OK" || !results?.[0]?.geometry?.location) {
-              resolve(null);
-              return;
-            }
-            const loc = results[0].geometry.location;
-            resolve({ lat: loc.lat(), lng: loc.lng() });
-          });
-        });
+        const coords = await Promise.race<{ lat: number; lng: number } | null>([
+          new Promise((resolve) => {
+            geocoder.geocode({ placeId: locationPlaceId }, (results, status) => {
+              if (status !== "OK" || !results?.[0]?.geometry?.location) {
+                resolve(null);
+                return;
+              }
+              const loc = results[0].geometry.location;
+              resolve({ lat: loc.lat(), lng: loc.lng() });
+            });
+          }),
+          new Promise((resolve) => setTimeout(() => resolve(null), 8000)),
+        ]);
         if (coords) {
           lat = coords.lat;
           lng = coords.lng;
@@ -289,6 +292,7 @@ export default function CreateEventForm({
     } catch {
       setFormError("Something went wrong. Try again.");
     } finally {
+      submitLockRef.current = false;
       setSaving(false);
     }
   };
@@ -382,7 +386,17 @@ export default function CreateEventForm({
                   accept="image/jpeg,image/png,image/webp"
                   className="hidden"
                   onChange={(e) => {
-                    setImageFile(e.target.files?.[0] ?? null);
+                    const file = e.target.files?.[0] ?? null;
+                    if (file) {
+                      const sizeErr = imageSizeError(file);
+                      if (sizeErr) {
+                        setFormError(sizeErr);
+                        e.target.value = "";
+                        return;
+                      }
+                    }
+                    setFormError("");
+                    setImageFile(file);
                   }}
                 />
               </label>
@@ -397,6 +411,7 @@ export default function CreateEventForm({
               <Input
                 id={`${formId}-title`}
                 required
+                maxLength={100}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Event title"
@@ -414,6 +429,7 @@ export default function CreateEventForm({
                 id={`${formId}-desc`}
                 className="min-h-24 resize-none"
                 value={description}
+                maxLength={2000}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="What should attendees know?"
               />
@@ -514,6 +530,7 @@ export default function CreateEventForm({
               <Input
                 id={`${formId}-location-details`}
                 value={locationDetails}
+                maxLength={200}
                 onChange={(e) => setLocationDetails(e.target.value)}
                 placeholder="e.g. Room 2, East wing"
               />
@@ -529,6 +546,8 @@ export default function CreateEventForm({
                 id={`${formId}-cap`}
                 type="number"
                 min={1}
+                max={10000}
+                step={1}
                 required
                 value={maxCapacity}
                 onChange={(e) => setMaxCapacity(e.target.value)}

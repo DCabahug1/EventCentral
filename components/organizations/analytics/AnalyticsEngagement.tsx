@@ -4,6 +4,7 @@ import Link from "next/link";
 import { motion } from "motion/react";
 import AnalyticsLineChart from "@/components/organizations/analytics/AnalyticsLineChart";
 import AnalyticsSectionCard from "@/components/organizations/analytics/AnalyticsSectionCard";
+import { formatCount } from "@/lib/utils";
 import type { AnalyticsRange, EngagementStats } from "@/lib/types";
 
 type Props = {
@@ -92,7 +93,7 @@ export default function AnalyticsEngagement({ data, range }: Props) {
                 />
               </div>
               <span className="w-9 shrink-0 text-right text-sm font-semibold tabular-nums">
-                {event.rsvp_count}
+                {formatCount(event.rsvp_count)}
               </span>
             </motion.li>
           ))}

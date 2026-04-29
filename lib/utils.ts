@@ -5,6 +5,19 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+export function formatCount(n: number): string {
+  return n.toLocaleString("en-US");
+}
+
+export const MAX_IMAGE_UPLOAD_BYTES = 5 * 1024 * 1024;
+
+export function imageSizeError(file: File): string | null {
+  if (file.size > MAX_IMAGE_UPLOAD_BYTES) {
+    return "Image must be 5MB or smaller.";
+  }
+  return null;
+}
+
 export function toDateString(d: Date): string {
   return d.toISOString().split("T")[0];
 }

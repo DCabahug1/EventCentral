@@ -21,7 +21,7 @@ import CreateEventDialog from "@/components/organizations/CreateEventDialog";
 import OrganizationEventsTabs from "@/components/organizations/OrganizationEventsTabs";
 import OrganizationPageSkeleton from "@/components/organizations/OrganizationPageSkeleton";
 import OrganizationProfileHeader from "@/components/organizations/OrganizationProfileHeader";
-import { formatUsPhoneDisplay, phoneDigitsForTel } from "@/lib/utils";
+import { formatUsPhoneDisplay, imageSizeError, phoneDigitsForTel } from "@/lib/utils";
 import {
   deleteOrganization,
   getOrganizationById,
@@ -478,8 +478,28 @@ export default function OrganizationPage({ params }: OrganizationPageProps) {
           bannerPreview={bannerPreview}
           avatarUrl={org.avatar_url}
           bannerUrl={org.banner_url}
-          onAvatarFileChange={setAvatarFile}
-          onBannerFileChange={setBannerFile}
+          onAvatarFileChange={(file) => {
+            if (file) {
+              const sizeErr = imageSizeError(file);
+              if (sizeErr) {
+                setFormError(sizeErr);
+                return;
+              }
+              setFormError("");
+            }
+            setAvatarFile(file);
+          }}
+          onBannerFileChange={(file) => {
+            if (file) {
+              const sizeErr = imageSizeError(file);
+              if (sizeErr) {
+                setFormError(sizeErr);
+                return;
+              }
+              setFormError("");
+            }
+            setBannerFile(file);
+          }}
           formError={formError}
           saving={saving}
           onRequestDelete={() => {

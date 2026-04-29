@@ -23,6 +23,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import PaginationBar from "@/components/discover/PaginationBar";
+import { formatCount } from "@/lib/utils";
 import { getAttendeesPage, removeAttendee } from "@/lib/rsvp";
 
 const PAGE_SIZE = 20;
@@ -116,7 +117,7 @@ export default function AttendeeListDialog({
             <DialogTitle className="text-2xl font-bold tracking-tight">
               Attendees
               <span className="ml-2 text-base font-normal text-muted-foreground">
-                ({count})
+                ({formatCount(count)})
               </span>
             </DialogTitle>
           </DialogHeader>

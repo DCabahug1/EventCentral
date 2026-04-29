@@ -37,11 +37,15 @@ function RegisterForm() {
       setErrorMessage("Passwords do not match");
       return;
     }
+    if (!formData.password.trim()) {
+      setErrorMessage("Password cannot be only spaces.");
+      return;
+    }
 
     try {
       setLoading(true);
       const result = await signUpWithEmailAndPassword(
-        formData.email,
+        formData.email.trim().toLowerCase(),
         formData.password,
       );
 
@@ -125,6 +129,8 @@ function RegisterForm() {
             <Input
               type="password"
               id="confirmPassword"
+              minLength={8}
+              maxLength={20}
               required
               value={formData.confirmPassword}
               onChange={(e) =>

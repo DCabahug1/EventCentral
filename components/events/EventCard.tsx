@@ -9,7 +9,7 @@ import { Badge } from "../ui/badge";
 import { Skeleton } from "../ui/skeleton";
 import { getCategoryConfig } from "@/lib/categoryConfig";
 import Link from "next/link";
-import { formatDateTime } from "@/lib/utils";
+import { formatDateTime, formatCount } from "@/lib/utils";
 import { getOrganizationById } from "@/lib/organizations";
 import { PostgrestError } from "@supabase/supabase-js";
 
@@ -259,7 +259,7 @@ function EventCard({
                 <span className="text-white/40">·</span>
                 <span className="flex items-center gap-1">
                   <Users className="w-4 h-4" />
-                  {attendeeCount}/{maxCapacity}
+                  {formatCount(attendeeCount)}/{formatCount(maxCapacity)}
                 </span>
               </div>
               {/* Progress bar */}

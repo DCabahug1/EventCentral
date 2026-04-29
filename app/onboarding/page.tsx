@@ -47,16 +47,26 @@ function OnboardingForm() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErrorMessage("");
+
+    const trimmedUsername = formData.username.trim();
+    if (!trimmedUsername) {
+      setErrorMessage("Username is required.");
+      return;
+    }
+    const phoneDigits = unformatPhoneNumber(formData.phone_number);
+    if (phoneDigits.length > 0 && phoneDigits.length !== 10) {
+      setErrorMessage("Phone number must be 10 digits.");
+      return;
+    }
+
     setLoading(true);
 
     try {
       const result = await createProfile({
-        username: formData.username,
+        username: trimmedUsername,
         avatar_url: null,
-        phone_number: phoneDigitsToNumber(
-          unformatPhoneNumber(formData.phone_number),
-        ),
-        description: formData.description,
+        phone_number: phoneDigitsToNumber(phoneDigits),
+        description: formData.description.trim(),
       });
 
       if (result instanceof AuthError) {
@@ -106,6 +116,7 @@ function OnboardingForm() {
                   type="text"
                   id="username"
                   required
+                  maxLength={32}
                   value={formData.username}
                   onChange={(e) =>
                     setFormData({ ...formData, username: e.target.value })
@@ -120,14 +131,22 @@ function OnboardingForm() {
                 <Input
                   type="tel"
                   id="phone_number"
+                  inputMode="numeric"
                   placeholder="(555) 555-5555"
+                  pattern="\(\d{3}\) \d{3}-\d{4}"
                   value={formData.phone_number}
-                  onChange={(e) =>
+                  onInvalid={(e) =>
+                    (e.target as HTMLInputElement).setCustomValidity(
+                      "Please enter a complete 10-digit phone number",
+                    )
+                  }
+                  onChange={(e) => {
+                    (e.target as HTMLInputElement).setCustomValidity("");
                     setFormData({
                       ...formData,
                       phone_number: formatPhoneNumber(e.target.value),
-                    })
-                  }
+                    });
+                  }}
                 />
               </div>
               <div className="flex flex-col gap-2">
@@ -138,6 +157,7 @@ function OnboardingForm() {
                 <textarea
                   id="description"
                   rows={3}
+                  maxLength={500}
                   placeholder="Tell us about yourself..."
                   value={formData.description}
                   onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>

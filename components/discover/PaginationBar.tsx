@@ -3,7 +3,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, formatCount } from "@/lib/utils";
 
 type PaginationBarProps = {
   page: number;
@@ -41,7 +41,7 @@ export default function PaginationBar({
       aria-label={`Pagination for ${label}`}
     >
       <p className="text-sm text-muted-foreground order-2 sm:order-1">
-        Showing {start}–{end} of {totalItems}
+        Showing {formatCount(start)}–{formatCount(end)} of {formatCount(totalItems)}
       </p>
       <div className="flex items-center gap-2 order-1 sm:order-2">
         <Button

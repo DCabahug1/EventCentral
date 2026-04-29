@@ -6,7 +6,7 @@ import { Calendar, MapPin, Users, Pencil, Building } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getCategoryConfig } from "@/lib/categoryConfig";
-import { formatDateTime, cn } from "@/lib/utils";
+import { formatDateTime, cn, formatCount } from "@/lib/utils";
 import { EVENT_STATUS_CONFIG, type EventStatus } from "@/lib/eventStatus";
 import type { Event, Organization } from "@/lib/types";
 
@@ -132,9 +132,9 @@ export default function EventHeader({
             <div className="flex items-center gap-2">
               <Users className="size-4 shrink-0" />
               <span>
-                {rsvpCount}
+                {formatCount(rsvpCount)}
                 {event.max_capacity !== null
-                  ? ` / ${event.max_capacity}`
+                  ? ` / ${formatCount(event.max_capacity)}`
                   : ""}{" "}
                 attending
               </span>

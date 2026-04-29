@@ -11,7 +11,7 @@ import { getAttendingEventsPage } from "@/lib/eventsServer";
 import { createClient } from "@/lib/supabase/client";
 import { uploadOrganizationAsset, uploadProfileAvatar } from "@/lib/bucketHandler";
 import { isOrganization, normalizeWebsite } from "@/lib/organizationPage";
-import { formatUsPhoneDisplay, phoneDigitsForTel } from "@/lib/utils";
+import { formatUsPhoneDisplay, imageSizeError, phoneDigitsForTel } from "@/lib/utils";
 import { Event, Organization, Profile } from "@/lib/types";
 import { PostgrestError } from "@supabase/supabase-js";
 import ProfileHeaderCard from "@/components/profile/ProfileHeaderCard";
@@ -70,6 +70,7 @@ export default function ProfilePageClient({
   const [phone, setPhone] = useState("");
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [removeAvatar, setRemoveAvatar] = useState(false);
   const [organizationsPage, setOrganizationsPage] = useState(1);
   const [upcomingPage, setUpcomingPage] = useState(1);
   const [pastPage, setPastPage] = useState(1);
@@ -123,6 +124,7 @@ export default function ProfilePageClient({
     setPhone(formatUsPhoneDisplay(profile.phone_number));
     setAvatarFile(null);
     setAvatarPreview(null);
+    setRemoveAvatar(false);
     setFormError("");
   }, [editOpen, profile]);
 
@@ -231,13 +233,26 @@ export default function ProfilePageClient({
   const handleEditSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError("");
+    const trimmedUsername = username.trim();
+    if (!trimmedUsername) {
+      setFormError("Username is required.");
+      return;
+    }
+    const phoneDigits = phoneDigitsForTel(phone);
+    if (phoneDigits.length > 0 && phoneDigits.length !== 10) {
+      setFormError("Phone number must be 10 digits.");
+      return;
+    }
     setSaving(true);
     try {
       let avatarUrl = profile.avatar_url;
-      if (avatarFile) avatarUrl = await uploadProfileAvatar(avatarFile, userId);
-      const phoneDigits = phoneDigitsForTel(phone);
+      if (avatarFile) {
+        avatarUrl = await uploadProfileAvatar(avatarFile, userId);
+      } else if (removeAvatar) {
+        avatarUrl = null;
+      }
       const result = await updateProfile({
-        username: username.trim() || null,
+        username: trimmedUsername,
         description: description.trim() || null,
         avatar_url: avatarUrl,
         phone_number: phoneDigits ? Number(phoneDigits) : null,
@@ -423,15 +438,30 @@ setTimeout(() => {
         phone={phone}
         avatarInputId={avatarInputId}
         avatarPreview={avatarPreview}
-        profileAvatarUrl={profile.avatar_url}
+        profileAvatarUrl={removeAvatar ? null : profile.avatar_url}
         formErrorRef={formErrorRef}
         formScrollContainerRef={formScrollContainerRef}
         onOpenChange={setEditOpen}
         onSubmit={handleEditSubmit}
-        onAvatarChange={setAvatarFile}
+        onAvatarChange={(file) => {
+          if (file) {
+            const sizeErr = imageSizeError(file);
+            if (sizeErr) {
+              setFormError(sizeErr);
+              return;
+            }
+            setFormError("");
+          }
+          setAvatarFile(file);
+          if (file) setRemoveAvatar(false);
+        }}
         onUsernameChange={setUsername}
         onDescriptionChange={setDescription}
         onPhoneChange={setPhone}
+        onRemoveAvatar={() => {
+          setAvatarFile(null);
+          setRemoveAvatar(true);
+        }}
         onRequestDelete={() => {
           setEditOpen(false);
           setDeleteError("");
@@ -461,8 +491,28 @@ setTimeout(() => {
         onPhoneChange={setNewOrgPhone}
         avatarPreview={newOrgAvatarPreview}
         bannerPreview={newOrgBannerPreview}
-        onAvatarFileChange={setNewOrgAvatarFile}
-        onBannerFileChange={setNewOrgBannerFile}
+        onAvatarFileChange={(file) => {
+          if (file) {
+            const sizeErr = imageSizeError(file);
+            if (sizeErr) {
+              setNewOrgFormError(sizeErr);
+              return;
+            }
+            setNewOrgFormError("");
+          }
+          setNewOrgAvatarFile(file);
+        }}
+        onBannerFileChange={(file) => {
+          if (file) {
+            const sizeErr = imageSizeError(file);
+            if (sizeErr) {
+              setNewOrgFormError(sizeErr);
+              return;
+            }
+            setNewOrgFormError("");
+          }
+          setNewOrgBannerFile(file);
+        }}
         formError={newOrgFormError}
         saving={newOrgSaving}
       />

@@ -9,6 +9,7 @@ import {
   Mail,
   Phone,
   Upload,
+  X,
 } from "lucide-react";
 import { LocationInput } from "@/components/ui/location-input";
 import {
@@ -170,6 +171,18 @@ export default function EditOrganizationDialog({
                       }
                     />
                   </label>
+                  {avatarPreview ? (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="text-muted-foreground hover:text-destructive"
+                      onClick={() => onAvatarFileChange(null)}
+                    >
+                      <X className="size-4" aria-hidden />
+                      Discard new avatar
+                    </Button>
+                  ) : null}
                 </FieldContent>
               </Field>
 
@@ -225,6 +238,18 @@ export default function EditOrganizationDialog({
                       }
                     />
                   </label>
+                  {bannerPreview ? (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="text-muted-foreground hover:text-destructive"
+                      onClick={() => onBannerFileChange(null)}
+                    >
+                      <X className="size-4" aria-hidden />
+                      Discard new banner
+                    </Button>
+                  ) : null}
                 </FieldContent>
               </Field>
 
@@ -245,6 +270,7 @@ export default function EditOrganizationDialog({
                       id="edit-name"
                       placeholder="e.g. SoundWave Productions"
                       required
+                      maxLength={100}
                       className="pl-10"
                       value={name}
                       onChange={(e) => onNameChange(e.target.value)}
@@ -266,6 +292,7 @@ export default function EditOrganizationDialog({
                     id="edit-description"
                     className="min-h-24 resize-none"
                     value={description}
+                    maxLength={1000}
                     placeholder="Tell people about your organization..."
                     onChange={(e) => onDescriptionChange(e.target.value)}
                   />
@@ -307,7 +334,8 @@ export default function EditOrganizationDialog({
                       type="text"
                       inputMode="url"
                       placeholder="Website URL"
-                      pattern="[^\s]*\.[^\s]+"
+                      pattern="(https?:\/\/)?[\w-]+(\.[\w-]+)+([\/?#][^\s]*)?"
+                      maxLength={200}
                       className="pl-10"
                       value={website}
                       onInvalid={(e) =>
@@ -330,6 +358,7 @@ export default function EditOrganizationDialog({
                       id="edit-email"
                       type="email"
                       placeholder="Contact email"
+                      maxLength={254}
                       className="pl-10"
                       value={email}
                       onInvalid={(e) =>

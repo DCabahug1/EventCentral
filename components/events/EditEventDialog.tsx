@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect, useId } from "react";
+import { useState, useEffect, useId, useRef } from "react";
 import Image from "next/image";
 import { useMapsLibrary } from "@vis.gl/react-google-maps";
-import { ImageIcon } from "lucide-react";
+import { ImageIcon, X } from "lucide-react";
 import {
   Dialog,
   DialogClose,
@@ -40,7 +40,7 @@ import { CATEGORY_CONFIG } from "@/lib/categoryConfig";
 import { uploadEventImage } from "@/lib/bucketHandler";
 import { updateEvent } from "@/lib/eventsServer";
 import { createClient } from "@/lib/supabase/client";
-import { cn } from "@/lib/utils";
+import { cn, imageSizeError } from "@/lib/utils";
 import type { Event } from "@/lib/types";
 
 function toLocalInput(isoStr: string): string {
@@ -86,6 +86,7 @@ export default function EditEventDialog({
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [formError, setFormError] = useState("");
   const [saving, setSaving] = useState(false);
+  const submitLockRef = useRef(false);
 
   useEffect(() => {
     if (!open) return;
@@ -113,11 +114,12 @@ export default function EditEventDialog({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submitLockRef.current) return;
     setFormError("");
 
     const cap = Number(maxCapacity);
     if (!title.trim()) { setFormError("Title is required."); return; }
-    if (!Number.isFinite(cap) || cap < 1) { setFormError("Max capacity must be at least 1."); return; }
+    if (!Number.isInteger(cap) || cap < 1 || cap > 10000) { setFormError("Max capacity must be a whole number between 1 and 10000."); return; }
     if (!address.trim()) { setFormError("Location is required."); return; }
 
     const addressChanged = address.trim() !== (event.address ?? "").trim();
@@ -134,11 +136,12 @@ export default function EditEventDialog({
     }
     if (end <= start) { setFormError("End time must be after start time."); return; }
 
+    submitLockRef.current = true;
     setSaving(true);
     try {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { setFormError("You must be signed in."); setSaving(false); return; }
+      if (!user) { setFormError("You must be signed in."); return; }
 
       let imageUrl = event.image_url;
       if (imageFile) {
@@ -154,13 +157,16 @@ export default function EditEventDialog({
       let lat = event.lat;
       let lng = event.lng;
       if (locationPlaceId && geocoder) {
-        const coords = await new Promise<{ lat: number; lng: number } | null>((resolve) => {
-          geocoder.geocode({ placeId: locationPlaceId }, (results, status) => {
-            if (status !== "OK" || !results?.[0]?.geometry?.location) { resolve(null); return; }
-            const loc = results[0].geometry.location;
-            resolve({ lat: loc.lat(), lng: loc.lng() });
-          });
-        });
+        const coords = await Promise.race<{ lat: number; lng: number } | null>([
+          new Promise((resolve) => {
+            geocoder.geocode({ placeId: locationPlaceId }, (results, status) => {
+              if (status !== "OK" || !results?.[0]?.geometry?.location) { resolve(null); return; }
+              const loc = results[0].geometry.location;
+              resolve({ lat: loc.lat(), lng: loc.lng() });
+            });
+          }),
+          new Promise((resolve) => setTimeout(() => resolve(null), 8000)),
+        ]);
         if (coords) { lat = coords.lat; lng = coords.lng; }
       }
 
@@ -187,6 +193,7 @@ export default function EditEventDialog({
     } catch {
       setFormError("Something went wrong. Try again.");
     } finally {
+      submitLockRef.current = false;
       setSaving(false);
     }
   };
@@ -249,9 +256,33 @@ export default function EditEventDialog({
                       type="file"
                       accept="image/jpeg,image/png,image/webp"
                       className="hidden"
-                      onChange={(e) => setImageFile(e.target.files?.[0] ?? null)}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0] ?? null;
+                        if (file) {
+                          const sizeErr = imageSizeError(file);
+                          if (sizeErr) {
+                            setFormError(sizeErr);
+                            e.target.value = "";
+                            return;
+                          }
+                        }
+                        setFormError("");
+                        setImageFile(file);
+                      }}
                     />
                   </label>
+                  {imageFile ? (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="text-muted-foreground hover:text-destructive"
+                      onClick={() => setImageFile(null)}
+                    >
+                      <X className="size-4" aria-hidden />
+                      Discard new image
+                    </Button>
+                  ) : null}
                 </FieldContent>
               </Field>
 
@@ -263,6 +294,7 @@ export default function EditEventDialog({
                   <Input
                     id="edit-event-title"
                     required
+                    maxLength={100}
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="Event title"
@@ -280,6 +312,7 @@ export default function EditEventDialog({
                     id="edit-event-desc"
                     className="min-h-24 resize-none"
                     value={description}
+                    maxLength={2000}
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder="What should attendees know?"
                   />
@@ -372,6 +405,7 @@ export default function EditEventDialog({
                   <Input
                     id="edit-event-location-details"
                     value={locationDetails}
+                    maxLength={200}
                     onChange={(e) => setLocationDetails(e.target.value)}
                     placeholder="e.g. Room 2, East wing"
                   />
@@ -387,6 +421,8 @@ export default function EditEventDialog({
                     id="edit-event-cap"
                     type="number"
                     min={1}
+                    max={10000}
+                    step={1}
                     required
                     value={maxCapacity}
                     onChange={(e) => setMaxCapacity(e.target.value)}

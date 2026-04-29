@@ -34,7 +34,7 @@ function LoginForm() {
     try {
       setLoading(true);
       const result = await signInWithEmailAndPassword(
-        formData.email,
+        formData.email.trim().toLowerCase(),
         formData.password,
       );
 

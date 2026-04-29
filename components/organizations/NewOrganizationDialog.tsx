@@ -225,6 +225,7 @@ export default function NewOrganizationDialog({
                         id="create-org-name"
                         placeholder="e.g. SoundWave Productions"
                         required
+                        maxLength={100}
                         className="pl-10"
                         value={name}
                         onChange={(e) => onNameChange(e.target.value)}
@@ -246,6 +247,7 @@ export default function NewOrganizationDialog({
                       id="create-org-description"
                       className="min-h-24 resize-none"
                       value={description}
+                      maxLength={1000}
                       placeholder="Tell people about your organization..."
                       onChange={(e) => onDescriptionChange(e.target.value)}
                     />
@@ -287,7 +289,8 @@ export default function NewOrganizationDialog({
                         type="text"
                         inputMode="url"
                         placeholder="Website URL"
-                        pattern="[^\s]*\.[^\s]+"
+                        pattern="(https?:\/\/)?[\w-]+(\.[\w-]+)+([\/?#][^\s]*)?"
+                        maxLength={200}
                         className="pl-10"
                         value={website}
                         onInvalid={(e) =>
@@ -310,6 +313,7 @@ export default function NewOrganizationDialog({
                         id="create-org-email"
                         type="email"
                         placeholder="Contact email"
+                        maxLength={254}
                         className="pl-10"
                         value={email}
                         onInvalid={(e) =>

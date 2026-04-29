@@ -1,7 +1,7 @@
 import React from "react";
 import { Event } from "@/lib/types";
 import { ArrowUpRight, Calendar, MapPin, Users } from "lucide-react";
-import { formatDateTime } from "@/lib/utils";
+import { formatDateTime, formatCount } from "@/lib/utils";
 import { getCategoryConfig } from "@/lib/categoryConfig";
 import { Progress } from "../ui/progress";
 import { Button } from "../ui/button";
@@ -79,7 +79,7 @@ function EventItem({
           <div className="flex items-center gap-1">
             <Users className="w-4 h-4 text-muted-foreground" />
             <p className="text-sm text-muted-foreground">
-              {safeAttendees} / {maxCapacity} attendees
+              {formatCount(safeAttendees)} / {formatCount(maxCapacity)} attendees
             </p>
           </div>
         </div>
