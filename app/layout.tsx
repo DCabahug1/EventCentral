@@ -58,7 +58,7 @@ export default function RootLayout({
           <Header />
           <PageMount>{children}</PageMount>
           <Footer />
-          <Toaster richColors position="top-right" />
+          <Toaster richColors position="bottom-right" />
         </ThemeProvider>
         <Script
           src="https://tweakcn.com/live-preview.min.js"

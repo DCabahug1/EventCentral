@@ -3,11 +3,6 @@
 import { CalendarPlus, Copy, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card";
 import { Progress } from "@/components/ui/progress";
 import {
   Avatar,
@@ -131,80 +126,15 @@ export default function EventRSVPPanel({
       <div className="flex flex-col gap-2">
         <span className="text-sm text-muted-foreground">Share this event</span>
         <div className="flex gap-2">
-          <HoverCard openDelay={150} closeDelay={80}>
-            <HoverCardTrigger asChild>
-              <Button
-                variant="outline"
-                size="icon"
-                aria-label="Add to calendar"
-                onClick={onCalendarOpen}
-              >
-                <CalendarPlus className="size-4" />
-              </Button>
-            </HoverCardTrigger>
-            <HoverCardContent
-              side="top"
-              className="w-auto max-w-xs p-3 text-xs"
-            >
-              <div className="flex flex-col gap-1">
-                <span className="text-sm font-semibold">Add to calendar</span>
-                <span className="text-muted-foreground">
-                  Download a calendar file to save this event to Google,
-                  Apple, or Outlook calendars.
-                </span>
-              </div>
-            </HoverCardContent>
-          </HoverCard>
-
-          <HoverCard openDelay={150} closeDelay={80}>
-            <HoverCardTrigger asChild>
-              <Button
-                variant="outline"
-                size="icon"
-                aria-label="Copy link"
-                onClick={onCopyLink}
-              >
-                <Copy className="size-4" />
-              </Button>
-            </HoverCardTrigger>
-            <HoverCardContent
-              side="top"
-              className="w-auto max-w-xs p-3 text-xs"
-            >
-              <div className="flex flex-col gap-1">
-                <span className="text-sm font-semibold">Copy link</span>
-                <span className="text-muted-foreground">
-                  Copy a direct link to this event so you can paste it
-                  anywhere.
-                </span>
-              </div>
-            </HoverCardContent>
-          </HoverCard>
-
-          <HoverCard openDelay={150} closeDelay={80}>
-            <HoverCardTrigger asChild>
-              <Button
-                variant="outline"
-                size="icon"
-                aria-label="Share"
-                onClick={onShare}
-              >
-                <Share2 className="size-4" />
-              </Button>
-            </HoverCardTrigger>
-            <HoverCardContent
-              side="top"
-              className="w-auto max-w-xs p-3 text-xs"
-            >
-              <div className="flex flex-col gap-1">
-                <span className="text-sm font-semibold">Share</span>
-                <span className="text-muted-foreground">
-                  Open your device&apos;s share sheet to send this event
-                  to friends and apps.
-                </span>
-              </div>
-            </HoverCardContent>
-          </HoverCard>
+          <Button variant="outline" size="icon" aria-label="Add to calendar" onClick={onCalendarOpen}>
+            <CalendarPlus className="size-4" />
+          </Button>
+          <Button variant="outline" size="icon" aria-label="Copy link" onClick={onCopyLink}>
+            <Copy className="size-4" />
+          </Button>
+          <Button variant="outline" size="icon" aria-label="Share" onClick={onShare}>
+            <Share2 className="size-4" />
+          </Button>
         </div>
       </div>
     </div>
