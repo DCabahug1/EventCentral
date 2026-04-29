@@ -24,8 +24,23 @@ const fontMono = DM_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://eventcentral-us.vercel.app"),
   title: "EventCentral",
   description: "Discover what's happening around you.",
+  icons: {
+    apple: "/logo.jpeg",
+  },
+  openGraph: {
+    title: "EventCentral",
+    description: "Discover what's happening around you.",
+    images: ["/logo.jpeg"],
+  },
+  twitter: {
+    card: "summary",
+    title: "EventCentral",
+    description: "Discover what's happening around you.",
+    images: ["/logo.jpeg"],
+  },
 };
 
 export default function RootLayout({
