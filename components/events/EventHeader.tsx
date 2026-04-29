@@ -117,9 +117,16 @@ export default function EventHeader({
               <span>{formatDateTime(event.start_time)}</span>
             </div>
             {event.address && (
-              <div className="flex items-center gap-2">
-                <MapPin className="size-4 shrink-0" />
-                <span>{event.address}</span>
+              <div className="flex items-start gap-2">
+                <MapPin className="mt-0.5 size-4 shrink-0" />
+                <div className="flex min-w-0 flex-col">
+                  <span>{event.address}</span>
+                  {event.location_details && (
+                    <span className="text-xs text-muted-foreground/80">
+                      {event.location_details}
+                    </span>
+                  )}
+                </div>
               </div>
             )}
             <div className="flex items-center gap-2">
