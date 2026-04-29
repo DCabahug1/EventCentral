@@ -9,6 +9,7 @@ import { getReviewsWithProfilesByEvent } from "@/lib/reviews";
 import { getEventAttendeeAvatars } from "@/lib/rsvp";
 import { isOrganization } from "@/lib/organizationPage";
 import EventPageContent from "@/components/events/EventPageContent";
+import { logPageView } from "@/lib/analyticsServer";
 import type { Organization } from "@/lib/types";
 
 type PageProps = {
@@ -28,6 +29,8 @@ export default async function EventPage({ params }: PageProps) {
   ]);
 
   if (!event) notFound();
+
+  await logPageView("event", event.id);
 
   const [orgResult, reviews, attendeeAvatars] = await Promise.all([
     event.organization_id

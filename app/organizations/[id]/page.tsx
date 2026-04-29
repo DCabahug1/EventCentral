@@ -28,6 +28,7 @@ import {
   updateOrganization,
 } from "@/lib/organizations";
 import { getEventsByOrganizationIdPage } from "@/lib/eventsServer";
+import { logPageView } from "@/lib/analyticsServer";
 import { uploadOrganizationAsset } from "@/lib/bucketHandler";
 import { createClient } from "@/lib/supabase/client";
 import { PostgrestError } from "@supabase/supabase-js";
@@ -115,6 +116,8 @@ export default function OrganizationPage({ params }: OrganizationPageProps) {
         setIsOwner(false);
         return;
       }
+
+      void logPageView("organization", rawOrg.id);
 
       if (rawOrg.user_id) {
         const founderResult = await getProfile(rawOrg.user_id);
