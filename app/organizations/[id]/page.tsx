@@ -38,7 +38,7 @@ import {
   normalizeWebsite,
   ORG_EVENTS_PAGE_SIZE,
 } from "@/lib/organizationPage";
-
+import { toast } from "sonner";
 type OrganizationPageProps = {
   params: Promise<{ id: string }>;
 };
@@ -290,10 +290,7 @@ export default function OrganizationPage({ params }: OrganizationPageProps) {
         const updated = result as Organization;
         setOrg(updated);
         setEditOpen(false);
-        if (typeof document !== "undefined") {
-          document.title = `${updated.name} | EventCentral`;
-        }
-        router.refresh();
+        toast.success("Organization saved successfully.");
         return;
       }
 
@@ -340,8 +337,10 @@ export default function OrganizationPage({ params }: OrganizationPageProps) {
       const result = await deleteOrganization(org.id);
       if (result === null) {
         setDeleteOpen(false);
-        // Replace (no refresh) so we don't re-trigger load() on this route and get stuck on the skeleton.
-        router.replace("/");
+        toast.success("Organization deleted successfully.");
+        setTimeout(() => {
+          router.replace("/");
+        }, 1500);
         return;
       }
       const msg =

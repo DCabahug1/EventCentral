@@ -25,7 +25,7 @@ import EditEventDialog from "@/components/events/EditEventDialog";
 import DeleteEventDialog from "@/components/events/DeleteEventDialog";
 import AttendeeListDialog from "@/components/events/AttendeeListDialog";
 import type { Event, Organization, ReviewWithProfile } from "@/lib/types";
-
+import { toast } from "sonner";
 type Props = {
   event: Event;
   organization: Organization | null;
@@ -158,7 +158,10 @@ export default function EventPageContent({
     const result = await deleteEvent(event.id);
     setDeleting(false);
     if (result === null) {
-      router.push("/discover");
+      toast.success("Event deleted successfully.");
+      setTimeout(() => {
+        router.push("/discover");
+      }, 1500);
     } else {
       setDeleteError(result instanceof Error ? result.message : "Failed to delete event.");
     }
@@ -289,7 +292,7 @@ export default function EventPageContent({
         event={event}
         open={editDialogOpen}
         onOpenChange={setEditDialogOpen}
-        onSuccess={() => { setEditDialogOpen(false); router.refresh(); }}
+        onSuccess={() => { setEditDialogOpen(false); toast.success("Event saved successfully."); router.refresh(); }}
         onRequestDelete={() => { setEditDialogOpen(false); setDeleteDialogOpen(true); }}
       />
 

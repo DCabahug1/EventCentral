@@ -20,6 +20,7 @@ import EventsSection from "@/components/profile/EventsSection";
 import DeleteAccountDialog from "@/components/profile/DeleteAccountDialog";
 import EditProfileDialog from "@/components/profile/EditProfileDialog";
 import NewOrganizationDialog from "@/components/organizations/NewOrganizationDialog";
+import { toast } from "sonner";
 
 const PROFILE_ORGS_PAGE_SIZE = 4;
 const PROFILE_EVENTS_PAGE_SIZE = 6;
@@ -244,6 +245,7 @@ export default function ProfilePageClient({
       if (result && !(result instanceof Error) && !(result instanceof PostgrestError)) {
         setProfile(result);
         setEditOpen(false);
+        toast.success("Profile saved successfully.");
         return;
       }
       const message =
@@ -347,8 +349,15 @@ export default function ProfilePageClient({
         return;
       }
       const supabase = createClient();
-      await supabase.auth.signOut();
-      window.location.href = "/auth/login";
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        setDeleteError(error.message ?? "Could not delete account.");
+        return;
+      }
+toast.success("Your account has been successfully deleted.");
+setTimeout(() => {
+  window.location.href = "/auth/login";
+}, 1500);
     } catch (err) {
       setDeleteError(err instanceof Error ? err.message : "Could not delete account.");
     } finally {
