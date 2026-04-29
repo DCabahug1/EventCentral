@@ -11,7 +11,7 @@
       "Bash(mv /tmp/design.html /tmp/design.html.gz)",
       "Bash(gunzip -f /tmp/design.html.gz)",
       "Bash(mkdir -p /tmp/design)",
-      "Bash(tar -xf /tmp/design.html -C /tmp/design)"
+      "Bash(tar -xf /tmp/design.html -C /tmp/design)",
       "Bash(xargs grep *)",
       "Bash(grep -E \"\\(if|&&|\\\\\\\\?\\)\")"
     ]
