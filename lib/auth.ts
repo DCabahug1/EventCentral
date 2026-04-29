@@ -1,12 +1,14 @@
 'use client'
 import { createClient } from "./supabase/client";
 
-export const signInWithGoogle = async () => {
+export const signInWithGoogle = async (next: string = "/discover") => {
   const supabase = createClient();
+  const callbackUrl = new URL(`${window.location.origin}/auth/callback`);
+  callbackUrl.searchParams.set("next", next);
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: `${window.location.origin}/auth/callback?next=/discover`,
+      redirectTo: callbackUrl.toString(),
     },
   });
 

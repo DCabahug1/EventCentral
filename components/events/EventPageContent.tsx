@@ -18,6 +18,7 @@ import { createRSVP, cancelRSVP, getEventRsvpCount } from "@/lib/rsvp";
 import { deleteEvent, updateEvent } from "@/lib/eventsServer";
 import { getEventStatus } from "@/lib/eventStatus";
 import EventHeader from "@/components/events/EventHeader";
+import EventLocationMap from "@/components/events/EventLocationMap";
 import EventReviews from "@/components/events/EventReviews";
 import EventRSVPPanel from "@/components/events/EventRSVPPanel";
 import EventHostedByCard from "@/components/events/EventHostedByCard";
@@ -67,7 +68,10 @@ export default function EventPageContent({
   const isEnded = eventStatus === "ENDED" || eventStatus === "CANCELLED";
 
   const handleRsvp = () => {
-    if (!currentUserId) { router.push("/auth/login"); return; }
+    if (!currentUserId) {
+      router.push(`/auth/login?next=${encodeURIComponent(`/events/${event.id}`)}`);
+      return;
+    }
     setRsvpError("");
     startRsvpTransition(async () => {
       if (isRsvped) {
@@ -222,6 +226,12 @@ export default function EventPageContent({
                   </p>
                   <p className="text-sm leading-relaxed">{event.description}</p>
                 </div>
+              )}
+
+              {event.lat != null && event.lng != null && (
+                <EventLocationMap
+                  event={event as Event & { lat: number; lng: number }}
+                />
               )}
 
               <EventReviews

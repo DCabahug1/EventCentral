@@ -30,7 +30,8 @@ function AvatarButton({ profile }: { profile: Profile }) {
       console.error("Error signing out", result.message);
       return;
     }
-    router.push("/auth/login");
+    router.push("/");
+    router.refresh();
   };
 
 

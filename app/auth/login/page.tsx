@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { Suspense, useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -9,11 +9,12 @@ import { Separator } from "@/components/ui/separator";
 import { AuthMarketingHero } from "@/components/auth/AuthHero";
 import { signInWithEmailAndPassword, signInWithGoogle } from "@/lib/auth";
 import { AuthError } from "@supabase/supabase-js";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "motion/react";
 import { FormRequiredLegend, RequiredMark } from "@/components/ui/form-field-hints";
+import { safeNextPath } from "@/lib/redirect";
 
-function page() {
+function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -22,6 +23,9 @@ function page() {
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const next = safeNextPath(searchParams.get("next"));
+  const registerHref = `/auth/register?next=${encodeURIComponent(next)}`;
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -39,7 +43,7 @@ function page() {
         return;
       }
 
-      router.push("/discover");
+      router.push(next);
     } catch {
       setErrorMessage("There was an error signing in");
     } finally {
@@ -116,13 +120,13 @@ function page() {
             variant="outline"
             className="w-full"
             disabled={loading}
-            onClick={signInWithGoogle}
+            onClick={() => signInWithGoogle(next)}
           >
             {loading ? <Loader2 className="animate-spin" /> : "Continue with Google"}
           </Button>
           <p className="text-sm text-muted-foreground">
             Don&apos;t have an account?{" "}
-            <Link href="/auth/register" className="text-primary underline">
+            <Link href={registerHref} className="text-primary underline">
               Sign up
             </Link>
           </p>
@@ -132,4 +136,12 @@ function page() {
   );
 }
 
-export default page;
+function Page() {
+  return (
+    <Suspense fallback={null}>
+      <LoginForm />
+    </Suspense>
+  );
+}
+
+export default Page;

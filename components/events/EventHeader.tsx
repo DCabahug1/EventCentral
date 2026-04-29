@@ -43,9 +43,9 @@ export default function EventHeader({
 
   return (
     <div className="mb-8">
-      {/* Mobile-only image — above text on small screens */}
+      {/* Mobile-only image above text on small screens */}
       {imageUrl && (
-        <div className="relative mb-6 aspect-video w-full overflow-hidden rounded-xl lg:hidden ">
+        <div className="relative mb-6 aspect-video w-full overflow-hidden rounded-xl lg:hidden border">
           <Image
             src={imageUrl}
             alt={event.title}

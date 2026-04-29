@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { Suspense, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -7,12 +7,13 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { createProfile } from "@/lib/profiles";
 import { AuthError } from "@supabase/supabase-js";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   FormRequiredLegend,
   OptionalFieldHint,
   RequiredMark,
 } from "@/components/ui/form-field-hints";
+import { safeNextPath } from "@/lib/redirect";
 
 function formatPhoneNumber(value: string): string {
   const digits = value.replace(/\D/g, "").slice(0, 10);
@@ -31,7 +32,7 @@ function phoneDigitsToNumber(digits: string): number | null {
   return Number.isNaN(parsedNumber) ? null : parsedNumber;
 }
 
-function page() {
+function OnboardingForm() {
   const [formData, setFormData] = useState({
     username: "",
     phone_number: "",
@@ -40,6 +41,8 @@ function page() {
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const next = safeNextPath(searchParams.get("next"));
     
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -71,8 +74,8 @@ function page() {
         return;
       }
 
-      router.push("/discover");
-    } catch (error) {
+      router.push(next);
+    } catch {
       setErrorMessage("There was an error creating your profile");
     } finally {
       setLoading(false);
@@ -162,4 +165,12 @@ function page() {
   );
 }
 
-export default page;
+function Page() {
+  return (
+    <Suspense fallback={null}>
+      <OnboardingForm />
+    </Suspense>
+  );
+}
+
+export default Page;
