@@ -1,5 +1,6 @@
 import Image from "next/image";
-import { Globe, Mail, MapPin, Pencil, Phone, User } from "lucide-react";
+import Link from "next/link";
+import { BarChart3, Globe, Mail, MapPin, Pencil, Phone, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ExpandableDescription } from "@/components/ui/expandable-description";
 import { cn, formatUsPhoneDisplay, phoneDigitsForTel } from "@/lib/utils";
@@ -62,6 +63,19 @@ export default function OrganizationProfileHeader({
                     <Globe className="size-4" />
                     Visit website
                   </a>
+                </Button>
+              ) : null}
+              {isOwner ? (
+                <Button
+                  asChild
+                  variant="secondary"
+                  size="sm"
+                  className="w-full sm:w-auto"
+                >
+                  <Link href={`/organizations/${org.id}/analytics`}>
+                    <BarChart3 className="size-4" />
+                    Analytics
+                  </Link>
                 </Button>
               ) : null}
               {isOwner ? (

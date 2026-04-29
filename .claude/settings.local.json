@@ -5,6 +5,13 @@
       "WebFetch(domain:claude.ai)",
       "WebFetch(domain:storage.googleapis.com)",
       "Bash(pnpm exec:*)",
+      "Bash(curl -sIL \"https://api.anthropic.com/v1/design/h/uR7CD13c5oTesb2j8gKaPg?open_file=Analytics+Dashboard.html\")",
+      "Bash(curl -sL -o /tmp/design.html \"https://api.anthropic.com/v1/design/h/uR7CD13c5oTesb2j8gKaPg?open_file=Analytics+Dashboard.html\")",
+      "Read(//tmp/**)",
+      "Bash(mv /tmp/design.html /tmp/design.html.gz)",
+      "Bash(gunzip -f /tmp/design.html.gz)",
+      "Bash(mkdir -p /tmp/design)",
+      "Bash(tar -xf /tmp/design.html -C /tmp/design)"
       "Bash(xargs grep *)",
       "Bash(grep -E \"\\(if|&&|\\\\\\\\?\\)\")"
     ]

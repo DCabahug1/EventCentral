@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Afacad_Flux, Noto_Serif, DM_Mono } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import Header from "@/components/header/Header";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -50,14 +51,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <script
-          async
-          crossOrigin="anonymous"
-          src="https://tweakcn.com/live-preview.min.js"
-        />
-      </head>
-
       <body
         className={`${fontSans.variable} ${fontSerif.variable} ${fontMono.variable} antialiased`}
       >
@@ -67,6 +60,11 @@ export default function RootLayout({
           <Footer />
           <Toaster richColors position="top-right" />
         </ThemeProvider>
+        <Script
+          src="https://tweakcn.com/live-preview.min.js"
+          strategy="afterInteractive"
+          crossOrigin="anonymous"
+        />
       </body>
     </html>
   );

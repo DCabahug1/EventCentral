@@ -72,3 +72,33 @@ export type ReviewWithProfile = Review & {
   username: string | null;
   avatar_url: string | null;
 }
+
+export type AnalyticsRange = "7d" | "30d" | "all";
+
+export type EngagementStats = {
+  totalConfirmedRsvps: number;
+  rsvpsByDay: { date: string; count: number }[];
+  topEventsByRsvp: { id: number; title: string; rsvp_count: number }[];
+};
+
+export type ReviewStats = {
+  averageRating: number;
+  totalReviews: number;
+  ratingDistribution: { rating: number; count: number }[];
+  recentReviews: {
+    id: number;
+    event_id: number;
+    event_title: string;
+    rating: number;
+    content: string | null;
+    created_at: string;
+    username: string | null;
+    avatar_url: string | null;
+  }[];
+};
+
+export type ReachStats = {
+  orgProfileViews: number;
+  totalEventViews: number;
+  viewsPerEvent: { eventId: number; title: string; views: number }[];
+};
