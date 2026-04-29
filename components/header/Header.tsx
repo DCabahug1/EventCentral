@@ -1,11 +1,12 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { getCurrentUser } from "@/lib/user";
 import { getProfile } from "@/lib/profiles";
+import { PROFILE_UPDATED_EVENT } from "@/lib/profileEvents";
 import { PostgrestError } from "@supabase/supabase-js";
 import { Profile } from "@/lib/types";
 import { AuthError } from "@supabase/supabase-js";
@@ -20,38 +21,47 @@ function Header() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [createEventOpen, setCreateEventOpen] = useState(false);
 
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const userResult = await getCurrentUser();
+  const fetchProfile = useCallback(async () => {
+    try {
+      const userResult = await getCurrentUser();
 
-        if (userResult instanceof AuthError) {
-          setProfile(null);
-          return;
-        }
-
-        if (!userResult.user) {
-          setProfile(null);
-          return;
-        }
-
-        const profile = await getProfile(userResult.user.id);
-
-        if (profile instanceof PostgrestError || profile instanceof AuthError) {
-          console.error("Error getting profile", profile.message);
-          setProfile(null);
-          return;
-        }
-
-        setProfile(profile);
-      } catch (error) {
-        console.error("Error getting profile", error);
+      if (userResult instanceof AuthError) {
         setProfile(null);
         return;
       }
-    };
+
+      if (!userResult.user) {
+        setProfile(null);
+        return;
+      }
+
+      const profile = await getProfile(userResult.user.id);
+
+      if (profile instanceof PostgrestError || profile instanceof AuthError) {
+        console.error("Error getting profile", profile.message);
+        setProfile(null);
+        return;
+      }
+
+      setProfile(profile);
+    } catch (error) {
+      console.error("Error getting profile", error);
+      setProfile(null);
+      return;
+    }
+  }, []);
+
+  useEffect(() => {
     fetchProfile();
-  }, [pathname]);
+  }, [pathname, fetchProfile]);
+
+  useEffect(() => {
+    const handler = () => {
+      fetchProfile();
+    };
+    window.addEventListener(PROFILE_UPDATED_EVENT, handler);
+    return () => window.removeEventListener(PROFILE_UPDATED_EVENT, handler);
+  }, [fetchProfile]);
 
   const showNav = !pathname.startsWith("/auth") && !pathname.startsWith("/onboarding");
 

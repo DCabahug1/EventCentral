@@ -43,7 +43,7 @@ function DesktopNav({ profile, pathname, onHostEvent }: DesktopNavProps) {
           </Button>
           <Button
             type="button"
-            variant={pathname.startsWith("/create-event") ? "default" : "ghost"}
+            variant='outline'
             onClick={onHostEvent}
           >
               <Plus />

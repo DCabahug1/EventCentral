@@ -20,6 +20,7 @@ import EventsSection from "@/components/profile/EventsSection";
 import DeleteAccountDialog from "@/components/profile/DeleteAccountDialog";
 import EditProfileDialog from "@/components/profile/EditProfileDialog";
 import NewOrganizationDialog from "@/components/organizations/NewOrganizationDialog";
+import { dispatchProfileUpdated } from "@/lib/profileEvents";
 import { toast } from "sonner";
 
 const PROFILE_ORGS_PAGE_SIZE = 4;
@@ -259,6 +260,7 @@ export default function ProfilePageClient({
       });
       if (result && !(result instanceof Error) && !(result instanceof PostgrestError)) {
         setProfile(result);
+        dispatchProfileUpdated();
         setEditOpen(false);
         toast.success("Profile saved successfully.");
         return;

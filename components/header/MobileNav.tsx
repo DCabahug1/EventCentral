@@ -58,7 +58,7 @@ function MobileNav({ profile, onHostEvent }: MobileNavProps) {
                   setOpen(false);
                   onHostEvent();
                 }}
-                className={pathname.startsWith("/create-event") ? "bg-accent" : ""}
+                className='bg-muted'
               >
                 <div className="flex cursor-pointer items-center gap-2">
                   <Plus className="size-4" />
