@@ -54,8 +54,10 @@ export default function OrganizationPage({ params }: OrganizationPageProps) {
   const [org, setOrg] = useState<Organization | null>(null);
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
   const [pastEvents, setPastEvents] = useState<Event[]>([]);
+  const [cancelledEvents, setCancelledEvents] = useState<Event[]>([]);
   const [upcomingTotal, setUpcomingTotal] = useState(0);
   const [pastTotal, setPastTotal] = useState(0);
+  const [cancelledTotal, setCancelledTotal] = useState(0);
   const [founderProfile, setFounderProfile] = useState<Profile | null>(null);
   const [isOwner, setIsOwner] = useState(false);
 
@@ -67,6 +69,7 @@ export default function OrganizationPage({ params }: OrganizationPageProps) {
   const [formError, setFormError] = useState("");
   const [upcomingPage, setUpcomingPage] = useState(1);
   const [pastPage, setPastPage] = useState(1);
+  const [cancelledPage, setCancelledPage] = useState(1);
   const [createEventOpen, setCreateEventOpen] = useState(false);
 
   const avatarInputId = useId();
@@ -98,10 +101,17 @@ export default function OrganizationPage({ params }: OrganizationPageProps) {
     setNotFound(false);
 
     try {
-      const [rawOrg, upcomingResult, pastResult, supabase] = await Promise.all([
+      const [
+        rawOrg,
+        upcomingResult,
+        pastResult,
+        cancelledResult,
+        supabase,
+      ] = await Promise.all([
         getOrganizationById(orgId),
         getEventsByOrganizationIdPage(orgId, "upcoming", 1, ORG_EVENTS_PAGE_SIZE),
         getEventsByOrganizationIdPage(orgId, "past", 1, ORG_EVENTS_PAGE_SIZE),
+        getEventsByOrganizationIdPage(orgId, "cancelled", 1, ORG_EVENTS_PAGE_SIZE),
         createClient(),
       ]);
 
@@ -110,8 +120,10 @@ export default function OrganizationPage({ params }: OrganizationPageProps) {
         setOrg(null);
         setUpcomingEvents([]);
         setPastEvents([]);
+        setCancelledEvents([]);
         setUpcomingTotal(0);
         setPastTotal(0);
+        setCancelledTotal(0);
         setFounderProfile(null);
         setIsOwner(false);
         return;
@@ -139,8 +151,11 @@ export default function OrganizationPage({ params }: OrganizationPageProps) {
       setUpcomingTotal(upcomingResult.total);
       setPastEvents(pastResult.items);
       setPastTotal(pastResult.total);
+      setCancelledEvents(cancelledResult.items);
+      setCancelledTotal(cancelledResult.total);
       setUpcomingPage(1);
       setPastPage(1);
+      setCancelledPage(1);
       setIsOwner(!!user?.id && user.id === rawOrg.user_id);
       setName(rawOrg.name);
       setDescription(rawOrg.description ?? "");
@@ -210,6 +225,7 @@ export default function OrganizationPage({ params }: OrganizationPageProps) {
 
   const totalUpcomingPages = Math.max(1, Math.ceil(upcomingTotal / ORG_EVENTS_PAGE_SIZE));
   const totalPastPages = Math.max(1, Math.ceil(pastTotal / ORG_EVENTS_PAGE_SIZE));
+  const totalCancelledPages = Math.max(1, Math.ceil(cancelledTotal / ORG_EVENTS_PAGE_SIZE));
 
   const handleUpcomingPageChange = useCallback(async (page: number) => {
     setUpcomingPage(page);
@@ -223,6 +239,13 @@ export default function OrganizationPage({ params }: OrganizationPageProps) {
     const result = await getEventsByOrganizationIdPage(orgId, "past", page, ORG_EVENTS_PAGE_SIZE);
     setPastEvents(result.items);
     setPastTotal(result.total);
+  }, [orgId]);
+
+  const handleCancelledPageChange = useCallback(async (page: number) => {
+    setCancelledPage(page);
+    const result = await getEventsByOrganizationIdPage(orgId, "cancelled", page, ORG_EVENTS_PAGE_SIZE);
+    setCancelledEvents(result.items);
+    setCancelledTotal(result.total);
   }, [orgId]);
 
   const handleEditSubmit = async (e: React.FormEvent) => {
@@ -395,14 +418,19 @@ export default function OrganizationPage({ params }: OrganizationPageProps) {
             org={org}
             upcoming={upcomingEvents}
             past={pastEvents}
+            cancelled={cancelledEvents}
             upcomingTotal={upcomingTotal}
             pastTotal={pastTotal}
+            cancelledTotal={cancelledTotal}
             upcomingPage={upcomingPage}
             pastPage={pastPage}
+            cancelledPage={cancelledPage}
             totalUpcomingPages={totalUpcomingPages}
             totalPastPages={totalPastPages}
+            totalCancelledPages={totalCancelledPages}
             onUpcomingPageChange={handleUpcomingPageChange}
             onPastPageChange={handlePastPageChange}
+            onCancelledPageChange={handleCancelledPageChange}
             isOwner={isOwner}
             onCreateEvent={
               isOwner ? () => setCreateEventOpen(true) : undefined

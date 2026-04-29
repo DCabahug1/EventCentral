@@ -10,18 +10,25 @@ import ListEmptyState from "@/components/ui/list-empty-state";
 import { ORG_EVENTS_PAGE_SIZE } from "@/lib/organizationPage";
 import type { Event, Organization } from "@/lib/types";
 
+type TabValue = "upcoming" | "past" | "cancelled";
+
 type Props = {
   org: Organization;
   upcoming: Event[];
   past: Event[];
+  cancelled: Event[];
   upcomingTotal: number;
   pastTotal: number;
+  cancelledTotal: number;
   upcomingPage: number;
   pastPage: number;
+  cancelledPage: number;
   totalUpcomingPages: number;
   totalPastPages: number;
+  totalCancelledPages: number;
   onUpcomingPageChange: (page: number) => void;
   onPastPageChange: (page: number) => void;
+  onCancelledPageChange: (page: number) => void;
   isOwner?: boolean;
   onCreateEvent?: () => void;
 };
@@ -30,19 +37,29 @@ export default function OrganizationEventsTabs({
   org,
   upcoming,
   past,
+  cancelled,
   upcomingTotal,
   pastTotal,
+  cancelledTotal,
   upcomingPage,
   pastPage,
+  cancelledPage,
   totalUpcomingPages,
   totalPastPages,
+  totalCancelledPages,
   onUpcomingPageChange,
   onPastPageChange,
+  onCancelledPageChange,
   isOwner = false,
   onCreateEvent,
 }: Props) {
-  const [tab, setTab] = useState<"upcoming" | "past">("upcoming");
-  const tabCount = tab === "upcoming" ? upcomingTotal : pastTotal;
+  const [tab, setTab] = useState<TabValue>("upcoming");
+  const tabCount =
+    tab === "upcoming"
+      ? upcomingTotal
+      : tab === "past"
+        ? pastTotal
+        : cancelledTotal;
 
   return (
     <section className="flex flex-col gap-4" aria-labelledby="org-events-heading">
@@ -73,12 +90,13 @@ export default function OrganizationEventsTabs({
 
       <Tabs
         value={tab}
-        onValueChange={(v) => setTab(v as "upcoming" | "past")}
+        onValueChange={(v) => setTab(v as TabValue)}
         className="flex flex-col gap-4"
       >
         <TabsList className="w-full max-w-md sm:w-fit">
           <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
           <TabsTrigger value="past">Past</TabsTrigger>
+          <TabsTrigger value="cancelled">Cancelled</TabsTrigger>
         </TabsList>
 
         <TabsContent value="upcoming" className="flex flex-col gap-4">
@@ -130,6 +148,33 @@ export default function OrganizationEventsTabs({
                 totalItems={pastTotal}
                 pageSize={ORG_EVENTS_PAGE_SIZE}
                 onPageChange={onPastPageChange}
+              />
+            </>
+          )}
+        </TabsContent>
+
+        <TabsContent value="cancelled" className="flex flex-col gap-4">
+          {cancelledTotal === 0 ? (
+            <ListEmptyState message="No cancelled events found." />
+          ) : (
+            <>
+              <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
+                {cancelled.map((ev) => (
+                  <EventCard
+                    key={ev.id}
+                    event={ev}
+                    org={org}
+                    variant="organization"
+                  />
+                ))}
+              </div>
+              <PaginationBar
+                label="Cancelled organization events"
+                page={cancelledPage}
+                totalPages={totalCancelledPages}
+                totalItems={cancelledTotal}
+                pageSize={ORG_EVENTS_PAGE_SIZE}
+                onPageChange={onCancelledPageChange}
               />
             </>
           )}

@@ -121,10 +121,10 @@ export async function getAttendingEventsPage(
   return { items: data as Event[], total: count ?? 0 };
 }
 
-/** Returns one page of upcoming or past events for an organization. */
+/** Returns one page of upcoming, past, or cancelled events for an organization. */
 export async function getEventsByOrganizationIdPage(
   organizationId: number,
-  bucket: "upcoming" | "past",
+  bucket: "upcoming" | "past" | "cancelled",
   page: number,
   pageSize: number,
 ): Promise<{ items: Event[]; total: number }> {
@@ -142,13 +142,23 @@ export async function getEventsByOrganizationIdPage(
       "id,organization_id,organization_name,rsvp_count,user_id,title,description,start_time,end_time,address,location_details,lat,lng,max_capacity,image_url,category,CANCELLED,created_at,updated_at",
       { count: "exact" },
     )
-    .eq("organization_id", organizationId)
-    .eq("CANCELLED", false);
+    .eq("organization_id", organizationId);
 
-  query =
-    bucket === "upcoming"
-      ? query.gte("end_time", nowIso).order("start_time", { ascending: true })
-      : query.lt("end_time", nowIso).order("start_time", { ascending: false });
+  if (bucket === "cancelled") {
+    query = query
+      .eq("CANCELLED", true)
+      .order("start_time", { ascending: false });
+  } else if (bucket === "upcoming") {
+    query = query
+      .eq("CANCELLED", false)
+      .gte("end_time", nowIso)
+      .order("start_time", { ascending: true });
+  } else {
+    query = query
+      .eq("CANCELLED", false)
+      .lt("end_time", nowIso)
+      .order("start_time", { ascending: false });
+  }
 
   const { data, error, count } = await query.range(from, to);
 
