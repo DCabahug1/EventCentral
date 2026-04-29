@@ -399,7 +399,7 @@ export default function OrganizationPage({ params }: OrganizationPageProps) {
 
   return (
     <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!}>
-      <div className="min-h-svh overflow-x-hidden bg-muted/30">
+      <div className="min-h-svh overflow-x-hidden">
         <OrganizationBanner bannerUrl={org.banner_url} />
 
         <div className="mx-auto flex max-w-5xl flex-col gap-8 px-4 pb-16 pt-6 sm:px-6 lg:px-8">
