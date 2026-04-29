@@ -38,7 +38,7 @@ import {
   RequiredMark,
 } from "@/components/ui/form-field-hints";
 
-export type NewOrganizationDialogProps = {
+type NewOrganizationDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (e: React.FormEvent) => void;

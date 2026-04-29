@@ -1,7 +1,7 @@
 "use client";
-import { createClient } from "./supabase/client";
-import { distanceBetweenLocations } from "./utils";
-import { Event } from "./types";
+import { createClient } from "../supabase/client";
+import { distanceBetweenLocations } from "../utils";
+import { Event } from "../types";
 import { PostgrestError } from "@supabase/supabase-js";
 
 export const getEvents = async (filters?: {

@@ -7,7 +7,7 @@ import { useSearchParams } from "next/navigation";
 import { Event } from "@/lib/types";
 import { todayDateString, daysFromNowDateString } from "@/lib/utils";
 import EventList from "@/components/map-view/EventList";
-import { getEvents, getEventById } from "@/lib/eventsClient";
+import { getEvents, getEventById } from "@/lib/events/client";
 import { APIProvider } from "@vis.gl/react-google-maps";
 import {
   SidebarProvider,

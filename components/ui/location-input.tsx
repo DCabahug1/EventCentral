@@ -220,5 +220,3 @@ export function LocationInput({
     </Popover>
   );
 }
-
-export default LocationInput;

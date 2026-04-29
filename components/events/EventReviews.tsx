@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
-import { createReview } from "@/lib/reviews";
+import { createReview } from "@/lib/reviews/server";
 import EditReviewDialog from "@/components/events/EditReviewDialog";
 import EventReviewSummary from "@/components/events/EventReviewSummary";
 import type { Event, Review, ReviewWithProfile } from "@/lib/types";

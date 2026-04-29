@@ -7,12 +7,12 @@ import { Eye, EyeOff, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import { AuthMarketingHero } from "@/components/auth/AuthHero";
-import { signInWithEmailAndPassword, signInWithGoogle } from "@/lib/auth";
+import { signInWithEmailAndPassword, signInWithGoogle } from "@/lib/auth/actions";
 import { AuthError } from "@supabase/supabase-js";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "motion/react";
 import { FormRequiredLegend, RequiredMark } from "@/components/ui/form-field-hints";
-import { safeNextPath } from "@/lib/redirect";
+import { safeNextPath } from "@/lib/auth/redirect";
 
 function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);

@@ -1,11 +1,11 @@
 "use server";
-import { createClient } from "./supabase/server";
+import { createClient } from "../supabase/server";
 import type {
   AnalyticsRange,
   EngagementStats,
   ReachStats,
   ReviewStats,
-} from "./types";
+} from "../types";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 

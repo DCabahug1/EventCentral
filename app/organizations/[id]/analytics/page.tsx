@@ -5,7 +5,7 @@ import {
   getEngagementStats,
   getReachStats,
   getReviewStats,
-} from "@/lib/analyticsServer";
+} from "@/lib/analytics/server";
 import type { AnalyticsRange } from "@/lib/types";
 
 type PageProps = {

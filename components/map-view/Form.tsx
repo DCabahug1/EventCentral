@@ -15,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { SEARCH_CATEGORY_CONFIG } from "@/lib/categoryConfig";
+import { SEARCH_CATEGORY_CONFIG } from "@/lib/events/categories";
 import { addOneYear, daysFromNowDateString, todayDateString } from "@/lib/utils";
 
 type RegionBounds = {

@@ -8,7 +8,7 @@ import {
   DISCOVER_NEAR_ME_RADIUS_MILES,
   DISCOVER_PAGE_SIZE_GRID,
   DISCOVER_PAGE_SIZE_HAPPENING,
-} from "@/lib/discoverConstants";
+} from "@/lib/events/discover";
 import { motion, AnimatePresence } from "motion/react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "../ui/tabs";
 import ListEmptyState from "../ui/list-empty-state";

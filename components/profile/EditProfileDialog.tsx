@@ -28,7 +28,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
-export type EditProfileDialogProps = {
+type EditProfileDialogProps = {
   open: boolean;
   saving: boolean;
   formError: string;

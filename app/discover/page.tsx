@@ -5,12 +5,12 @@ import { APIProvider } from "@vis.gl/react-google-maps";
 import EventsList from "@/components/discover/EventsList";
 import EventsListSkeleton from "@/components/discover/EventsListSkeleton";
 import Hero from "@/components/discover/Hero";
-import { getEvents } from "@/lib/eventsClient";
+import { getEvents } from "@/lib/events/client";
 import { Event } from "@/lib/types";
 import {
   DISCOVER_NEAR_ME_RADIUS_MILES,
   type DiscoverRegionBounds,
-} from "@/lib/discoverConstants";
+} from "@/lib/events/discover";
 
 function DiscoverPageContent() {
   const [events, setEvents] = useState<Event[]>([]);

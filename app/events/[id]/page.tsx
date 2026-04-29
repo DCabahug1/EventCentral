@@ -2,14 +2,14 @@ import { notFound } from "next/navigation";
 import { PostgrestError } from "@supabase/supabase-js";
 import EventPageMapsProvider from "@/components/events/EventPageMapsProvider";
 import { createClient } from "@/lib/supabase/server";
-import { getEventById } from "@/lib/eventsServer";
-import { getOrganizationById } from "@/lib/organizations";
-import { getProfile } from "@/lib/profiles";
-import { getReviewsWithProfilesByEvent } from "@/lib/reviews";
-import { getEventAttendeeAvatars } from "@/lib/rsvp";
-import { isOrganization } from "@/lib/organizationPage";
+import { getEventById } from "@/lib/events/server";
+import { getOrganizationById } from "@/lib/organizations/server";
+import { getProfile } from "@/lib/profiles/server";
+import { getReviewsWithProfilesByEvent } from "@/lib/reviews/server";
+import { getEventAttendeeAvatars } from "@/lib/rsvp/server";
+import { isOrganization } from "@/lib/organizations/page";
 import EventPageContent from "@/components/events/EventPageContent";
-import { logPageView } from "@/lib/analyticsServer";
+import { logPageView } from "@/lib/analytics/server";
 import type { Organization } from "@/lib/types";
 
 type PageProps = {

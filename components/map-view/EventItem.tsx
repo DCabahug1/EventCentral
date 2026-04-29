@@ -2,7 +2,7 @@ import React from "react";
 import { Event } from "@/lib/types";
 import { ArrowUpRight, Calendar, MapPin, Users } from "lucide-react";
 import { formatDateTime, formatCount } from "@/lib/utils";
-import { getCategoryConfig } from "@/lib/categoryConfig";
+import { getCategoryConfig } from "@/lib/events/categories";
 import { Progress } from "../ui/progress";
 import { Button } from "../ui/button";
 import Link from "next/link";

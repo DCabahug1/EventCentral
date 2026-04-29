@@ -13,7 +13,10 @@
       "Bash(mkdir -p /tmp/design)",
       "Bash(tar -xf /tmp/design.html -C /tmp/design)",
       "Bash(xargs grep *)",
-      "Bash(grep -E \"\\(if|&&|\\\\\\\\?\\)\")"
+      "Bash(grep -E \"\\(if|&&|\\\\\\\\?\\)\")",
+      "Bash(pnpm remove *)",
+      "Bash(pnpm dlx *)",
+      "Bash(node reorg-lib.mjs)"
     ]
   }
 }

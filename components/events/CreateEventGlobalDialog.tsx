@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { APIProvider } from "@vis.gl/react-google-maps";
 import { PostgrestError } from "@supabase/supabase-js";
 import { Building2 } from "lucide-react";
-import { getOrganizationsByUserId } from "@/lib/organizations";
+import { getOrganizationsByUserId } from "@/lib/organizations/server";
 import type { Organization, Profile } from "@/lib/types";
 import CreateEventForm from "@/components/events/CreateEventForm";
 import { Button } from "@/components/ui/button";

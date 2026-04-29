@@ -1,6 +1,6 @@
 "use server";
-import { createClient } from "./supabase/server";
-import { Event } from "./types";
+import { createClient } from "../supabase/server";
+import { Event } from "../types";
 import { PostgrestError } from "@supabase/supabase-js";
 
 /** Returns upcoming/live events for the landing page featured strip. */
@@ -40,38 +40,6 @@ export async function getCategoryCounts(): Promise<Record<string, number>> {
   return Object.fromEntries(
     categories.map((cat, i) => [cat, results[i].count ?? 0])
   );
-}
-
-/** Returns confirmed RSVP events for one user. */
-export async function getAttendingEvents(userId?: string): Promise<Event[]> {
-  const supabase = await createClient();
-
-  const resolvedUserId = userId ?? (
-    await supabase.auth.getUser()
-  ).data.user?.id;
-  if (!resolvedUserId) return [];
-
-  const { data: rsvps, error: rsvpError } = await supabase
-    .from("rsvps")
-    .select("event_id")
-    .eq("user_id", resolvedUserId)
-    .eq("status", "CONFIRMED");
-
-  if (rsvpError || !rsvps || rsvps.length === 0) return [];
-
-  const ids = rsvps.map((r: { event_id: number }) => r.event_id);
-
-  const { data, error } = await supabase
-    .from("events")
-    .select(
-      "id,organization_id,organization_name,rsvp_count,user_id,title,description,start_time,end_time,address,location_details,lat,lng,max_capacity,image_url,category,CANCELLED,created_at,updated_at",
-    )
-    .in("id", ids)
-    .eq("CANCELLED", false)
-    .order("start_time", { ascending: true });
-
-  if (error || !data) return [];
-  return data as Event[];
 }
 
 export async function getAttendingEventsPage(

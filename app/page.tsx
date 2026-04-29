@@ -1,6 +1,6 @@
 import { AuthError } from "@supabase/supabase-js";
-import { getCurrentUser } from "@/lib/user";
-import { getCategoryCounts } from "@/lib/eventsServer";
+import { getCurrentUser } from "@/lib/auth/user";
+import { getCategoryCounts } from "@/lib/events/server";
 import LandingHero from "@/components/landing/LandingHero";
 import CategoriesSection from "@/components/landing/CategoriesSection";
 import HowItWorks from "@/components/landing/HowItWorks";

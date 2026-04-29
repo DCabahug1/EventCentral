@@ -1,6 +1,6 @@
 "use server";
-import { createClient } from "./supabase/server";
-import { Organization } from "./types";
+import { createClient } from "../supabase/server";
+import { Organization } from "../types";
 import { PostgrestError } from "@supabase/supabase-js";
 
 export const createOrganization = async (

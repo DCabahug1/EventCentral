@@ -10,7 +10,7 @@ import {
   CircleOff,
 } from "lucide-react";
 
-export type CategoryConfig = {
+type CategoryConfig = {
   label: string;
   icon: LucideIcon;
   colorClass: string;

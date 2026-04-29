@@ -14,9 +14,9 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { createRSVP, cancelRSVP, getEventRsvpCount } from "@/lib/rsvp";
-import { deleteEvent, updateEvent } from "@/lib/eventsServer";
-import { getEventStatus } from "@/lib/eventStatus";
+import { createRSVP, cancelRSVP, getEventRsvpCount } from "@/lib/rsvp/server";
+import { deleteEvent, updateEvent } from "@/lib/events/server";
+import { getEventStatus } from "@/lib/events/status";
 import EventHeader from "@/components/events/EventHeader";
 import EventLocationMap from "@/components/events/EventLocationMap";
 import EventReviews from "@/components/events/EventReviews";

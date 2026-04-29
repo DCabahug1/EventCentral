@@ -1,6 +1,6 @@
 'use server'
-import { createClient } from "./supabase/server";
-import { Review, ReviewWithProfile } from "./types";
+import { createClient } from "../supabase/server";
+import { Review, ReviewWithProfile } from "../types";
 import { PostgrestError } from "@supabase/supabase-js";
 
 type ReviewInput = Omit<Review, "id" | "user_id" | "created_at" | "edited_at">;
@@ -64,43 +64,6 @@ export const createReview = async (
 
   if (error) return error;
   return data as Review;
-}
-
-// Fetches all reviews for a given event.
-// Returns an array of reviews or a PostgrestError on failure.
-export const getReviewsByEvent = async (
-  event_id: number
-): Promise<Review[] | PostgrestError | null> => {
-  const supabase = await createClient();
-
-  const { data, error } = await supabase
-    .from('reviews')
-    .select('*')
-    .eq('event_id', event_id)
-    .order('created_at', { ascending: false });
-
-  if (error) return error;
-  return data as Review[];
-}
-
-// Fetches all reviews written by the currently authenticated user.
-// Returns an array of reviews or an Error/PostgrestError on failure.
-export const getReviewsByUser = async (): Promise<Review[] | Error | PostgrestError | null> => {
-  const supabase = await createClient();
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-  if (authError || !user) {
-    return new Error("User must be authenticated to view their reviews.");
-  }
-
-  const { data, error } = await supabase
-    .from('reviews')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false });
-
-  if (error) return error;
-  return data as Review[];
 }
 
 // Updates an existing review by ID.

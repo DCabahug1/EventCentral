@@ -1,6 +1,6 @@
 'use server'
-import { createClient } from "./supabase/server";
-import { RSVP } from "./types";
+import { createClient } from "../supabase/server";
+import { RSVP } from "../types";
 import { PostgrestError, SupabaseClient } from "@supabase/supabase-js";
 
 type RSVPInput = Omit<RSVP, "id" | "user_id" | "status" | "created_at">;
@@ -87,44 +87,6 @@ export const createRSVP = async (
   if (error) return error;
   await syncRsvpCount(supabase, input.event_id);
   return data as RSVP;
-}
-
-// Fetches all RSVPs for a given event.
-// Returns an array of RSVPs or a PostgrestError on failure.
-export const getRSVPsByEvent = async (
-  event_id: number
-): Promise<RSVP[] | PostgrestError | null> => {
-  const supabase = await createClient();
-
-  const { data, error } = await supabase
-    .from('rsvps')
-    .select('*')
-    .eq('event_id', event_id)
-    .eq('status', 'CONFIRMED')
-    .order('created_at', { ascending: false });
-
-  if (error) return error;
-  return data as RSVP[];
-}
-
-// Fetches all RSVPs for the currently authenticated user.
-// Returns an array of RSVPs or an Error/PostgrestError on failure.
-export const getRSVPsByUser = async (): Promise<RSVP[] | Error | PostgrestError | null> => {
-  const supabase = await createClient();
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-  if (authError || !user) {
-    return new Error("User must be authenticated to view RSVPs.");
-  }
-
-  const { data, error } = await supabase
-    .from('rsvps')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false });
-
-  if (error) return error;
-  return data as RSVP[];
 }
 
 // Returns the first `limit` confirmed attendee profiles (username + avatar_url) for an event.

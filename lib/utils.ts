@@ -9,7 +9,7 @@ export function formatCount(n: number): string {
   return n.toLocaleString("en-US");
 }
 
-export const MAX_IMAGE_UPLOAD_BYTES = 5 * 1024 * 1024;
+const MAX_IMAGE_UPLOAD_BYTES = 5 * 1024 * 1024;
 
 export function imageSizeError(file: File): string | null {
   if (file.size > MAX_IMAGE_UPLOAD_BYTES) {
@@ -18,7 +18,7 @@ export function imageSizeError(file: File): string | null {
   return null;
 }
 
-export function toDateString(d: Date): string {
+function toDateString(d: Date): string {
   return d.toISOString().split("T")[0];
 }
 

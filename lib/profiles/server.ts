@@ -1,6 +1,6 @@
 'use server'
-import { createClient } from "./supabase/server";
-import { Profile } from "./types";
+import { createClient } from "../supabase/server";
+import { Profile } from "../types";
 import { PostgrestError } from "@supabase/supabase-js";
 
 type ProfileInput = Omit<Profile, "id" | "user_id" | "email" | "created_at" | "updated_at" | "avatar_url"> & { avatar_url?: string | null };
@@ -74,21 +74,3 @@ export const updateProfile = async (
   return data as Profile;
 }
 
-// Deletes the currently authenticated user's profile.
-// Returns null on success or an Error/PostgrestError on failure.
-export const deleteProfile = async (): Promise<null | Error | PostgrestError> => {
-  const supabase = await createClient();
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-  if (authError || !user) {
-    return new Error("User must be authenticated to delete a profile.");
-  }
-
-  const { error } = await supabase
-    .from('profiles')
-    .delete()
-    .eq('user_id', user.id);
-
-  if (error) return error;
-  return null;
-}

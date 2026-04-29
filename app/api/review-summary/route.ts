@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { generateReviewSummary } from "@/lib/reviewSummary";
+import { generateReviewSummary } from "@/lib/reviews/summary";
 import type { Review } from "@/lib/types";
 
 export async function POST(request: Request) {

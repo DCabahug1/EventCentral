@@ -26,19 +26,19 @@ import {
   deleteOrganization,
   getOrganizationById,
   updateOrganization,
-} from "@/lib/organizations";
-import { getEventsByOrganizationIdPage } from "@/lib/eventsServer";
-import { logPageView } from "@/lib/analyticsServer";
-import { uploadOrganizationAsset } from "@/lib/bucketHandler";
+} from "@/lib/organizations/server";
+import { getEventsByOrganizationIdPage } from "@/lib/events/server";
+import { logPageView } from "@/lib/analytics/server";
+import { uploadOrganizationAsset } from "@/lib/storage/buckets";
 import { createClient } from "@/lib/supabase/client";
 import { PostgrestError } from "@supabase/supabase-js";
 import type { Organization, Event, Profile } from "@/lib/types";
-import { getProfile } from "@/lib/profiles";
+import { getProfile } from "@/lib/profiles/server";
 import {
   isOrganization,
   normalizeWebsite,
   ORG_EVENTS_PAGE_SIZE,
-} from "@/lib/organizationPage";
+} from "@/lib/organizations/page";
 import { toast } from "sonner";
 type OrganizationPageProps = {
   params: Promise<{ id: string }>;

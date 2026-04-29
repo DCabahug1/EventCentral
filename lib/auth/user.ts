@@ -1,5 +1,5 @@
 'use server'
-import { createClient } from "./supabase/server";
+import { createClient } from "../supabase/server";
 
 export const getCurrentUser = async () => {
   const supabase = await createClient();

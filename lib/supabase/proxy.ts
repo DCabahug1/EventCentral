@@ -1,9 +1,9 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { getProfile } from "../profiles";
+import { getProfile } from "../profiles/server";
 import { PostgrestError } from "@supabase/supabase-js";
 import { Profile } from "../types";
-import { safeNextPath } from "../redirect";
+import { safeNextPath } from "../auth/redirect";
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({

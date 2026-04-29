@@ -4,7 +4,7 @@ import { BarChart3, Globe, Mail, MapPin, Pencil, Phone, User } from "lucide-reac
 import { Button } from "@/components/ui/button";
 import { ExpandableDescription } from "@/components/ui/expandable-description";
 import { cn, formatUsPhoneDisplay, phoneDigitsForTel } from "@/lib/utils";
-import { normalizeWebsite } from "@/lib/organizationPage";
+import { normalizeWebsite } from "@/lib/organizations/page";
 import type { Organization, Profile } from "@/lib/types";
 
 type Props = {

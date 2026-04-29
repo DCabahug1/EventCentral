@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
-import { getProfile } from "@/lib/profiles";
-import { getOrganizationsByUserIdPage } from "@/lib/organizations";
-import { getAttendingEventsPage } from "@/lib/eventsServer";
+import { getProfile } from "@/lib/profiles/server";
+import { getOrganizationsByUserIdPage } from "@/lib/organizations/server";
+import { getAttendingEventsPage } from "@/lib/events/server";
 import ProfileSkeleton from "@/components/profile/ProfileSkeleton";
 import ProfilePageClient from "./ProfilePageClient";
 

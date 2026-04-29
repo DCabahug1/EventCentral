@@ -12,11 +12,11 @@ import {
 import Link from "next/link";
 import { Button } from "../ui/button";
 import { ChevronDown, LogOut, Moon, Sun, User } from "lucide-react";
-import { signOut } from "@/lib/auth";
+import { signOut } from "@/lib/auth/actions";
 import { AuthError } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { pastelColors } from "@/lib/avatarColors";
+import { pastelColors } from "@/lib/profiles/colors";
 import { useTheme } from "next-themes";
 
 function AvatarButton({ profile }: { profile: Profile }) {

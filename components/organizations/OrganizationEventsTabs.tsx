@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PaginationBar from "@/components/discover/PaginationBar";
 import EventCard from "@/components/events/EventCard";
 import ListEmptyState from "@/components/ui/list-empty-state";
-import { ORG_EVENTS_PAGE_SIZE } from "@/lib/organizationPage";
+import { ORG_EVENTS_PAGE_SIZE } from "@/lib/organizations/page";
 import type { Event, Organization } from "@/lib/types";
 
 type TabValue = "upcoming" | "past" | "cancelled";

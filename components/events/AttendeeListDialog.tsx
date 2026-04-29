@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import PaginationBar from "@/components/discover/PaginationBar";
 import { formatCount } from "@/lib/utils";
-import { getAttendeesPage, removeAttendee } from "@/lib/rsvp";
+import { getAttendeesPage, removeAttendee } from "@/lib/rsvp/server";
 
 const PAGE_SIZE = 20;
 

@@ -1,5 +1,5 @@
 'use client'
-import { createClient } from "./supabase/client";
+import { createClient } from "../supabase/client";
 
 export const signInWithGoogle = async (next: string = "/discover") => {
   const supabase = createClient();

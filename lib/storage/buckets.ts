@@ -1,10 +1,10 @@
 "use client";
-import { createClient } from "./supabase/client";
+import { createClient } from "../supabase/client";
 
 const MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024;
 const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
-export const uploadImageToBucket = async (
+const uploadImageToBucket = async (
   file: File,
   bucket: string,
   path: string,
@@ -30,11 +30,9 @@ export const uploadImageToBucket = async (
   return data.publicUrl;
 };
 
-/** Public bucket for org avatar & banner images (create in Supabase if missing). */
-export const ORGANIZATIONS_BUCKET = "organizations";
-export const PROFILES_BUCKET = "profiles";
-/** Event cover images (landscape-friendly). Create bucket in Supabase if missing. */
-export const EVENTS_BUCKET = "events";
+const ORGANIZATIONS_BUCKET = "organizations";
+const PROFILES_BUCKET = "profiles";
+const EVENTS_BUCKET = "events";
 
 export async function uploadOrganizationAsset(
   file: File,

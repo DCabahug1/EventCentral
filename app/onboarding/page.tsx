@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { createProfile } from "@/lib/profiles";
+import { createProfile } from "@/lib/profiles/server";
 import { AuthError } from "@supabase/supabase-js";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
@@ -13,7 +13,7 @@ import {
   OptionalFieldHint,
   RequiredMark,
 } from "@/components/ui/form-field-hints";
-import { safeNextPath } from "@/lib/redirect";
+import { safeNextPath } from "@/lib/auth/redirect";
 
 function formatPhoneNumber(value: string): string {
   const digits = value.replace(/\D/g, "").slice(0, 10);

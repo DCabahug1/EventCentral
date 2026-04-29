@@ -2,15 +2,15 @@
 
 import React, { useEffect, useId, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { updateProfile } from "@/lib/profiles";
+import { updateProfile } from "@/lib/profiles/server";
 import {
   createOrganization,
   getOrganizationsByUserIdPage,
-} from "@/lib/organizations";
-import { getAttendingEventsPage } from "@/lib/eventsServer";
+} from "@/lib/organizations/server";
+import { getAttendingEventsPage } from "@/lib/events/server";
 import { createClient } from "@/lib/supabase/client";
-import { uploadOrganizationAsset, uploadProfileAvatar } from "@/lib/bucketHandler";
-import { isOrganization, normalizeWebsite } from "@/lib/organizationPage";
+import { uploadOrganizationAsset, uploadProfileAvatar } from "@/lib/storage/buckets";
+import { isOrganization, normalizeWebsite } from "@/lib/organizations/page";
 import { formatUsPhoneDisplay, imageSizeError, phoneDigitsForTel } from "@/lib/utils";
 import { Event, Organization, Profile } from "@/lib/types";
 import { PostgrestError } from "@supabase/supabase-js";
@@ -20,7 +20,7 @@ import EventsSection from "@/components/profile/EventsSection";
 import DeleteAccountDialog from "@/components/profile/DeleteAccountDialog";
 import EditProfileDialog from "@/components/profile/EditProfileDialog";
 import NewOrganizationDialog from "@/components/organizations/NewOrganizationDialog";
-import { dispatchProfileUpdated } from "@/lib/profileEvents";
+import { dispatchProfileUpdated } from "@/lib/profiles/events";
 import { toast } from "sonner";
 
 const PROFILE_ORGS_PAGE_SIZE = 4;

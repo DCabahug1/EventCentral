@@ -7,10 +7,10 @@ import { MapPin, Calendar, Users } from "lucide-react";
 import { Progress } from "../ui/progress";
 import { Badge } from "../ui/badge";
 import { Skeleton } from "../ui/skeleton";
-import { getCategoryConfig } from "@/lib/categoryConfig";
+import { getCategoryConfig } from "@/lib/events/categories";
 import Link from "next/link";
 import { formatDateTime, formatCount } from "@/lib/utils";
-import { getOrganizationById } from "@/lib/organizations";
+import { getOrganizationById } from "@/lib/organizations/server";
 import { PostgrestError } from "@supabase/supabase-js";
 
 // Returns a Tailwind color class based on how full the event is

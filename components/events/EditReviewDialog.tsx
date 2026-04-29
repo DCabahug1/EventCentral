@@ -22,7 +22,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
-import { updateReview, deleteReview } from "@/lib/reviews";
+import { updateReview, deleteReview } from "@/lib/reviews/server";
 import type { ReviewWithProfile } from "@/lib/types";
 
 type Props = {

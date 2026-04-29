@@ -1,4 +1,4 @@
-import { Review } from "./types";
+import { Review } from "../types";
 import Anthropic from "@anthropic-ai/sdk";
 
 const buildPrompt = (reviews: Review[]) => {

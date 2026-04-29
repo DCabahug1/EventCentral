@@ -4,15 +4,15 @@ import { useEffect, useId, useRef, useState } from "react";
 import Image from "next/image";
 import { useMapsLibrary } from "@vis.gl/react-google-maps";
 import { Upload } from "lucide-react";
-import { createEvent } from "@/lib/eventsServer";
-import { isEvent } from "@/lib/eventPage";
+import { createEvent } from "@/lib/events/server";
+import { isEvent } from "@/lib/events/page";
 import {
   CATEGORY_CONFIG,
   DEFAULT_EVENT_CATEGORY,
-} from "@/lib/categoryConfig";
+} from "@/lib/events/categories";
 import type { Event, Organization } from "@/lib/types";
 import { createClient } from "@/lib/supabase/client";
-import { uploadEventImage } from "@/lib/bucketHandler";
+import { uploadEventImage } from "@/lib/storage/buckets";
 import { cn, imageSizeError } from "@/lib/utils";
 import {
   Field,
@@ -58,7 +58,7 @@ function toLocalInput(d: Date): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
-export type CreateEventFormProps = {
+type CreateEventFormProps = {
   org: Organization;
   /** Root form id (for submit buttons in footers via `form=`). */
   formId: string;

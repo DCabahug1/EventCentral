@@ -5,9 +5,9 @@ import Image from "next/image";
 import { Calendar, MapPin, Users, Pencil, Building } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { getCategoryConfig } from "@/lib/categoryConfig";
+import { getCategoryConfig } from "@/lib/events/categories";
 import { formatDateTime, cn, formatCount } from "@/lib/utils";
-import { EVENT_STATUS_CONFIG, type EventStatus } from "@/lib/eventStatus";
+import { EVENT_STATUS_CONFIG, type EventStatus } from "@/lib/events/status";
 import type { Event, Organization } from "@/lib/types";
 
 type Props = {

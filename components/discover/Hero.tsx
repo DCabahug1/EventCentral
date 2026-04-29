@@ -6,10 +6,10 @@ import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { X, LoaderCircle, Locate, MapPin, SearchIcon } from "lucide-react";
 import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
-import { SEARCH_CATEGORY_CONFIG } from "@/lib/categoryConfig";
+import { SEARCH_CATEGORY_CONFIG } from "@/lib/events/categories";
 import { useMapsLibrary } from "@vis.gl/react-google-maps";
 import LocationInput from "@/components/map-view/LocationInput";
-import type { DiscoverRegionBounds } from "@/lib/discoverConstants";
+import type { DiscoverRegionBounds } from "@/lib/events/discover";
 import { Input } from "../ui/input";
 
 function Hero({
