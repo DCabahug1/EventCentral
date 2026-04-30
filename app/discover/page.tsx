@@ -71,9 +71,11 @@ function DiscoverPageContent() {
   }, [fetchEvents]);
 
   const scrollToEvents = () =>
-    eventsListRef.current?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
+    requestAnimationFrame(() => {
+      eventsListRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
     });
 
   const handleFindIt = (keyword: string) => {
