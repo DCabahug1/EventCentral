@@ -8,11 +8,10 @@ import {
   useRef,
   useState,
 } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { APIProvider } from "@vis.gl/react-google-maps";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import NotFoundContent from "@/components/ui/not-found-content";
 import OrganizationBackLink from "@/components/organizations/OrganizationBackLink";
 import OrganizationBanner from "@/components/organizations/OrganizationBanner";
 import DeleteOrganizationDialog from "@/components/organizations/DeleteOrganizationDialog";
@@ -385,15 +384,12 @@ export default function OrganizationPage({ params }: OrganizationPageProps) {
 
   if (notFound || !org) {
     return (
-      <div className="flex min-h-svh flex-col items-center justify-center gap-4 bg-background px-4">
-        <h1 className="text-2xl font-bold tracking-tight">Organization not found</h1>
-        <p className="text-center text-sm text-muted-foreground">
-          This organization does not exist or you do not have access.
-        </p>
-        <Button asChild>
-          <Link href="/discover">Back to Discover</Link>
-        </Button>
-      </div>
+      <NotFoundContent
+        title="Organization not found"
+        description="This organization doesn't exist or you don't have access."
+        href="/discover"
+        linkLabel="Back to Discover"
+      />
     );
   }
 
