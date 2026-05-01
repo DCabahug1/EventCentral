@@ -3,7 +3,7 @@
 ## Layout Spacing
 
 - Prefer **flex/grid `gap`** (and container padding) for space **between** siblings.
-- Minimize directional margin and padding (`mt-*`, `mb-*`, `ml-*`, `mr-*`, `pt-*`, `pb-*`, `pl-*`, `pr-*`). Use them only when necessary — for example one-off offsets, overlapping layers, or markup you cannot wrap in a flex/grid parent.
+- Minimize directional margin and padding (`mt-*`, `mb-*`, `ml-*`, `mr-*`, `pt-*`, `pb-*`, `pl-*`, `pr-*`). Use them only when necessary, for example one-off offsets, overlapping layers, or markup you cannot wrap in a flex/grid parent.
 - When spacing belongs on the **container** (padding on all sides or symmetric horizontal/vertical), prefer **`p-*`**, **`px-*`**, or **`py-*`** on the container instead of per-child directional margins.
 
 **Prefer**
@@ -30,11 +30,11 @@
 
 ### Next.js async `params` / `searchParams`
 
-In Next.js 15+, `params` and `searchParams` on pages/layouts are **Promises**. **Server Components:** `await params`. **`"use client"` pages:** unwrap with **`use(params)`** from React — type props as `params: Promise<{ ... }>` and do not read properties synchronously (avoids sync dynamic API / enumeration warnings).
+In Next.js 15+, `params` and `searchParams` on pages/layouts are **Promises**. **Server Components:** `await params`. **`"use client"` pages:** unwrap with **`use(params)`** from React, type props as `params: Promise<{ ... }>` and do not read properties synchronously (avoids sync dynamic API / enumeration warnings).
 
 ### Goals
 
-- **Route files** (`app/**/page.tsx`, `layout.tsx`) stay **readable**: routing, data loading, URL/search params, client state, and wiring handlers — not long JSX trees or repeated markup.
+- **Route files** (`app/**/page.tsx`, `layout.tsx`) stay **readable**: routing, data loading, URL/search params, client state, and wiring handlers, not long JSX trees or repeated markup.
 - **UI and layout** for a feature live under **`components/<feature>/`** with **one main concern per file** (e.g. `OrganizationBanner.tsx`, `OrganizationProfileHeader.tsx`).
 - **Reusable logic** that is not UI (constants, pure helpers, type guards) belongs in **`lib/`**, co-located by domain when it only serves one feature.
 

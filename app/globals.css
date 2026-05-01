@@ -38,6 +38,7 @@
   --font-sans: Afacad Flux, ui-sans-serif, sans-serif, system-ui;
   --font-serif: Noto Serif, ui-serif, serif;
   --font-mono: DM Mono, ui-monospace, monospace;
+  --font-display: Bebas Neue, sans-serif;
   --radius: 0rem;
   --shadow-x: 0px;
   --shadow-y: 1px;
@@ -147,6 +148,7 @@
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
   --font-serif: var(--font-serif);
+  --font-display: var(--font-display);
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);

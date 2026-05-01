@@ -32,10 +32,10 @@ export default function EventPageSkeleton() {
           <Skeleton className="h-4 w-28 rounded-none" />
         </div>
 
-        {/* Header — mobile image */}
+        {/* Header, mobile image */}
         <Skeleton className="mb-6 aspect-video w-full rounded-none lg:hidden" />
 
-        {/* Header — 2-col on desktop */}
+        {/* Header, 2-col on desktop */}
         <div className="mb-8 grid grid-cols-1 gap-10 lg:grid-cols-2 lg:items-start">
           <div className="flex flex-col gap-3">
             <Skeleton className="h-4 w-16 rounded-none" />

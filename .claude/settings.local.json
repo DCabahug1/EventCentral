@@ -16,7 +16,21 @@
       "Bash(grep -E \"\\(if|&&|\\\\\\\\?\\)\")",
       "Bash(pnpm remove *)",
       "Bash(pnpm dlx *)",
-      "Bash(node reorg-lib.mjs)"
+      "Bash(node reorg-lib.mjs)",
+      "Bash(pnpm add *)",
+      "WebFetch(domain:motion.dev)",
+      "WebFetch(domain:examples.motion.dev)",
+      "Bash(curl -s --range 0-80000 \"https://api.anthropic.com/v1/design/h/9h0VLfKQHWA855z7bkQntQ?open_file=Landing+Page+v2.html\")",
+      "Bash(curl -s --compressed \"https://api.anthropic.com/v1/design/h/9h0VLfKQHWA855z7bkQntQ\" -D -)",
+      "Read(//c/Users/Jeremiah/.claude/projects/c--Users-Jeremiah-Documents-GitHub-EventCentral/**)",
+      "Bash(curl -s \"https://api.anthropic.com/v1/design/h/9h0VLfKQHWA855z7bkQntQ\" -o handoff.tar.gz)",
+      "Bash(tar -tzf handoff.tar.gz)",
+      "Bash(tar -xzf handoff.tar.gz eventcentral/README.md)",
+      "Bash(tar -xzf handoff.tar.gz \"eventcentral/project/Landing Page v2.html\")",
+      "Bash(sed -i 's/\\\\* 0\\\\.06/\\\\* 0.2/g' \"c:/Users/Jeremiah/Documents/GitHub/EventCentral/components/landing/LandingHero.tsx\")",
+      "Bash(sed -i 's/delay: 0\\\\.55/delay: 1.0/' \"c:/Users/Jeremiah/Documents/GitHub/EventCentral/components/landing/LandingHero.tsx\")",
+      "Bash(sed -i 's/delay: 0\\\\.65/delay: 1.1/' \"c:/Users/Jeremiah/Documents/GitHub/EventCentral/components/landing/LandingHero.tsx\")",
+      "Bash(python3 -c ' *)"
     ]
   }
 }

@@ -146,7 +146,6 @@ function MapViewPage() {
 
       const scroller = contentScrollRef.current;
       if (scroller) {
-        // Safari is more reliable with explicit scrollTop on nested containers.
         const scrollerRect = scroller.getBoundingClientRect();
         const cardRect = card.getBoundingClientRect();
         const targetTop = Math.max(
@@ -184,7 +183,6 @@ function MapViewPage() {
       void fetchEvents({ ...DEFAULT_QUERY });
     };
     void init();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [focusEventId]);
 
   return (
@@ -195,7 +193,7 @@ function MapViewPage() {
         style={{ "--sidebar-offset": "4rem", minHeight: 0 } as React.CSSProperties}
         className="h-[calc(100svh-64px)]"
       >
-        {/* Filter sidebar — visible on desktop, slides off-canvas when toggled */}
+        {/* Filter sidebar, visible on desktop, slides off-canvas when toggled */}
         <Sidebar collapsible="offcanvas">
           <SidebarContent className="p-4">
             <Form fetchEvents={fetchEvents} appliedQuery={appliedQuery} />
@@ -203,13 +201,13 @@ function MapViewPage() {
         </Sidebar>
 
         {/* Main content: map stacked above event list */}
-        <div ref={contentScrollRef} className="flex-1 flex flex-col overflow-y-auto relative">
-          {/* Mobile filter trigger — opens FiltersDialog */}
+        <div ref={contentScrollRef} className="flex-1 flex flex-col overflow-y-auto relative" data-lenis-prevent>
+          {/* Mobile filter trigger, opens FiltersDialog */}
           <div className="absolute top-4 left-4 z-10 md:hidden">
             <FiltersDialog fetchEvents={fetchEvents} appliedQuery={appliedQuery} />
           </div>
 
-          {/* Desktop sidebar toggle — floats over the top-left of the map */}
+          {/* Desktop sidebar toggle, floats over the top-left of the map */}
           <div className="absolute top-4 left-4 z-10 hidden md:block">
             <SidebarTrigger className="bg-background shadow-sm border" />
           </div>
