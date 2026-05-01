@@ -39,7 +39,7 @@ function StepCard({ image, heading, index, isActive }: { image: string; heading:
   return (
     <motion.div
       className={cn(
-        "w-full aspect-3/2 overflow-hidden rounded-md border border-border/50 flex flex-col transition-[filter] duration-500",
+        "w-full aspect-3/2 overflow-hidden rounded-md border border-border/50 flex flex-col transition-[filter] duration-500 ",
         !isActive && "lg:brightness-50",
       )}
       initial={{ opacity: 0, y: 40, scale: 0.97 }}
@@ -47,7 +47,7 @@ function StepCard({ image, heading, index, isActive }: { image: string; heading:
       viewport={{ once: true, margin: "-60px 0px" }}
       transition={{ duration: 0.85, delay: index * 0.08, ease: [0.2, 0.7, 0.2, 1] }}
     >
-      <div className="shrink-0 flex items-center justify-center gap-3 px-4 h-9 bg-card border-b border-border/50 relative">
+      <div className="shrink-0 flex items-center justify-center gap-3 px-4 h-9 bg-card border-b border-border/50 relative ">
         <div className="absolute left-4 flex gap-1.5">
           <div className="w-2.5 h-2.5 rounded-full bg-[#ff5f57]" />
           <div className="w-2.5 h-2.5 rounded-full bg-[#febc2e]" />
@@ -149,11 +149,12 @@ export default function HowItWorks() {
         </div>
 
         {/* Right: stacked images — desktop only */}
-        <div className="hidden lg:flex flex-col gap-6">
+        <div className="hidden lg:flex flex-col gap-[35svh]">
           {STEPS.map((step, i) => (
             <div
               key={i}
               ref={(el) => { stepRefs.current[i] = el; }}
+              className='sticky top-[25svh]'
             >
               <StepCard image={step.image} heading={step.heading} index={i} isActive={i === activeStep} />
             </div>
