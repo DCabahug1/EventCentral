@@ -7,6 +7,7 @@ import {
   useTransform,
   type MotionValue,
 } from "motion/react";
+import Image from "next/image";
 import { Zap, BarChart2, Building2, CalendarPlus, Music } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -94,26 +95,52 @@ function StatsCardBody() {
 
 // ── Desktop: scroll-driven absolutely-positioned cards ────────────────────────
 
-function DesktopCards({ a1, a2, a3 }: { a1: CardAnim; a2: CardAnim; a3: CardAnim }) {
+function DesktopCards({
+  a1,
+  a2,
+  a3,
+}: {
+  a1: CardAnim;
+  a2: CardAnim;
+  a3: CardAnim;
+}) {
   return (
     <div className="relative w-full h-120 max-w-140 mx-auto">
       <motion.div
         className="absolute top-[6%] left-0 w-[62%] bg-card border border-border/50 p-5 flex flex-col gap-2"
-        style={{ transformPerspective: 700, rotateZ: -4, opacity: a1.opacity, y: a1.y, scale: a1.scale }}
+        style={{
+          transformPerspective: 700,
+          rotateZ: -4,
+          opacity: a1.opacity,
+          y: a1.y,
+          scale: a1.scale,
+        }}
       >
         <OrgCardBody />
       </motion.div>
 
       <motion.div
         className="absolute top-[34%] right-0 w-[55%] bg-card border border-border/50 p-5 flex flex-col gap-2"
-        style={{ transformPerspective: 700, rotateZ: 3, opacity: a2.opacity, y: a2.y, scale: a2.scale }}
+        style={{
+          transformPerspective: 700,
+          rotateZ: 3,
+          opacity: a2.opacity,
+          y: a2.y,
+          scale: a2.scale,
+        }}
       >
         <EventCardBody />
       </motion.div>
 
       <motion.div
         className="absolute bottom-[4%] left-[8%] w-[68%] bg-card border border-border/50 p-5 flex flex-col gap-2"
-        style={{ transformPerspective: 700, rotateZ: -5, opacity: a3.opacity, y: a3.y, scale: a3.scale }}
+        style={{
+          transformPerspective: 700,
+          rotateZ: -5,
+          opacity: a3.opacity,
+          y: a3.y,
+          scale: a3.scale,
+        }}
       >
         <StatsCardBody />
       </motion.div>
@@ -174,47 +201,53 @@ export default function HostSection() {
 
   // ── Left cards ──────────────────────────────────────────────────────────────
   const c1 = {
-    opacity: useTransform(scrollYProgress, [0, 0.18], [0.4, 0.95]),
-    y:       useTransform(scrollYProgress, [0, 0.18], [12, 0]),
-    scale:   useTransform(scrollYProgress, [0, 0.18], [0.97, 1]),
+    opacity: useTransform(scrollYProgress, [0, 0.18], [0, 0.95]),
+    y: useTransform(scrollYProgress, [0, 0.18], [12, 0]),
+    scale: useTransform(scrollYProgress, [0, 0.18], [0.97, 1]),
   };
   const c2 = {
     opacity: useTransform(scrollYProgress, [0.3, 0.47], [0, 0.95]),
-    y:       useTransform(scrollYProgress, [0.3, 0.47], [20, 0]),
-    scale:   useTransform(scrollYProgress, [0.3, 0.47], [0.95, 1]),
+    y: useTransform(scrollYProgress, [0.3, 0.47], [20, 0]),
+    scale: useTransform(scrollYProgress, [0.3, 0.47], [0.95, 1]),
   };
   const c3 = {
     opacity: useTransform(scrollYProgress, [0.55, 0.72], [0, 0.95]),
-    y:       useTransform(scrollYProgress, [0.55, 0.72], [20, 0]),
-    scale:   useTransform(scrollYProgress, [0.55, 0.72], [0.95, 1]),
+    y: useTransform(scrollYProgress, [0.55, 0.72], [20, 0]),
+    scale: useTransform(scrollYProgress, [0.55, 0.72], [0.95, 1]),
   };
 
   // ── Right panel ─────────────────────────────────────────────────────────────
-  const headingOpacity = useTransform(scrollYProgress, [0, 0.08],   [0.5, 1]);
-  const headingY       = useTransform(scrollYProgress, [0, 0.08],   [10, 0]);
-  const paraOpacity    = useTransform(scrollYProgress, [0, 0.12],   [0.3, 1]);
-  const paraY          = useTransform(scrollYProgress, [0, 0.12],   [8, 0]);
+  const headingOpacity = useTransform(scrollYProgress, [0, 0.08], [0, 1]);
+  const headingY = useTransform(scrollYProgress, [0, 0.08], [10, 0]);
+  const paraOpacity = useTransform(scrollYProgress, [0, 0.12], [0, 1]);
+  const paraY = useTransform(scrollYProgress, [0, 0.12], [8, 0]);
   // List items synced 1-to-1 with their card
   const ptOpacity = [
     useTransform(scrollYProgress, [0.05, 0.22], [0, 1]),
-    useTransform(scrollYProgress, [0.3,  0.47], [0, 1]),
+    useTransform(scrollYProgress, [0.3, 0.47], [0, 1]),
     useTransform(scrollYProgress, [0.55, 0.72], [0, 1]),
   ];
   const ptX = [
     useTransform(scrollYProgress, [0.05, 0.22], [-8, 0]),
-    useTransform(scrollYProgress, [0.3,  0.47], [-8, 0]),
+    useTransform(scrollYProgress, [0.3, 0.47], [-8, 0]),
     useTransform(scrollYProgress, [0.55, 0.72], [-8, 0]),
   ];
   const btnOpacity = useTransform(scrollYProgress, [0.72, 0.85], [0, 1]);
-  const btnScale   = useTransform(scrollYProgress, [0.72, 0.85], [0.95, 1]);
-  const btnY       = useTransform(scrollYProgress, [0.72, 0.85], [8, 0]);
+  const btnScale = useTransform(scrollYProgress, [0.72, 0.85], [0.95, 1]);
+  const btnY = useTransform(scrollYProgress, [0.72, 0.85], [8, 0]);
 
   return (
     <div ref={containerRef} className="lg:min-h-[200vh] relative">
-      <section className="py-26 md:py-32 lg:py-0 lg:sticky lg:top-0 lg:h-svh lg:flex lg:items-center border-b border-border/50 bg-primary/5">
-        <div className="max-w-330 mx-auto px-6 md:px-10 w-full">
+      <section className="relative overflow-hidden py-26 md:py-32 lg:py-0 lg:sticky lg:top-0 lg:h-svh lg:flex lg:items-center border-b border-border/50">
+        <Image
+          src="/landing-page/CTAImages/CTABackground.jpeg"
+          alt=""
+          fill
+          className="object-cover object-center"
+        />
+        <div className="absolute inset-0 bg-black/80" />
+        <div className="relative max-w-330 mx-auto px-6 md:px-10 w-full">
           <div className="grid grid-cols-1 gap-14 lg:grid-cols-2 lg:gap-20 items-center">
-
             {/* Cards — mobile uses whileInView, desktop uses scroll-driven */}
             <div className="lg:hidden">
               <MobileCards />
@@ -226,7 +259,7 @@ export default function HostSection() {
             {/* Right panel */}
             <div>
               <motion.h2
-                className="text-[clamp(40px,5.2vw,64px)] leading-[1.02] tracking-[-0.02em] font-semibold max-w-[18ch]"
+                className="text-[clamp(40px,5.2vw,64px)] leading-[1.02] tracking-[-0.02em] font-semibold max-w-[18ch] text-white"
                 style={{ opacity: headingOpacity, y: headingY }}
               >
                 Publish in <em className="not-italic text-primary">minutes.</em>{" "}
@@ -248,7 +281,7 @@ export default function HostSection() {
                   return (
                     <motion.li
                       key={pt.title}
-                      className="grid grid-cols-[auto_1fr] gap-4 items-start"
+                      className="grid grid-cols-[auto_1fr] gap-4 items-start text-white"
                       style={{ opacity: ptOpacity[i], x: ptX[i] }}
                     >
                       <div className="w-8 h-8 border border-border flex items-center justify-center text-primary shrink-0">
@@ -277,7 +310,6 @@ export default function HostSection() {
                 </Button>
               </motion.div>
             </div>
-
           </div>
         </div>
       </section>
