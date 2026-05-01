@@ -10,8 +10,10 @@ import { PROFILE_UPDATED_EVENT } from "@/lib/profiles/events";
 import { PostgrestError } from "@supabase/supabase-js";
 import { Profile } from "@/lib/types";
 import { AuthError } from "@supabase/supabase-js";
+import dynamic from "next/dynamic";
 import DesktopNav from "./DesktopNav";
-import MobileNav from "./MobileNav";
+
+const MobileNav = dynamic(() => import("./MobileNav"), { ssr: false });
 import CreateEventGlobalDialog from "@/components/events/CreateEventGlobalDialog";
 import { Button } from "@/components/ui/button";
 

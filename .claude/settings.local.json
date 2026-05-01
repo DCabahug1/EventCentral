@@ -16,7 +16,10 @@
       "Bash(grep -E \"\\(if|&&|\\\\\\\\?\\)\")",
       "Bash(pnpm remove *)",
       "Bash(pnpm dlx *)",
-      "Bash(node reorg-lib.mjs)"
+      "Bash(node reorg-lib.mjs)",
+      "Bash(pnpm add *)",
+      "WebFetch(domain:motion.dev)",
+      "WebFetch(domain:examples.motion.dev)"
     ]
   }
 }
