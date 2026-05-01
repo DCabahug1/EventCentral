@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "motion/react";
 import { Compass, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -10,10 +11,18 @@ interface LandingCtaProps {
 
 export default function LandingCta({ isLoggedIn }: LandingCtaProps) {
   return (
-    <section className="py-36 text-center">
-      <div className="max-w-330 mx-auto px-6 md:px-10 flex flex-col items-center gap-5">
+    <section className="relative py-36 text-center overflow-hidden">
+      <Image
+        src="/landing-page/CTAImages/CTABackground.jpeg"
+        alt=""
+        fill
+        className="object-cover object-center"
+        priority={false}
+      />
+      <div className="absolute inset-0 bg-black/70" />
+      <div className="relative max-w-330 mx-auto px-6 md:px-10 flex flex-col items-center gap-5">
         <motion.h2
-          className="text-[clamp(44px,7vw,96px)] leading-[0.98] tracking-[-0.03em] font-semibold"
+          className="text-[clamp(44px,7vw,96px)] leading-[0.98] tracking-[-0.03em] font-semibold text-white"
           initial={{ opacity: 0, y: 48 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-40px 0px" }}
@@ -59,5 +68,6 @@ export default function LandingCta({ isLoggedIn }: LandingCtaProps) {
         </motion.div>
       </div>
     </section>
+
   );
 }
