@@ -4,6 +4,12 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/lib/utils";
 import { Globe } from "lucide-react";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  type CarouselApi,
+} from "@/components/ui/carousel";
 
 const STEPS = [
   {
@@ -29,16 +35,18 @@ const STEPS = [
   },
 ];
 
-function StepCard({ image, heading, index }: { image: string; heading: string; index: number }) {
+function StepCard({ image, heading, index, isActive }: { image: string; heading: string; index: number; isActive: boolean }) {
   return (
     <motion.div
-      className="w-full aspect-3/2 overflow-hidden rounded-md border border-border/50 flex flex-col"
+      className={cn(
+        "w-full aspect-3/2 overflow-hidden rounded-md border border-border/50 flex flex-col transition-[filter] duration-500",
+        !isActive && "lg:brightness-50",
+      )}
       initial={{ opacity: 0, y: 40, scale: 0.97 }}
       whileInView={{ opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: true, margin: "-60px 0px" }}
       transition={{ duration: 0.85, delay: index * 0.08, ease: [0.2, 0.7, 0.2, 1] }}
     >
-      {/* Brows container */}
       <div className="shrink-0 flex items-center justify-center gap-3 px-4 h-9 bg-card border-b border-border/50 relative">
         <div className="absolute left-4 flex gap-1.5">
           <div className="w-2.5 h-2.5 rounded-full bg-[#ff5f57]" />
@@ -54,7 +62,6 @@ function StepCard({ image, heading, index }: { image: string; heading: string; i
           </div>
         </div>
       </div>
-      {/* Screenshot */}
       <div className="relative flex-1">
         <Image
           src={image}
@@ -71,6 +78,9 @@ export default function HowItWorks() {
   const [activeStep, setActiveStep] = useState(0);
   const activeStepRef = useRef(0);
   const stepRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
+  const [mobileStep, setMobileStep] = useState(0);
 
   useEffect(() => {
     const update = () => {
@@ -91,12 +101,19 @@ export default function HowItWorks() {
     return () => window.removeEventListener("scroll", update);
   }, []);
 
+  useEffect(() => {
+    if (!carouselApi) return;
+    const onSelect = () => setMobileStep(carouselApi.selectedScrollSnap());
+    carouselApi.on("select", onSelect);
+    return () => { carouselApi.off("select", onSelect); };
+  }, [carouselApi]);
+
   return (
     <section className="border-b border-border/50 bg-secondary dark:bg-secondary/10">
-      {/* Two-column body — even 50/50 split on desktop */}
-      <div className="max-w-330 mx-auto px-6 md:px-10 py-26 md:py-32 grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-20 items-start">
-        {/* Left: sticky text panel */}
-        <div className="hidden md:flex w-full aspect-3/2 self-start sticky top-[25svh] flex-col justify-center gap-12">
+      <div className="max-w-330 mx-auto px-6 md:px-10 py-26 md:py-32 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-20 items-start">
+
+        {/* Left: sticky text panel — desktop only */}
+        <div className="hidden lg:flex w-full aspect-3/2 self-start sticky top-[25svh] flex-col justify-center gap-12">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeStep}
@@ -110,16 +127,14 @@ export default function HowItWorks() {
                 <span className="text-primary">{STEPS[activeStep].label}</span>
                 <span className="text-muted-foreground"> / 03</span>
               </span>
-              <h3 className="text-[clamp(40px,5.2vw,64px)] leading-[1.02] tracking-[-0.02em] font-semibold">
+              <h3 className="text-5xl lg:text-[clamp(48px,5.2vw,64px)] leading-[1.02] tracking-[-0.02em] font-semibold">
                 {STEPS[activeStep].heading}
               </h3>
-              <p className="text-base text-muted-foreground leading-[1.6] max-w-[44ch]">
+              <p className="text-base lg:text-lg text-muted-foreground leading-[1.6] max-w-[44ch]">
                 {STEPS[activeStep].description}
               </p>
             </motion.div>
           </AnimatePresence>
-
-          {/* Step progress bars */}
           <div className="flex gap-2">
             {STEPS.map((_, i) => (
               <div
@@ -133,32 +148,57 @@ export default function HowItWorks() {
           </div>
         </div>
 
-        {/* Right: parallax image stack */}
-        <div className="w-full flex flex-col gap-6">
+        {/* Right: stacked images — desktop only */}
+        <div className="hidden lg:flex flex-col gap-6">
           {STEPS.map((step, i) => (
             <div
               key={i}
-              ref={(el) => {
-                stepRefs.current[i] = el;
-              }}
-              className="flex flex-col gap-3"
+              ref={(el) => { stepRefs.current[i] = el; }}
             >
-              <StepCard image={step.image} heading={step.heading} index={i} />
-              {/* Mobile-only label */}
-              <div className="md:hidden flex flex-col gap-1">
-                <span className="text-[11px] font-mono tracking-[0.1em] uppercase text-primary">
-                  {step.label}
-                </span>
-                <h3 className="text-xl font-semibold tracking-[-0.01em]">
-                  {step.heading}
-                </h3>
-                <p className="text-sm text-muted-foreground leading-[1.6]">
-                  {step.description}
-                </p>
-              </div>
+              <StepCard image={step.image} heading={step.heading} index={i} isActive={i === activeStep} />
             </div>
           ))}
         </div>
+
+        {/* Carousel — mobile and tablet */}
+        <div className="lg:hidden flex flex-col gap-6">
+          <Carousel setApi={setCarouselApi} opts={{ loop: false }} className="w-full">
+            <CarouselContent>
+              {STEPS.map((step, i) => (
+                <CarouselItem key={i}>
+                  <div className="flex flex-col gap-4 md:gap-5">
+                    <StepCard image={step.image} heading={step.heading} index={i} isActive={true} />
+                    <div className="flex flex-col gap-1 md:gap-2 px-1">
+                      <span className="text-sm md:text-base tracking-[0.1em] uppercase text-primary">
+                        {step.label}
+                      </span>
+                      <h3 className="text-2xl md:text-4xl font-semibold tracking-[-0.01em]">
+                        {step.heading}
+                      </h3>
+                      <p className="text-sm md:text-base text-muted-foreground leading-[1.6]">
+                        {step.description}
+                      </p>
+                    </div>
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+          </Carousel>
+
+          {/* Progress bars synced to carousel */}
+          <div className="flex gap-2 px-1">
+            {STEPS.map((_, i) => (
+              <div
+                key={i}
+                className={cn(
+                  "h-px w-8 transition-all duration-500",
+                  i === mobileStep ? "bg-primary w-12" : "bg-border",
+                )}
+              />
+            ))}
+          </div>
+        </div>
+
       </div>
     </section>
   );
