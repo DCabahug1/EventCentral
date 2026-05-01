@@ -75,7 +75,7 @@ export default function LandingHero({ isLoggedIn }: LandingHeroProps) {
 
       {/* Scroll indicator */}
       <motion.div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-2 flex flex-col items-center gap-1"
+        className="absolute hidden sm:flex bottom-8 left-1/2 -translate-x-1/2 z-2 flex-col items-center gap-1"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.4, duration: 0.6 }}
