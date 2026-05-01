@@ -29,14 +29,14 @@ const STEPS = [
   },
 ];
 
-function StepCard({ image, heading }: { image: string; heading: string }) {
+function StepCard({ image, heading, index }: { image: string; heading: string; index: number }) {
   return (
     <motion.div
       className="w-full aspect-3/2 overflow-hidden rounded-md border border-border/50 flex flex-col"
-      initial={{ opacity: 0, y: 32 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-80px 0px" }}
-      transition={{ duration: 0.7, ease: [0.2, 0.7, 0.2, 1] }}
+      initial={{ opacity: 0, y: 40, scale: 0.97 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: true, margin: "-60px 0px" }}
+      transition={{ duration: 0.85, delay: index * 0.08, ease: [0.2, 0.7, 0.2, 1] }}
     >
       {/* Brows container */}
       <div className="shrink-0 flex items-center justify-center gap-3 px-4 h-9 bg-card border-b border-border/50 relative">
@@ -143,7 +143,7 @@ export default function HowItWorks() {
               }}
               className="flex flex-col gap-3"
             >
-              <StepCard image={step.image} heading={step.heading} />
+              <StepCard image={step.image} heading={step.heading} index={i} />
               {/* Mobile-only label */}
               <div className="md:hidden flex flex-col gap-1">
                 <span className="text-[11px] font-mono tracking-[0.1em] uppercase text-primary">

@@ -61,20 +61,20 @@ export default function CategoriesSection({ counts }: CategoriesSectionProps) {
 
         <motion.p
           className="mt-[18px] text-muted-foreground text-base leading-[1.6] max-w-[58ch]"
-          initial={{ opacity: 0, y: 28 }}
+          initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-40px 0px" }}
-          transition={{ duration: 0.9, delay: 0.16, ease: [0.2, 0.7, 0.2, 1] }}
+          transition={{ duration: 0.75, delay: 0.1, ease: [0.2, 0.7, 0.2, 1] }}
         >
           Filter by what you&apos;re in the mood for. Every listing shows date, location, and capacity.
         </motion.p>
 
         <motion.div
           className="mt-14"
-          initial={{ opacity: 0, y: 28 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
           viewport={{ once: true, margin: "-40px 0px" }}
-          transition={{ duration: 0.9, delay: 0.16, ease: [0.2, 0.7, 0.2, 1] }}
+          transition={{ duration: 1.1, delay: 0.22, ease: [0.2, 0.7, 0.2, 1] }}
         >
           <div className="overflow-hidden relative [-webkit-mask-image:linear-gradient(to_right,transparent,black_60px,black_calc(100%_-_60px),transparent)] [mask-image:linear-gradient(to_right,transparent,black_60px,black_calc(100%_-_60px),transparent)]">
             <div

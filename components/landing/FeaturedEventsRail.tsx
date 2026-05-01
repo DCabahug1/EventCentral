@@ -9,10 +9,10 @@ export default function FeaturedEventsRail({ events }: { events: Event[] }) {
   return (
     <motion.div
       className="mt-14"
-      initial={{ opacity: 0, y: 28 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, y: 24, scale: 0.98 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: true, margin: "-40px 0px" }}
-      transition={{ duration: 0.9, delay: 0.16, ease: [0.2, 0.7, 0.2, 1] }}
+      transition={{ duration: 0.85, delay: 0.12, ease: [0.2, 0.7, 0.2, 1] }}
     >
       <div className="flex gap-5 overflow-x-auto pb-6 snap-x snap-mandatory [scrollbar-width:thin]">
         {events.map((event) => (

@@ -9,6 +9,7 @@ import { todayDateString, daysFromNowDateString } from "@/lib/utils";
 import EventList from "@/components/map-view/EventList";
 import { getEvents, getEventById } from "@/lib/events/client";
 import { APIProvider } from "@vis.gl/react-google-maps";
+import Lenis from "lenis";
 import {
   SidebarProvider,
   Sidebar,
@@ -66,6 +67,28 @@ function MapViewPage() {
   const mapRef = useRef<HTMLDivElement>(null);
   // Main scroll container (map + list column)
   const contentScrollRef = useRef<HTMLDivElement>(null);
+  const lenisRef = useRef<Lenis | null>(null);
+
+  useEffect(() => {
+    const wrapper = contentScrollRef.current;
+    if (!wrapper) return;
+
+    const lenis = new Lenis({ wrapper, lerp: 0.1, smoothWheel: true });
+    lenisRef.current = lenis;
+
+    let rafId: number;
+    const raf = (time: number) => {
+      lenis.raf(time);
+      rafId = requestAnimationFrame(raf);
+    };
+    rafId = requestAnimationFrame(raf);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      lenis.destroy();
+      lenisRef.current = null;
+    };
+  }, []);
 
   const appliedKeyword = appliedQuery.keyword.trim();
   const hasKeyword = Boolean(appliedKeyword);
@@ -123,7 +146,11 @@ function MapViewPage() {
   // Scrolls back to the map and sets the selected event so the map pans to it.
   const handleEventSelect = (id: number) => {
     setSelectedEventId(id);
-    mapRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (lenisRef.current) {
+      lenisRef.current.scrollTo(0);
+    } else {
+      mapRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   };
 
   // Called from the "View event" button inside a map marker popup.
@@ -146,14 +173,17 @@ function MapViewPage() {
 
       const scroller = contentScrollRef.current;
       if (scroller) {
-        // Safari is more reliable with explicit scrollTop on nested containers.
         const scrollerRect = scroller.getBoundingClientRect();
         const cardRect = card.getBoundingClientRect();
         const targetTop = Math.max(
           0,
           cardRect.top - scrollerRect.top + scroller.scrollTop - 24,
         );
-        scroller.scrollTo({ top: targetTop, behavior: "smooth" });
+        if (lenisRef.current) {
+          lenisRef.current.scrollTo(targetTop);
+        } else {
+          scroller.scrollTo({ top: targetTop, behavior: "smooth" });
+        }
         return;
       }
 
@@ -203,7 +233,7 @@ function MapViewPage() {
         </Sidebar>
 
         {/* Main content: map stacked above event list */}
-        <div ref={contentScrollRef} className="flex-1 flex flex-col overflow-y-auto relative">
+        <div ref={contentScrollRef} className="flex-1 flex flex-col overflow-y-auto relative" data-lenis-prevent>
           {/* Mobile filter trigger — opens FiltersDialog */}
           <div className="absolute top-4 left-4 z-10 md:hidden">
             <FiltersDialog fetchEvents={fetchEvents} appliedQuery={appliedQuery} />

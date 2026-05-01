@@ -29,10 +29,10 @@ function FloatingCards() {
       <motion.div
         className="w-full lg:absolute lg:top-[6%] lg:left-0 lg:w-[62%] bg-card border border-border/50 p-5 flex flex-col gap-2"
         style={{ transformPerspective: 700, rotateZ: -4 }}
-        initial={{ opacity: 0, y: 16 }}
-        whileInView={{ opacity: 0.95, y: 0 }}
+        initial={{ opacity: 0, y: 16, scale: 0.95 }}
+        whileInView={{ opacity: 0.95, y: 0, scale: 1 }}
         viewport={{ once: true, margin: "-40px 0px" }}
-        transition={{ duration: 0.6, ease: [0.2, 0.7, 0.2, 1] }}
+        transition={{ duration: 0.65, ease: [0.2, 0.7, 0.2, 1] }}
       >
         <div className="text-[12px] text-muted-foreground">
           Step 1: Create an organization
@@ -49,10 +49,10 @@ function FloatingCards() {
       <motion.div
         className="w-full self-end lg:self-auto lg:absolute lg:top-[34%] lg:right-0 lg:w-[55%] bg-card border border-border/50 p-5 flex flex-col gap-2"
         style={{ transformPerspective: 700, rotateZ: 3 }}
-        initial={{ opacity: 0, y: 24 }}
-        whileInView={{ opacity: 0.95, y: 0 }}
+        initial={{ opacity: 0, y: 24, scale: 0.95 }}
+        whileInView={{ opacity: 0.95, y: 0, scale: 1 }}
         viewport={{ once: true, margin: "-40px 0px" }}
-        transition={{ duration: 0.6, delay: 0.1, ease: [0.2, 0.7, 0.2, 1] }}
+        transition={{ duration: 0.65, delay: 0.12, ease: [0.2, 0.7, 0.2, 1] }}
       >
         <div className="text-[12px] text-muted-foreground">
           Step 2: Create an event
@@ -72,10 +72,10 @@ function FloatingCards() {
       <motion.div
         className="w-full lg:absolute lg:bottom-[4%] lg:left-[8%] lg:w-[68%] bg-card border border-border/50 p-5 flex flex-col gap-2"
         style={{ transformPerspective: 700, rotateZ: -5 }}
-        initial={{ opacity: 0, y: 32 }}
-        whileInView={{ opacity: 0.95, y: 0 }}
+        initial={{ opacity: 0, y: 32, scale: 0.95 }}
+        whileInView={{ opacity: 0.95, y: 0, scale: 1 }}
         viewport={{ once: true, margin: "-40px 0px" }}
-        transition={{ duration: 0.6, delay: 0.2, ease: [0.2, 0.7, 0.2, 1] }}
+        transition={{ duration: 0.65, delay: 0.24, ease: [0.2, 0.7, 0.2, 1] }}
       >
         <div className="text-[12px] text-muted-foreground">
           Step 3: Track live stats
@@ -116,12 +116,12 @@ export default function HostSection() {
             </motion.h2>
             <motion.p
               className="text-muted-foreground text-base leading-[1.6] max-w-[58ch] mt-4.5"
-              initial={{ opacity: 0, y: 28 }}
+              initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px 0px" }}
               transition={{
-                duration: 0.9,
-                delay: 0.16,
+                duration: 0.75,
+                delay: 0.1,
                 ease: [0.2, 0.7, 0.2, 1],
               }}
             >
@@ -137,12 +137,12 @@ export default function HostSection() {
                   <motion.li
                     key={pt.title}
                     className="grid grid-cols-[auto_1fr] gap-4 items-start"
-                    initial={{ opacity: 0, y: 28 }}
-                    whileInView={{ opacity: 1, y: 0 }}
+                    initial={{ opacity: 0, x: -8 }}
+                    whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true, margin: "-40px 0px" }}
                     transition={{
-                      duration: 0.9,
-                      delay: 0.16 + i * 0.08,
+                      duration: 0.65,
+                      delay: 0.1 + i * 0.1,
                       ease: [0.2, 0.7, 0.2, 1],
                     }}
                   >
@@ -162,12 +162,12 @@ export default function HostSection() {
 
             <motion.div
               className="mt-8"
-              initial={{ opacity: 0, y: 28 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, scale: 0.95, y: 8 }}
+              whileInView={{ opacity: 1, scale: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px 0px" }}
               transition={{
-                duration: 0.9,
-                delay: 0.4,
+                duration: 0.6,
+                delay: 0.38,
                 ease: [0.2, 0.7, 0.2, 1],
               }}
             >
