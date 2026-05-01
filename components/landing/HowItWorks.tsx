@@ -101,18 +101,48 @@ export default function HowItWorks() {
     return () => window.removeEventListener("scroll", update);
   }, []);
 
+  const autoPlayRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
   useEffect(() => {
     if (!carouselApi) return;
+
     const onSelect = () => setMobileStep(carouselApi.selectedScrollSnap());
     carouselApi.on("select", onSelect);
-    return () => { carouselApi.off("select", onSelect); };
+
+    const startAutoPlay = () => {
+      if (autoPlayRef.current) clearInterval(autoPlayRef.current);
+      autoPlayRef.current = setInterval(() => {
+        if (carouselApi.canScrollNext()) {
+          carouselApi.scrollNext();
+        } else {
+          carouselApi.scrollTo(0);
+        }
+      }, 3000);
+    };
+
+    const onPointerDown = () => {
+      if (autoPlayRef.current) clearInterval(autoPlayRef.current);
+    };
+    const onSettle = () => startAutoPlay();
+
+    carouselApi.on("pointerDown", onPointerDown);
+    carouselApi.on("settle", onSettle);
+
+    startAutoPlay();
+
+    return () => {
+      if (autoPlayRef.current) clearInterval(autoPlayRef.current);
+      carouselApi.off("select", onSelect);
+      carouselApi.off("pointerDown", onPointerDown);
+      carouselApi.off("settle", onSettle);
+    };
   }, [carouselApi]);
 
   return (
     <section className="border-b border-border/50 bg-secondary dark:bg-secondary/10">
       <div className="max-w-330 mx-auto px-6 md:px-10 py-26 md:py-32 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-20 items-start">
 
-        {/* Left: sticky text panel — desktop only */}
+        {/* Left: sticky text panel, desktop only */}
         <div className="hidden lg:flex w-full aspect-3/2 self-start sticky top-[25svh] flex-col justify-center gap-12">
           <AnimatePresence mode="wait">
             <motion.div
@@ -127,7 +157,7 @@ export default function HowItWorks() {
                 <span className="text-primary">{STEPS[activeStep].label}</span>
                 <span className="text-muted-foreground"> / 03</span>
               </span>
-              <h3 className="text-5xl lg:text-[clamp(48px,5.2vw,64px)] leading-[1.02] tracking-[-0.02em] font-semibold">
+              <h3 className="font-display text-[clamp(56px,5.2vw,72px)] leading-[0.95] tracking-[0.02em]">
                 {STEPS[activeStep].heading}
               </h3>
               <p className="text-base lg:text-lg text-muted-foreground leading-[1.6] max-w-[44ch]">
@@ -148,7 +178,7 @@ export default function HowItWorks() {
           </div>
         </div>
 
-        {/* Right: stacked images — desktop only */}
+        {/* Right: stacked images, desktop only */}
         <div className="hidden lg:flex flex-col gap-[35svh]">
           {STEPS.map((step, i) => (
             <div
@@ -161,7 +191,7 @@ export default function HowItWorks() {
           ))}
         </div>
 
-        {/* Carousel — mobile and tablet */}
+        {/* Carousel, mobile and tablet */}
         <div className="lg:hidden flex flex-col gap-6">
           <Carousel setApi={setCarouselApi} opts={{ loop: false }} className="w-full">
             <CarouselContent>
@@ -173,7 +203,7 @@ export default function HowItWorks() {
                       <span className="text-sm md:text-base tracking-[0.1em] uppercase text-primary">
                         {step.label}
                       </span>
-                      <h3 className="text-2xl md:text-4xl font-semibold tracking-[-0.01em]">
+                      <h3 className="font-display text-3xl md:text-5xl leading-[0.95] tracking-[0.02em]">
                         {step.heading}
                       </h3>
                       <p className="text-sm md:text-base text-muted-foreground leading-[1.6]">

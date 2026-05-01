@@ -50,7 +50,7 @@ export default function CategoriesSection({ counts }: CategoriesSectionProps) {
     <section className="py-26 md:py-32 border-b border-border/50">
       <div className="max-w-330 mx-auto px-6 md:px-10">
         <motion.h2
-          className="text-[clamp(40px,5.2vw,64px)] leading-[1.02] tracking-[-0.02em] font-semibold max-w-[18ch]"
+          className="font-display text-[clamp(56px,7vw,96px)] leading-[0.95] tracking-[0.02em] max-w-[18ch]"
           initial={{ opacity: 0, y: 28 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-40px 0px" }}

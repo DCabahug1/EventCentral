@@ -21,7 +21,7 @@ function Footer() {
       </Link>
       <div className=" w-[2px] h-[20px] bg-border" />
       <p className="text-muted-foreground text-xs sm:text-base">
-        Discover what's happening around you.
+        Discover what's happening.
       </p>
     </div>
   );

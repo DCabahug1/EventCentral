@@ -9,7 +9,6 @@ import { todayDateString, daysFromNowDateString } from "@/lib/utils";
 import EventList from "@/components/map-view/EventList";
 import { getEvents, getEventById } from "@/lib/events/client";
 import { APIProvider } from "@vis.gl/react-google-maps";
-import Lenis from "lenis";
 import {
   SidebarProvider,
   Sidebar,
@@ -67,28 +66,6 @@ function MapViewPage() {
   const mapRef = useRef<HTMLDivElement>(null);
   // Main scroll container (map + list column)
   const contentScrollRef = useRef<HTMLDivElement>(null);
-  const lenisRef = useRef<Lenis | null>(null);
-
-  useEffect(() => {
-    const wrapper = contentScrollRef.current;
-    if (!wrapper) return;
-
-    const lenis = new Lenis({ wrapper, lerp: 0.1, smoothWheel: true });
-    lenisRef.current = lenis;
-
-    let rafId: number;
-    const raf = (time: number) => {
-      lenis.raf(time);
-      rafId = requestAnimationFrame(raf);
-    };
-    rafId = requestAnimationFrame(raf);
-
-    return () => {
-      cancelAnimationFrame(rafId);
-      lenis.destroy();
-      lenisRef.current = null;
-    };
-  }, []);
 
   const appliedKeyword = appliedQuery.keyword.trim();
   const hasKeyword = Boolean(appliedKeyword);
@@ -146,11 +123,7 @@ function MapViewPage() {
   // Scrolls back to the map and sets the selected event so the map pans to it.
   const handleEventSelect = (id: number) => {
     setSelectedEventId(id);
-    if (lenisRef.current) {
-      lenisRef.current.scrollTo(0);
-    } else {
-      mapRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
+    mapRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   // Called from the "View event" button inside a map marker popup.
@@ -179,11 +152,7 @@ function MapViewPage() {
           0,
           cardRect.top - scrollerRect.top + scroller.scrollTop - 24,
         );
-        if (lenisRef.current) {
-          lenisRef.current.scrollTo(targetTop);
-        } else {
-          scroller.scrollTo({ top: targetTop, behavior: "smooth" });
-        }
+        scroller.scrollTo({ top: targetTop, behavior: "smooth" });
         return;
       }
 
@@ -214,7 +183,6 @@ function MapViewPage() {
       void fetchEvents({ ...DEFAULT_QUERY });
     };
     void init();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [focusEventId]);
 
   return (
@@ -225,7 +193,7 @@ function MapViewPage() {
         style={{ "--sidebar-offset": "4rem", minHeight: 0 } as React.CSSProperties}
         className="h-[calc(100svh-64px)]"
       >
-        {/* Filter sidebar — visible on desktop, slides off-canvas when toggled */}
+        {/* Filter sidebar, visible on desktop, slides off-canvas when toggled */}
         <Sidebar collapsible="offcanvas">
           <SidebarContent className="p-4">
             <Form fetchEvents={fetchEvents} appliedQuery={appliedQuery} />
@@ -234,12 +202,12 @@ function MapViewPage() {
 
         {/* Main content: map stacked above event list */}
         <div ref={contentScrollRef} className="flex-1 flex flex-col overflow-y-auto relative" data-lenis-prevent>
-          {/* Mobile filter trigger — opens FiltersDialog */}
+          {/* Mobile filter trigger, opens FiltersDialog */}
           <div className="absolute top-4 left-4 z-10 md:hidden">
             <FiltersDialog fetchEvents={fetchEvents} appliedQuery={appliedQuery} />
           </div>
 
-          {/* Desktop sidebar toggle — floats over the top-left of the map */}
+          {/* Desktop sidebar toggle, floats over the top-left of the map */}
           <div className="absolute top-4 left-4 z-10 hidden md:block">
             <SidebarTrigger className="bg-background shadow-sm border" />
           </div>

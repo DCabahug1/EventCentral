@@ -1,5 +1,6 @@
 "use client";
 import React, { useCallback, useEffect, useState } from "react";
+import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { Moon, Sun } from "lucide-react";
@@ -22,6 +23,20 @@ function Header() {
   const { theme, setTheme } = useTheme();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [createEventOpen, setCreateEventOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  const isLanding = pathname === "/";
+
+  useEffect(() => {
+    if (!isLanding) {
+      setScrolled(false);
+      return;
+    }
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [isLanding]);
 
   const fetchProfile = useCallback(async () => {
     try {
@@ -65,14 +80,29 @@ function Header() {
     return () => window.removeEventListener(PROFILE_UPDATED_EVENT, handler);
   }, [fetchProfile]);
 
-  const showNav = !pathname.startsWith("/auth") && !pathname.startsWith("/onboarding");
+  const showNav =
+    !pathname.startsWith("/auth") && !pathname.startsWith("/onboarding");
 
   return (
     <>
-      <div className="sticky top-0 z-50 w-full h-16 bg-background border-b flex items-center justify-between px-6">
+      <div
+        className={cn(
+          "z-50 w-full h-16 flex items-center justify-between px-6 transition-[background-color,border-color] duration-400",
+          isLanding
+            ? cn(
+                "fixed top-0",
+                scrolled
+                  ? "bg-background border-b border-border"
+                  : "bg-transparent border-b border-transparent text-white",
+              )
+            : "sticky top-0 bg-background border-b border-border",
+        )}
+      >
         <Link href="/">
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight">Event<span className="text-primary">Central</span></h1>
+            <h1 className="text-2xl font-bold tracking-tight">
+              Event<span className="text-primary">Central</span>
+            </h1>
           </div>
         </Link>
 
@@ -82,13 +112,18 @@ function Header() {
             size="icon"
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
           >
-            {theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
+            {theme === "dark" ? (
+              <Sun className="size-4" />
+            ) : (
+              <Moon className="size-4" />
+            )}
           </Button>
         ) : (
           <DesktopNav
             profile={profile}
             pathname={pathname}
             onHostEvent={() => setCreateEventOpen(true)}
+            transparent={isLanding && !scrolled}
           />
         )}
 
@@ -96,6 +131,7 @@ function Header() {
           <MobileNav
             profile={profile}
             onHostEvent={() => setCreateEventOpen(true)}
+            transparent={isLanding && !scrolled}
           />
         )}
       </div>

@@ -248,7 +248,7 @@ export default function HostSection() {
         <div className="absolute inset-0 bg-black/80" />
         <div className="relative max-w-330 mx-auto px-6 md:px-10 w-full">
           <div className="grid grid-cols-1 gap-14 lg:grid-cols-2 lg:gap-20 items-center">
-            {/* Cards — mobile uses whileInView, desktop uses scroll-driven */}
+            {/* Cards, mobile uses whileInView, desktop uses scroll-driven */}
             <div className="lg:hidden">
               <MobileCards />
             </div>
@@ -259,7 +259,7 @@ export default function HostSection() {
             {/* Right panel */}
             <div>
               <motion.h2
-                className="text-[clamp(40px,5.2vw,64px)] leading-[1.02] tracking-[-0.02em] font-semibold max-w-[18ch] text-white"
+                className="font-display text-[clamp(56px,7vw,96px)] leading-[0.95] tracking-[0.02em] max-w-[18ch] text-white"
                 style={{ opacity: headingOpacity, y: headingY }}
               >
                 Publish in <em className="not-italic text-primary">minutes.</em>{" "}

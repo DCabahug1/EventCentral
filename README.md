@@ -4,13 +4,13 @@
 
 Install the following in order before anything else:
 
-1. **Git** — [git-scm.com/downloads](https://git-scm.com/downloads)
-2. **Node.js** (v20 LTS) — [nodejs.org](https://nodejs.org)
-3. **pnpm** — open a terminal and run:
+1. **Git**, [git-scm.com/downloads](https://git-scm.com/downloads)
+2. **Node.js** (v20 LTS), [nodejs.org](https://nodejs.org)
+3. **pnpm**, open a terminal and run:
    ```bash
    npm install -g pnpm
    ```
-4. **GitHub Desktop** — [desktop.github.com](https://desktop.github.com)
+4. **GitHub Desktop**, [desktop.github.com](https://desktop.github.com)
 
 ## Clone & Install
 
@@ -32,7 +32,7 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=
 ```
 
-> `.env.local` is gitignored and will never be committed — do not share these values outside of Discord.
+> `.env.local` is gitignored and will never be committed, do not share these values outside of Discord.
 
 ## Running the Dev Server
 
@@ -48,8 +48,8 @@ We use two permanent branches:
 
 | Branch | Purpose |
 | --- | --- |
-| `main` | Public-facing — what users see |
-| `production/main` | Team integration branch — all work merges here first |
+| `main` | Public-facing, what users see |
+| `production/main` | Team integration branch, all work merges here first |
 
 When starting new work, always branch off of `production/main`:
 
@@ -67,13 +67,13 @@ When starting new work, always branch off of `production/main`:
 
 ## TODOs
 
-### Map View — Supabase Integration
+### Map View, Supabase Integration
 
 When the map view is connected to a Supabase table, move the following filters
 into the database query instead of filtering the client-side array in `lib/events.ts`:
 
-- **Date range** — use `.gte("start_time", startDate).lte("start_time", endDate)`
-- **Event type** — use `.contains("tags", [eventType])` (skip when `"all"`)
+- **Date range**, use `.gte("start_time", startDate).lte("start_time", endDate)`
+- **Event type**, use `.contains("tags", [eventType])` (skip when `"all"`)
 
 **Distance (radius) filtering stays client-side** using `distanceBetweenLocations`
 in `lib/utils.ts`. A bounding-box pre-filter can optionally be added to the query

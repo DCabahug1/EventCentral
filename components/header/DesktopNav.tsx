@@ -6,14 +6,16 @@ import { Compass, MapPin, Moon, Plus, Sun, User } from "lucide-react";
 import AvatarButton from "./AvatarButton";
 import { motion, AnimatePresence } from "motion/react";
 import { useTheme } from "next-themes";
+import { cn } from "@/lib/utils";
 
 interface DesktopNavProps {
   profile: Profile | null;
   pathname: string;
   onHostEvent: () => void;
+  transparent?: boolean;
 }
 
-function DesktopNav({ profile, pathname, onHostEvent }: DesktopNavProps) {
+function DesktopNav({ profile, pathname, onHostEvent, transparent }: DesktopNavProps) {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
@@ -41,14 +43,16 @@ function DesktopNav({ profile, pathname, onHostEvent }: DesktopNavProps) {
               Map View
             </Link>
           </Button>
-          <Button
-            type="button"
-            variant='outline'
-            onClick={onHostEvent}
-          >
+          <span className={cn(transparent && "dark")}>
+            <Button
+              type="button"
+              variant='outline'
+              onClick={onHostEvent}
+            >
               <Plus />
               Host an Event
-          </Button>
+            </Button>
+          </span>
           <AvatarButton profile={profile} />
         </motion.div>
       ) : !pathname.startsWith("/onboarding") ? (
@@ -72,19 +76,23 @@ function DesktopNav({ profile, pathname, onHostEvent }: DesktopNavProps) {
               Map View
             </Link>
           </Button>
-          <Button variant='outline' asChild>
-            <Link href="/auth/login">
-              <User />
-              Sign in
-            </Link>
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-          >
-            {mounted && (theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />)}
-          </Button>
+          <span className={cn(transparent && "dark")}>
+            <Button variant='outline' asChild>
+              <Link href="/auth/login">
+                <User />
+                Sign in
+              </Link>
+            </Button>
+          </span>
+          <span className={cn(transparent && "dark")}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            >
+              {mounted && (theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />)}
+            </Button>
+          </span>
         </motion.div>
       ) : null}
     </AnimatePresence>

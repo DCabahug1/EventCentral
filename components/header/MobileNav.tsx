@@ -10,17 +10,23 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { Compass, MapPin, Menu, Plus, User, X } from "lucide-react";
+import { Compass, MapPin, Menu, Moon, Plus, Sun, User, X } from "lucide-react";
 import AvatarButton from "./AvatarButton";
+import { useTheme } from "next-themes";
+import { cn } from "@/lib/utils";
 
 interface MobileNavProps {
   profile: Profile | null;
   onHostEvent: () => void;
+  transparent?: boolean;
 }
 
-function MobileNav({ profile, onHostEvent }: MobileNavProps) {
+function MobileNav({ profile, onHostEvent, transparent }: MobileNavProps) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     setOpen(false);
@@ -37,8 +43,14 @@ function MobileNav({ profile, onHostEvent }: MobileNavProps) {
         <DropdownMenuContent align="end" side="bottom" className="w-56">
           {profile ? (
             <>
-              <DropdownMenuItem asChild className={pathname === "/discover" ? "bg-accent" : ""}>
-                <Link href="/discover" className="flex cursor-pointer items-center gap-2">
+              <DropdownMenuItem
+                asChild
+                className={pathname === "/discover" ? "bg-accent" : ""}
+              >
+                <Link
+                  href="/discover"
+                  className="flex cursor-pointer items-center gap-2"
+                >
                   <Compass className="size-4" />
                   Discover
                 </Link>
@@ -47,7 +59,10 @@ function MobileNav({ profile, onHostEvent }: MobileNavProps) {
                 asChild
                 className={pathname === "/map-view" ? "bg-accent" : ""}
               >
-                <Link href="/map-view" className="flex cursor-pointer items-center gap-2">
+                <Link
+                  href="/map-view"
+                  className="flex cursor-pointer items-center gap-2"
+                >
                   <MapPin className="size-4" />
                   Map View
                 </Link>
@@ -58,7 +73,7 @@ function MobileNav({ profile, onHostEvent }: MobileNavProps) {
                   setOpen(false);
                   onHostEvent();
                 }}
-                className='bg-muted'
+                className="bg-muted"
               >
                 <div className="flex cursor-pointer items-center gap-2">
                   <Plus className="size-4" />
@@ -68,8 +83,14 @@ function MobileNav({ profile, onHostEvent }: MobileNavProps) {
             </>
           ) : (
             <>
-              <DropdownMenuItem asChild className={pathname === "/discover" ? "bg-accent" : ""}>
-                <Link href="/discover" className="flex cursor-pointer items-center gap-2">
+              <DropdownMenuItem
+                asChild
+                className={pathname === "/discover" ? "bg-accent" : ""}
+              >
+                <Link
+                  href="/discover"
+                  className="flex cursor-pointer items-center gap-2"
+                >
                   <Compass className="size-4" />
                   Discover
                 </Link>
@@ -78,7 +99,10 @@ function MobileNav({ profile, onHostEvent }: MobileNavProps) {
                 asChild
                 className={pathname === "/map-view" ? "bg-accent" : ""}
               >
-                <Link href="/map-view" className="flex cursor-pointer items-center gap-2">
+                <Link
+                  href="/map-view"
+                  className="flex cursor-pointer items-center gap-2"
+                >
                   <MapPin className="size-4" />
                   Map View
                 </Link>
@@ -96,6 +120,20 @@ function MobileNav({ profile, onHostEvent }: MobileNavProps) {
           )}
         </DropdownMenuContent>
       </DropdownMenu>
+      <span className={cn(transparent && "dark")}>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+        >
+          {mounted &&
+            (theme === "dark" ? (
+              <Sun className="size-4" />
+            ) : (
+              <Moon className="size-4" />
+            ))}
+        </Button>
+      </span>
       {profile && <AvatarButton profile={profile} />}
     </div>
   );
