@@ -7,6 +7,7 @@ import HowItWorks from "@/components/landing/HowItWorks";
 import FeaturedEventsSection from "@/components/landing/FeaturedEventsSection";
 import HostSection from "@/components/landing/HostSection";
 import LandingCta from "@/components/landing/LandingCta";
+import LenisProvider from "@/components/providers/LenisProvider";
 
 export default async function Page() {
   const [userResult, categoryCounts] = await Promise.all([
@@ -16,13 +17,15 @@ export default async function Page() {
   const isLoggedIn = !(userResult instanceof AuthError) && !!userResult.user;
 
   return (
-    <div className="flex flex-col w-full">
-      <LandingHero isLoggedIn={isLoggedIn} />
-      <CategoriesSection counts={categoryCounts} />
-      <HowItWorks />
-      <FeaturedEventsSection />
-      <HostSection />
-      <LandingCta isLoggedIn={isLoggedIn} />
-    </div>
+    <LenisProvider>
+      <div className="flex flex-col w-full">
+        <LandingHero isLoggedIn={isLoggedIn} />
+        <CategoriesSection counts={categoryCounts} />
+        <HowItWorks />
+        <FeaturedEventsSection />
+        <HostSection />
+        <LandingCta isLoggedIn={isLoggedIn} />
+      </div>
+    </LenisProvider>
   );
 }

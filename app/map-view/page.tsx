@@ -201,7 +201,7 @@ function MapViewPage() {
         </Sidebar>
 
         {/* Main content: map stacked above event list */}
-        <div ref={contentScrollRef} className="flex-1 flex flex-col overflow-y-auto relative" data-lenis-prevent>
+        <div ref={contentScrollRef} className="flex-1 flex flex-col overflow-y-auto relative">
           {/* Mobile filter trigger, opens FiltersDialog */}
           <div className="absolute top-4 left-4 z-10 md:hidden">
             <FiltersDialog fetchEvents={fetchEvents} appliedQuery={appliedQuery} />

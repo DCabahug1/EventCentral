@@ -4,7 +4,6 @@ import Script from "next/script";
 import "./globals.css";
 import Header from "@/components/header/Header";
 import { ThemeProvider } from "@/components/theme-provider";
-import LenisProvider from "@/components/providers/LenisProvider";
 import Footer from "@/components/footer/Footer";
 import PageMount from "@/components/ui/page-mount";
 import { Toaster } from "@/components/ui/sonner";
@@ -62,12 +61,10 @@ export default function RootLayout({
         className={`${fontSans.variable} ${fontSerif.variable} ${fontMono.variable} ${fontDisplay.variable} antialiased`}
       >
         <ThemeProvider attribute="class" defaultTheme="dark">
-          <LenisProvider>
-            <Header />
-            <PageMount>{children}</PageMount>
-            <Footer />
-            <Toaster richColors position="bottom-right" />
-          </LenisProvider>
+          <Header />
+          <PageMount>{children}</PageMount>
+          <Footer />
+          <Toaster richColors position="bottom-right" />
         </ThemeProvider>
         <Script
           src="https://tweakcn.com/live-preview.min.js"
