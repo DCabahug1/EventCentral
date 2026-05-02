@@ -42,8 +42,8 @@ function StepCard({ image, heading, index, isActive }: { image: string; heading:
         "w-full aspect-3/2 overflow-hidden rounded-md border border-border/50 flex flex-col transition-[filter] duration-500 ",
         !isActive && "lg:brightness-50",
       )}
-      initial={{ opacity: 0, y: 40, scale: 0.97 }}
-      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
       viewport={{ once: true, margin: "-60px 0px" }}
       transition={{ duration: 0.85, delay: index * 0.08, ease: [0.2, 0.7, 0.2, 1] }}
     >
@@ -167,9 +167,9 @@ export default function HowItWorks() {
           <AnimatePresence mode="wait">
             <motion.div
               key={activeStep}
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -16 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               transition={{ duration: 0.3, ease: "easeOut" }}
               className="flex flex-col gap-5"
             >

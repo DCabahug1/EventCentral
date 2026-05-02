@@ -18,6 +18,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { pastelColors } from "@/lib/profiles/colors";
 import { useTheme } from "next-themes";
+import { dispatchProfileUpdated } from "@/lib/profiles/events";
 
 function AvatarButton({ profile }: { profile: Profile }) {
   const [randomAvatarColor] = useState<string>(pastelColors[Math.floor(Math.random() * pastelColors.length)]);
@@ -30,6 +31,7 @@ function AvatarButton({ profile }: { profile: Profile }) {
       console.error("Error signing out", result.message);
       return;
     }
+    dispatchProfileUpdated();
     router.push("/");
     router.refresh();
   };
