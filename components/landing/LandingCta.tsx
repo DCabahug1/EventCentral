@@ -43,7 +43,7 @@ export default function LandingCta({ isLoggedIn }: LandingCtaProps) {
         >
           {isLoggedIn ? (
             <Button size="lg" asChild>
-              <Link href="/map-view">
+              <Link href="/discover">
                 <MapPin />
                 Find Events
               </Link>
