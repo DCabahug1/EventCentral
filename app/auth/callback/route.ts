@@ -1,15 +1,26 @@
 import { NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 // The client you created from the Server-Side Auth instructions
 import { createClient } from '@/lib/supabase/server'
+import { safeNextPath } from '@/lib/auth/redirect'
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
-  // if "next" is in param, use it as the redirect URL
-  let next = searchParams.get('next') ?? '/'
-  if (!next.startsWith('/')) {
-    // if "next" is not a relative URL, use the default
-    next = '/'
+  const cookieStore = await cookies()
+  const cookieNext = cookieStore.get('auth_next')?.value
+  // Prefer the query param; fall back to the cookie set before OAuth started.
+  // Supabase's OAuth flow can drop query strings from `redirectTo`, so the
+  // cookie keeps us from defaulting to `/discover` when a real `next` exists.
+  const rawNext =
+    searchParams.get('next') ??
+    (cookieNext ? decodeURIComponent(cookieNext) : null)
+  const next = safeNextPath(rawNext)
+
+  const buildResponse = (url: string) => {
+    const response = NextResponse.redirect(url)
+    response.cookies.delete('auth_next')
+    return response
   }
 
   if (code) {
@@ -20,15 +31,15 @@ export async function GET(request: Request) {
       const isLocalEnv = process.env.NODE_ENV === 'development'
       if (isLocalEnv) {
         // we can be sure that there is no load balancer in between, so no need to watch for X-Forwarded-Host
-        return NextResponse.redirect(`${origin}${next}`)
+        return buildResponse(`${origin}${next}`)
       } else if (forwardedHost) {
-        return NextResponse.redirect(`https://${forwardedHost}${next}`)
+        return buildResponse(`https://${forwardedHost}${next}`)
       } else {
-        return NextResponse.redirect(`${origin}${next}`)
+        return buildResponse(`${origin}${next}`)
       }
     }
   }
 
   // return the user to an error page with instructions
-  return NextResponse.redirect(`${origin}/auth/auth-code-error`)
+  return buildResponse(`${origin}/auth/auth-code-error`)
 }

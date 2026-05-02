@@ -4,85 +4,138 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { Profile } from "@/lib/types";
 import { Button } from "../ui/button";
-import { Compass, Menu, Plus, User, X } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
+import { Compass, MapPin, Menu, Moon, Plus, Sun, User, X } from "lucide-react";
 import AvatarButton from "./AvatarButton";
-import { motion, AnimatePresence } from "motion/react";
+import { useTheme } from "next-themes";
+import { cn } from "@/lib/utils";
 
 interface MobileNavProps {
   profile: Profile | null;
+  onHostEvent: () => void;
+  transparent?: boolean;
 }
 
-function MobileNav({ profile }: MobileNavProps) {
+function MobileNav({ profile, onHostEvent, transparent }: MobileNavProps) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     setOpen(false);
   }, [pathname]);
 
   return (
-    <>
-      {/* Hamburger toggle row in the header bar */}
-      <div className="flex sm:hidden items-center gap-2">
+    <div className="flex sm:hidden items-center gap-2">
+      <DropdownMenu open={open} onOpenChange={setOpen}>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon" aria-label="Toggle menu">
+            {open ? <X /> : <Menu />}
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" side="bottom" className="w-56">
+          {profile ? (
+            <>
+              <DropdownMenuItem
+                asChild
+                className={pathname === "/discover" ? "bg-accent" : ""}
+              >
+                <Link
+                  href="/discover"
+                  className="flex cursor-pointer items-center gap-2"
+                >
+                  <Compass className="size-4" />
+                  Discover
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                asChild
+                className={pathname === "/map-view" ? "bg-accent" : ""}
+              >
+                <Link
+                  href="/map-view"
+                  className="flex cursor-pointer items-center gap-2"
+                >
+                  <MapPin className="size-4" />
+                  Map View
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onSelect={(e) => {
+                  e.preventDefault();
+                  setOpen(false);
+                  onHostEvent();
+                }}
+                className="bg-muted"
+              >
+                <div className="flex cursor-pointer items-center gap-2">
+                  <Plus className="size-4" />
+                  Host an Event
+                </div>
+              </DropdownMenuItem>
+            </>
+          ) : (
+            <>
+              <DropdownMenuItem
+                asChild
+                className={pathname === "/discover" ? "bg-accent" : ""}
+              >
+                <Link
+                  href="/discover"
+                  className="flex cursor-pointer items-center gap-2"
+                >
+                  <Compass className="size-4" />
+                  Discover
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                asChild
+                className={pathname === "/map-view" ? "bg-accent" : ""}
+              >
+                <Link
+                  href="/map-view"
+                  className="flex cursor-pointer items-center gap-2"
+                >
+                  <MapPin className="size-4" />
+                  Map View
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link
+                  href="/auth/login"
+                  className="flex cursor-pointer items-center gap-2"
+                >
+                  <User className="size-4" />
+                  Sign in
+                </Link>
+              </DropdownMenuItem>
+            </>
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <span className={cn(transparent && "dark")}>
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => setOpen((prev) => !prev)}
-          aria-label="Toggle menu"
+          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
         >
-          {open ? <X /> : <Menu />}
-        </Button>
-        {profile && <AvatarButton profile={profile} />}
-      </div>
-
-      {/* Slide-down panel */}
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            key="mobile-menu"
-            initial={{ opacity: 0, y: -6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            transition={{ duration: 0.15, ease: "easeOut" }}
-            className="sm:hidden fixed top-16 left-0 right-0 z-40 bg-background border-b px-4 py-3 flex flex-col gap-1"
-          >
-            {profile ? (
-              <>
-                <Button
-                  variant={pathname === "/" ? "default" : "ghost"}
-                  className="w-full justify-start"
-                  asChild
-                >
-                  <Link href="/">
-                    <Compass />
-                    Discover
-                  </Link>
-                </Button>
-                <Button
-                  variant={
-                    pathname.startsWith("/create-event") ? "default" : "ghost"
-                  }
-                  className="w-full justify-start"
-                  asChild
-                >
-                  <Link href="/create-event">
-                    <Plus />
-                    Host an Event
-                  </Link>
-                </Button>
-              </>
+          {mounted &&
+            (theme === "dark" ? (
+              <Sun className="size-4" />
             ) : (
-              <Button className="w-full" asChild>
-                <Link href="/auth/login">
-                  <User />
-                  Sign in
-                </Link>
-              </Button>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </>
+              <Moon className="size-4" />
+            ))}
+        </Button>
+      </span>
+      {profile && <AvatarButton profile={profile} />}
+    </div>
   );
 }
 

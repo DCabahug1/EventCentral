@@ -1,13 +1,19 @@
 "use client";
-import React, { useState } from "react";
+import React, { Suspense, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { createProfile } from "@/lib/profiles";
+import { createProfile } from "@/lib/profiles/server";
 import { AuthError } from "@supabase/supabase-js";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import {
+  FormRequiredLegend,
+  OptionalFieldHint,
+  RequiredMark,
+} from "@/components/ui/form-field-hints";
+import { safeNextPath } from "@/lib/auth/redirect";
 
 function formatPhoneNumber(value: string): string {
   const digits = value.replace(/\D/g, "").slice(0, 10);
@@ -20,7 +26,13 @@ function unformatPhoneNumber(value: string): string {
   return value.replace(/\D/g, "");
 }
 
-function page() {
+function phoneDigitsToNumber(digits: string): number | null {
+  if (!digits) return null;
+  const parsedNumber = parseInt(digits, 10);
+  return Number.isNaN(parsedNumber) ? null : parsedNumber;
+}
+
+function OnboardingForm() {
   const [formData, setFormData] = useState({
     username: "",
     phone_number: "",
@@ -29,18 +41,33 @@ function page() {
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const next = safeNextPath(searchParams.get("next"));
     
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErrorMessage("");
+
+    const trimmedUsername = formData.username.trim();
+    if (!trimmedUsername) {
+      setErrorMessage("Username is required.");
+      return;
+    }
+    const phoneDigits = unformatPhoneNumber(formData.phone_number);
+    if (phoneDigits.length > 0 && phoneDigits.length !== 10) {
+      setErrorMessage("Phone number must be 10 digits.");
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const result = await createProfile(
-        formData.username,
-        unformatPhoneNumber(formData.phone_number),
-        formData.description,
-      );
+      const result = await createProfile({
+        username: trimmedUsername,
+        avatar_url: null,
+        phone_number: phoneDigitsToNumber(phoneDigits),
+        description: formData.description.trim(),
+      });
 
       if (result instanceof AuthError) {
         setErrorMessage(result.message);
@@ -57,8 +84,8 @@ function page() {
         return;
       }
 
-      router.push("/");
-    } catch (error) {
+      router.push(next);
+    } catch {
       setErrorMessage("There was an error creating your profile");
     } finally {
       setLoading(false);
@@ -71,7 +98,7 @@ function page() {
         <Card className="grid grid-cols-1 sm:grid-cols-2 gap-0 p-0 overflow-hidden w-full max-w-2xl">
           <div className="flex flex-col justify-center px-4 py-8 gap-4">
             <div>
-              <h1 className="text-2xl font-bold">Set up your profile</h1>
+              <h1 className="text-2xl font-bold tracking-tight">Set up your profile</h1>
               <p className="text-sm text-muted-foreground">
                 Tell us a bit about yourself to get started
               </p>
@@ -80,12 +107,16 @@ function page() {
               onSubmit={handleSubmit}
               className="w-full flex flex-col gap-4"
             >
+              <FormRequiredLegend />
               <div className="flex flex-col gap-2">
-                <Label htmlFor="username">Username</Label>
+                <Label htmlFor="username">
+                  Username <RequiredMark />
+                </Label>
                 <Input
                   type="text"
                   id="username"
                   required
+                  maxLength={32}
                   value={formData.username}
                   onChange={(e) =>
                     setFormData({ ...formData, username: e.target.value })
@@ -94,34 +125,39 @@ function page() {
               </div>
               <div className="flex flex-col gap-2">
                 <Label htmlFor="phone_number">
-                  Phone Number{" "}
-                  <span className="text-xs text-muted-foreground">
-                    (Optional)
-                  </span>
+                  Phone number
+                  <OptionalFieldHint />
                 </Label>
                 <Input
                   type="tel"
                   id="phone_number"
+                  inputMode="numeric"
                   placeholder="(555) 555-5555"
+                  pattern="\(\d{3}\) \d{3}-\d{4}"
                   value={formData.phone_number}
-                  onChange={(e) =>
+                  onInvalid={(e) =>
+                    (e.target as HTMLInputElement).setCustomValidity(
+                      "Please enter a complete 10-digit phone number",
+                    )
+                  }
+                  onChange={(e) => {
+                    (e.target as HTMLInputElement).setCustomValidity("");
                     setFormData({
                       ...formData,
                       phone_number: formatPhoneNumber(e.target.value),
-                    })
-                  }
+                    });
+                  }}
                 />
               </div>
               <div className="flex flex-col gap-2">
                 <Label htmlFor="description">
-                  Bio{" "}
-                  <span className="text-xs text-muted-foreground">
-                    (Optional)
-                  </span>
+                  Bio
+                  <OptionalFieldHint />
                 </Label>
                 <textarea
                   id="description"
                   rows={3}
+                  maxLength={500}
                   placeholder="Tell us about yourself..."
                   value={formData.description}
                   onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
@@ -137,11 +173,11 @@ function page() {
             </form>
           </div>
           <Image
-            src="/AuthPages/AuthFormSideImage.jpg"
+            src="/auth-pages/AuthFormSideImage.jpg"
             alt="EventCentral"
             width={800}
             height={800}
-            className="hidden sm:block h-full object-cover"
+            className="hidden sm:block h-full border border-border object-cover"
           />
         </Card>
       </div>
@@ -149,4 +185,12 @@ function page() {
   );
 }
 
-export default page;
+function Page() {
+  return (
+    <Suspense fallback={null}>
+      <OnboardingForm />
+    </Suspense>
+  );
+}
+
+export default Page;
