@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { motion } from "motion/react";
-import { Compass, UserPlus } from "lucide-react";
+import { Compass, MapPin, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface LandingCtaProps {
@@ -44,8 +44,8 @@ export default function LandingCta({ isLoggedIn }: LandingCtaProps) {
           {isLoggedIn ? (
             <Button size="lg" asChild>
               <Link href="/map-view">
-                <Compass />
-                Open the Map
+                <MapPin />
+                Find Events
               </Link>
             </Button>
           ) : (
