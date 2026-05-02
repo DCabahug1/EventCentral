@@ -162,7 +162,9 @@ function DiscoverPageContent() {
 
     return (
       event.title.toLowerCase().includes(normalizedQuery) ||
-      (event.address ?? "").toLowerCase().includes(normalizedQuery)
+      (event.address ?? "").toLowerCase().includes(normalizedQuery) ||
+      (event.organization_name ?? "").toLowerCase().includes(normalizedQuery) ||
+      (event.description ?? "").toLowerCase().includes(normalizedQuery)
     );
   });
 
