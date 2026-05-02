@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { useEffect, useRef } from "react";
 import { motion, useScroll, useTransform } from "motion/react";
 import { MapPin, UserPlus, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -47,6 +48,11 @@ export default function LandingHero({ isLoggedIn }: LandingHeroProps) {
   const { scrollY } = useScroll();
   const y = useTransform(scrollY, [0, 900], [0, 252]);
   const scale = useTransform(scrollY, [0, 900], [1, 1.225]);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    videoRef.current?.play().catch(() => {});
+  }, []);
 
   let wordIndex = 0;
 
@@ -58,6 +64,7 @@ export default function LandingHero({ isLoggedIn }: LandingHeroProps) {
         style={{ y, scale }}
       >
         <video
+          ref={videoRef}
           src="/landing-page/HeroVideo.mp4"
           poster="/landing-page/HeroImage.jpg"
           autoPlay

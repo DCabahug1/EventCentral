@@ -183,6 +183,11 @@
     @apply bg-background text-foreground font-sans;
     letter-spacing: var(--tracking-normal);
   }
+  video::-webkit-media-controls,
+  video::-webkit-media-controls-start-playback-button {
+    display: none !important;
+    -webkit-appearance: none;
+  }
 }
 
 @keyframes marquee-scroll {
