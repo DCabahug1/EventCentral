@@ -81,6 +81,8 @@ export default function HowItWorks() {
 
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [mobileStep, setMobileStep] = useState(0);
+  const carouselContainerRef = useRef<HTMLDivElement>(null);
+  const isInViewRef = useRef(false);
 
   useEffect(() => {
     const update = () => {
@@ -109,8 +111,12 @@ export default function HowItWorks() {
     const onSelect = () => setMobileStep(carouselApi.selectedScrollSnap());
     carouselApi.on("select", onSelect);
 
-    const startAutoPlay = () => {
+    const stopAutoPlay = () => {
       if (autoPlayRef.current) clearInterval(autoPlayRef.current);
+    };
+
+    const startAutoPlay = () => {
+      stopAutoPlay();
       autoPlayRef.current = setInterval(() => {
         if (carouselApi.canScrollNext()) {
           carouselApi.scrollNext();
@@ -120,18 +126,32 @@ export default function HowItWorks() {
       }, 3000);
     };
 
-    const onPointerDown = () => {
-      if (autoPlayRef.current) clearInterval(autoPlayRef.current);
-    };
-    const onSettle = () => startAutoPlay();
+    const onPointerDown = () => stopAutoPlay();
+    const onSettle = () => { if (isInViewRef.current) startAutoPlay(); };
 
     carouselApi.on("pointerDown", onPointerDown);
     carouselApi.on("settle", onSettle);
 
-    startAutoPlay();
+    const el = carouselContainerRef.current;
+    let observer: IntersectionObserver | null = null;
+    if (el) {
+      observer = new IntersectionObserver(
+        ([entry]) => {
+          isInViewRef.current = entry.isIntersecting;
+          if (entry.isIntersecting) {
+            startAutoPlay();
+          } else {
+            stopAutoPlay();
+          }
+        },
+        { threshold: 0.3 }
+      );
+      observer.observe(el);
+    }
 
     return () => {
-      if (autoPlayRef.current) clearInterval(autoPlayRef.current);
+      stopAutoPlay();
+      observer?.disconnect();
       carouselApi.off("select", onSelect);
       carouselApi.off("pointerDown", onPointerDown);
       carouselApi.off("settle", onSettle);
@@ -192,7 +212,7 @@ export default function HowItWorks() {
         </div>
 
         {/* Carousel, mobile and tablet */}
-        <div className="lg:hidden flex flex-col gap-6">
+        <div ref={carouselContainerRef} className="lg:hidden flex flex-col gap-6">
           <Carousel setApi={setCarouselApi} opts={{ loop: false }} className="w-full">
             <CarouselContent>
               {STEPS.map((step, i) => (
