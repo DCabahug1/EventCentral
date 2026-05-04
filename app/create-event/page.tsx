@@ -1,9 +1,5 @@
-import React from 'react'
+import { redirect } from "next/navigation";
 
-function page() {
-  return (
-    <div>page</div>
-  )
+export default function CreateEventPage() {
+  redirect("/");
 }
-
-export default page

@@ -1,8 +1,9 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { getProfile } from "../profiles";
+import { getProfile } from "../profiles/server";
 import { PostgrestError } from "@supabase/supabase-js";
 import { Profile } from "../types";
+import { safeNextPath } from "../auth/redirect";
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -46,16 +47,27 @@ export async function updateSession(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname;
 
+  const PROTECTED_PATHS = [
+    "/profile",
+    "/onboarding",
+    "/organizations/new",
+    "/create-event",
+  ];
+  const isProtectedPath = PROTECTED_PATHS.some(
+    (path) => pathname === path || pathname.startsWith(`${path}/`),
+  );
+
   if (!user) {
-    if (pathname !== "/" && !pathname.startsWith("/auth")) {
+    if (isProtectedPath) {
       const url = request.nextUrl.clone();
       url.pathname = "/auth/login";
+      url.searchParams.set("next", `${pathname}${request.nextUrl.search}`);
       return NextResponse.redirect(url);
     }
     return supabaseResponse;
   }
 
-  // User is authenticated — safe to fetch profile
+  // User is authenticated so profile fetch is allowed.
   let profile: Profile | null = null;
 
   try {
@@ -79,11 +91,11 @@ export async function updateSession(request: NextRequest) {
     return supabaseResponse;
   }
 
-  // User has a profile — block auth and onboarding pages
+  // User has a profile so block auth and onboarding pages.
   if (pathname.startsWith("/auth") || pathname.startsWith("/onboarding")) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/";
-    return NextResponse.redirect(url);
+    const requestedNext = request.nextUrl.searchParams.get("next");
+    const target = safeNextPath(requestedNext, "/discover");
+    return NextResponse.redirect(new URL(target, request.nextUrl.origin));
   }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is. If you're

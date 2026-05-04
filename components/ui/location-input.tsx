@@ -1,0 +1,222 @@
+"use client";
+import React, { useEffect, useRef, useState } from "react";
+import { useMapsLibrary } from "@vis.gl/react-google-maps";
+import { Popover, PopoverAnchor, PopoverContent } from "./popover";
+import { Input } from "./input";
+import { MapPin } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+type Suggestion = {
+  placeId: string;
+  description: string;
+};
+
+const suggestionItemClass =
+  "relative flex w-full cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none select-none focus:bg-accent focus:text-accent-foreground";
+
+export function LocationInput({
+  id,
+  value,
+  onChange,
+  readOnly,
+  onActivate,
+  onValidityChange,
+  onPlaceSelect,
+  onInputKeyDown,
+  placeholder = "City, neighborhood, state, or country",
+  hideMapPin = false,
+  mapPinSide = "right",
+  anchorClassName,
+  inputClassName,
+  /** When false, an empty field is reported as invalid (required location flows). Default true (e.g. map filter “any location”). */
+  treatEmptyAsValid = true,
+}: {
+  id?: string;
+  value: string;
+  onChange: (value: string) => void;
+  readOnly?: boolean;
+  onActivate?: () => void;
+  onValidityChange?: (valid: boolean) => void;
+  onPlaceSelect?: (description: string, placeId: string) => void;
+  onInputKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  placeholder?: string;
+  hideMapPin?: boolean;
+  /** Which side of the input the map pin icon sits on. Defaults to "right". */
+  mapPinSide?: "left" | "right";
+  anchorClassName?: string;
+  inputClassName?: string;
+  treatEmptyAsValid?: boolean;
+}) {
+  const placesLib = useMapsLibrary("places");
+  const [autocompleteService, setAutocompleteService] =
+    useState<google.maps.places.AutocompleteService | null>(null);
+
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const [open, setOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (placesLib) {
+      setAutocompleteService(new placesLib.AutocompleteService());
+    }
+  }, [placesLib]);
+
+  const fetchSuggestions = (input: string) => {
+    if (!autocompleteService || input.trim().length < 2) {
+      setSuggestions([]);
+      setOpen(false);
+      return;
+    }
+    autocompleteService.getPlacePredictions(
+      { input, types: ["geocode"] },
+      (predictions, status) => {
+        if (
+          status === google.maps.places.PlacesServiceStatus.OK &&
+          predictions
+        ) {
+          setSuggestions(
+            predictions.slice(0, 5).map((p) => ({
+              placeId: p.place_id,
+              description: p.description,
+            })),
+          );
+          setOpen(true);
+        } else {
+          setSuggestions([]);
+          setOpen(false);
+        }
+      },
+    );
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (readOnly) return;
+    const val = e.target.value;
+    onChange(val);
+    // Empty: valid only when treatEmptyAsValid (e.g. map filter). Otherwise invalid until a suggestion is chosen.
+    onValidityChange?.(
+      val.trim() === "" ? treatEmptyAsValid : false,
+    );
+    setActiveIndex(-1);
+    fetchSuggestions(val);
+  };
+
+  const handleSelect = (description: string, placeId: string) => {
+    onChange(description);
+    onValidityChange?.(true);
+    onPlaceSelect?.(description, placeId);
+    setSuggestions([]);
+    setOpen(false);
+    setActiveIndex(-1);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!open || suggestions.length === 0) {
+      onInputKeyDown?.(e);
+      return;
+    }
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setActiveIndex((i) => Math.min(i + 1, suggestions.length - 1));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setActiveIndex((i) => Math.max(i - 1, 0));
+    } else if (e.key === "Enter" && activeIndex >= 0) {
+      e.preventDefault();
+      handleSelect(
+        suggestions[activeIndex].description,
+        suggestions[activeIndex].placeId,
+      );
+    } else if (e.key === "Escape") {
+      setOpen(false);
+    }
+  };
+
+  const popoverOpen = !readOnly && open && suggestions.length > 0;
+
+  return (
+    <Popover
+      open={popoverOpen}
+      onOpenChange={(next) => {
+        if (!next) setOpen(false);
+      }}
+      modal={false}
+    >
+      <PopoverAnchor asChild>
+        <div
+          ref={containerRef}
+          className={cn("relative w-full", anchorClassName)}
+        >
+          {!hideMapPin && (
+            <MapPin
+              className={cn(
+                "absolute top-1/2 -translate-y-1/2 text-muted-foreground size-4 z-10 pointer-events-none",
+                mapPinSide === "left" ? "left-3" : "right-3",
+              )}
+            />
+          )}
+          <Input
+            id={id}
+            type="text"
+            placeholder={placeholder}
+            value={value}
+            onChange={handleInputChange}
+            onKeyDown={readOnly ? undefined : handleKeyDown}
+            onFocus={() => {
+              if (readOnly) {
+                onActivate?.();
+                return;
+              }
+              suggestions.length > 0 && setOpen(true);
+            }}
+            readOnly={readOnly}
+            autoComplete="off"
+            className={cn(
+              !hideMapPin && mapPinSide === "left" && "pl-9",
+              !hideMapPin && mapPinSide === "right" && "pr-9",
+              inputClassName,
+            )}
+          />
+        </div>
+      </PopoverAnchor>
+      <PopoverContent
+        align="start"
+        side="bottom"
+        sideOffset={4}
+        className="w-(--radix-popover-anchor-width) p-1"
+        onOpenAutoFocus={(e) => e.preventDefault()}
+        onCloseAutoFocus={(e) => e.preventDefault()}
+      >
+        <ul
+          className="max-h-[min(280px,var(--radix-popover-content-available-height))] overflow-y-auto"
+          role="listbox"
+        >
+          {suggestions.map((s, i) => (
+            <li key={s.placeId} role="presentation">
+              <button
+                type="button"
+                role="option"
+                aria-selected={i === activeIndex}
+                className={cn(
+                  suggestionItemClass,
+                  i === activeIndex
+                    ? "bg-accent text-accent-foreground"
+                    : "hover:bg-accent hover:text-accent-foreground",
+                )}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  handleSelect(s.description, s.placeId);
+                }}
+                onMouseEnter={() => setActiveIndex(i)}
+              >
+                <MapPin className="size-3 shrink-0 text-muted-foreground" />
+                {s.description}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </PopoverContent>
+    </Popover>
+  );
+}
