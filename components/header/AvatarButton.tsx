@@ -32,8 +32,8 @@ function AvatarButton({ profile }: { profile: Profile }) {
       return;
     }
     dispatchProfileUpdated();
-    router.push("/");
-    router.refresh();
+    console.log("Signed out successfully");
+    window.location.reload();
   };
 
 
