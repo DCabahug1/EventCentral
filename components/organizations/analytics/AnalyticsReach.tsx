@@ -20,12 +20,12 @@ export default function AnalyticsReach({ data }: Props) {
     {
       label: "Total Organization views",
       value: data.orgProfileViews,
-      note: `unique ${data.orgProfileViews == 1 ? "view" : "views"} to this organization's page`,
+      note: `unique signed-in ${data.orgProfileViews == 1 ? "view" : "views"} to this organization's page`,
     },
     {
       label: "Total event page views",
       value: data.totalEventViews,
-      note: "across all events under this organization",
+      note: "by signed-in users across all events",
     },
   ];
 

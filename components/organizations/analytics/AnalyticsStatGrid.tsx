@@ -74,7 +74,7 @@ export default function AnalyticsStatGrid({
     {
       label: "Total Views",
       value: totalViews,
-      sub: "organization + event pages",
+      sub: "by signed-in users",
     },
     {
       label: "Events",
