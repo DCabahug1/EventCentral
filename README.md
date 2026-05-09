@@ -85,3 +85,5 @@ The application supports both light and dark modes. The active theme follows the
 | Deployment | Vercel |
 | Package Manager | pnpm |
 
+## Development Workflow
+This project was built with AI pair programming assistance from Claude Code, an agentic terminal tool for delegating full-stack development tasks. Claude Code handled component scaffolding, API integration, database schema iteration, and feature implementation across the Next.js and Supabase stack, accelerating development velocity and reducing boilerplate overhead.
